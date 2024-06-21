@@ -13,10 +13,10 @@ function App() {
       <NavBar/>
 
       <Routes>
-        <Route path="/" element={<Navigate to="/profile" replace />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/visa" element={<VisaStatusManagement />} />
-        <Route path="/housing" element={<Housing />} />
+        <Route path="/employee" element={<Navigate to="/employee/profile" replace />} />
+        <Route path="/employee/profile" element={<Profile />} />
+        <Route path="/employee/visa" element={<VisaStatusManagement />} />
+        <Route path="/employee/housing" element={<Housing />} />
       </Routes>
     </Router>
   )
