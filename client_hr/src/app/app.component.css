@@ -1,0 +1,25 @@
+.home {
+    position: absolute;
+    left: 0;
+    padding-left: 1rem;
+} 
+
+/* Material UI */
+#material-nav {
+    background-color:  #DCDCDC;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#material-nav > span{
+    height: 100%;
+    padding: 0 0.75vw;
+    display: flex;
+    align-items: center;
+}
+
+
+#material-nav > span:hover{
+    cursor:pointer;
+    opacity: 0.75;
+}
