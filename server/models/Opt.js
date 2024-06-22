@@ -36,6 +36,6 @@ const OptSchema = new Schema({
   },
 });
 
-const Opt = mongoose.model("Opt", OptSchema);
+const Opt = mongoose.models.Opt || mongoose.model("Opt", OptSchema);
 
 module.exports = Opt;

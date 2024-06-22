@@ -184,6 +184,7 @@ const OnboardingSchema = new Schema({
   },
 });
 
-const Onboarding = mongoose.model("Onboarding", OnboardingSchema);
+const Onboarding =
+  mongoose.models.Onboarding || mongoose.model("Onboarding", OnboardingSchema);
 
 module.exports = Onboarding;
