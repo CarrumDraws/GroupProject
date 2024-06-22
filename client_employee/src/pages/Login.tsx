@@ -29,7 +29,7 @@ function Login() {
         backgroundColor: '#D9D9D9',
         border: 'none',
         borderRadius: 0,
-        '& .MuiOutlinedInput-root': {
+        '& .MuiOutlinedInputRoot': {
             '& fieldset': {
                 borderColor: 'transparent',
             },
