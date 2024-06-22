@@ -61,7 +61,6 @@ const RegisterValidation = (req, res, next) => {
 
   // Sanitize inputs
   req.body.password = validator.escape(password.trim());
-  req.body.email = validator.normalizeEmail(email.trim());
 
   // Validate Password and Email
   if (
@@ -73,10 +72,10 @@ const RegisterValidation = (req, res, next) => {
     return res.status(400).json({ message: "Missing required fields!" });
   }
 
-  //   if (!validator.isEmail(email)) {
-  //     console.log("Invalid Email!");
-  //     return res.status(400).json({ message: "Invalid Email!" });
-  //   }
+  if (!validator.isEmail(email)) {
+    console.log("Invalid Email!");
+    return res.status(400).json({ message: "Invalid Email!" });
+  }
 
   const passwordPattern =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,10}$/;
