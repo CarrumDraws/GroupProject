@@ -1,1 +1,22 @@
-<p>login works!</p>
+<ng-container *ngIf="hasToken$ | async; else loginPage">
+    <button (click)="onLogout()">log out</button>
+</ng-container>
+
+<ng-template #loginPage>
+<div class="my-div">
+    <form class="example-form" [formGroup]="loginForm" (submit)="onSubmit()">
+        <mat-form-field class="example-full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="text" placeholder="Email" formControlName="email">
+          <mat-error>required</mat-error>
+        </mat-form-field>
+      
+        <mat-form-field class="example-full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="text" placeholder="Password" formControlName="password">
+          <mat-error>required</mat-error>
+        </mat-form-field>
+        <button mat-raised-button>Login</button>
+    </form>
+</div>
+</ng-template>

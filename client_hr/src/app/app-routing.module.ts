@@ -6,14 +6,15 @@ import { VisaComponent } from './components/visa/visa.component';
 import { HiringComponent } from './components/hiring/hiring.component';
 import { HousingComponent } from './components/housing/housing.component';
 import { LoginComponent } from './components/login/login.component';
+import { AuthGuard } from './store/auth/auth.guard';
 
 const routes: Routes = [
   
   {path: '', component: LoginComponent},
-  {path: 'employee', component: EmployeeComponent},
-  {path: 'visa', component: VisaComponent},
-  {path: 'hiring', component: HiringComponent},
-  {path: 'housing', component: HousingComponent}
+  {path: 'employee', component: EmployeeComponent, canActivate: [AuthGuard]},
+  {path: 'visa', component: VisaComponent, canActivate: [AuthGuard]},
+  {path: 'hiring', component: HiringComponent, canActivate: [AuthGuard]},
+  {path: 'housing', component: HousingComponent, canActivate: [AuthGuard]}
 
 ];
 
