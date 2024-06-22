@@ -24,6 +24,7 @@ const CommentSchema = new Schema({
   },
 });
 
-const Registration = mongoose.model("Registration", CommentSchema);
+const Comment =
+  mongoose.models.Comment || mongoose.model("Comment", CommentSchema);
 
-module.exports = Registration;
+module.exports = Comment;
