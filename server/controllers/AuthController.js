@@ -21,7 +21,7 @@ const sendRegistrationToken = async (req, res) => {
     const link = CLIENT_EMPLOYEE_PORT + "/register/" + token;
 
     const newRegistration = new Registration({
-      email: validator.normalizeEmail(employeeEmail.trim()),
+      email: employeeEmail,
       name: employeeName,
       link,
       status: false,
