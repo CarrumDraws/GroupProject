@@ -7,3 +7,6 @@ build/
 
 # Ignore all zip
 *.zip
+
+# Ignore .env file
+.env

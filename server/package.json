@@ -4,12 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "env-cmd nodemon index",
+    "seed": "env-cmd node config/seed"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.19.2"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "env-cmd": "^10.1.0",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.3",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.4",
+    "path": "^0.12.7",
+    "validator": "^13.12.0"
   }
 }
