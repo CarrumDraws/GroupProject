@@ -8,6 +8,7 @@ const EmployeeSchema = new Schema({
   isHR: { type: Boolean, required: true },
 });
 
-const Employee = mongoose.model("Employee", EmployeeSchema);
+const Employee =
+  mongoose.models.Employee || mongoose.model("Employee", EmployeeSchema);
 
 module.exports = Employee;

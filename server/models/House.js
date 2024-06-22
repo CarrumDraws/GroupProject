@@ -81,6 +81,6 @@ const HouseSchema = new Schema({
   },
 });
 
-const House = mongoose.model("House", HouseSchema);
+const House = mongoose.models.House || mongoose.model("House", HouseSchema);
 
 module.exports = House;
