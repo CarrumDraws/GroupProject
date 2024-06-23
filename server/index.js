@@ -1,6 +1,6 @@
 const app = require("./app.js");
 const db = require("./config/connection.js");
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 db.once("open", () => {
   app.listen(PORT, () => {
