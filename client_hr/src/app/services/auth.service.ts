@@ -1,32 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, observable, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, observable, of, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  private serverUrl = environment.serverUrl;
+
   constructor(private http:HttpClient, private router: Router) { }
-
-  login(username: string, password: string): Observable<any> {
+  
+  login(email: string, password: string): Observable<any> {
+    
     // Save it for later, need API call to the backend
-
-      // return this.http.post<any>(`${this.authUrl}/login`, { username, password })
-      //   .pipe(
-      //     tap(response => this.setSession(response)),
-      //     catchError(this.handleError<any>('login'))
-      //   );
-    
-    //mimic authorized login
-    return of({token: "my jwt token"}).pipe(
-      tap(response => this.setToken(response))
-    )
-
-    //mimic login failure
-    // return throwError("login failed");
-    
+    return this.http.post<any>(`${this.serverUrl}/login`, { email, password })
+      .pipe(
+        tap(response => this.setToken(response)),
+        catchError((err) => throwError(err))
+      );
+  
   }
 
   private setToken(result:any): void{
@@ -39,3 +34,4 @@ export class AuthService {
     this.router.navigate(['/employee']);
   }
 }
+    
