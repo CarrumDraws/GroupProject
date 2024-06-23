@@ -10,3 +10,4 @@ build/
 
 # Ignore .env file
 .env
+server/.env
