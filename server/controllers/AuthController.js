@@ -1,12 +1,23 @@
 // Main DB Connection Logic Happens Here!
 const generateToken = require("../utils/generateToken.js");
 
-const validator = require("validator");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
+
+// Require Nodemailer module
+const nodemailer = require("nodemailer");
+
+// Create a transporter using SMTP
+let transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAILPASSWORD,
+  },
+});
 
 // Create link to {CLIENT_EMPLOYEE_PORT/login/xxxx} with random characters in query param
 // Create a registration object in mongo
@@ -14,22 +25,42 @@ const Employee = require("../models/Employee.js");
 // [LATER] implement timeout
 const sendRegistrationToken = async (req, res) => {
   try {
-    const { employeeName, employeeEmail } = req.body;
+    const { name, email } = req.body;
     let token = generateRandomString(16);
 
     const { CLIENT_EMPLOYEE_PORT } = process.env;
     const link = CLIENT_EMPLOYEE_PORT + "/register/" + token;
 
+    const existingRegistration = await Registration.findOne({
+      email: email,
+    });
+    if (existingRegistration)
+      return res.status(400).json({ error: "Email Already in Use" });
+
     const newRegistration = new Registration({
-      email: employeeEmail,
-      name: employeeName,
+      email: email,
+      name: name,
       link,
       status: false,
     });
+
+    // Send Email
+    // let mailOptions = {
+    //   from: process.env.EMAIL,
+    //   to: email,
+    //   subject: "Register for Calum's Illustration Workshop",
+    //   text: `Congratulations, ${name}!\n\nYou've been selected to register for an upcoming Illustration Workshop.\nRegister with this link: ${link}\n\n Note: This link expires in 3 Hours.\n\nHope to see you soon!`,
+    // };
+
+    // transporter.sendMail(mailOptions, (error) => {
+    //   if (error) {
+    //     console.log(error);
+    //     res.status(500).send("Failed to send email");
+    //   }
+    //   console.log("Email Sent");
+    // });
+
     await newRegistration.save();
-
-    // [SEND EMAIL HERE]
-
     res.status(201).json(newRegistration);
   } catch (error) {
     console.error(error);
@@ -46,7 +77,9 @@ const register = async (req, res) => {
     );
 
     // check if email exists
-    let registration = await Registration.findOne({ email }).lean().exec();
+    let registration = await Registration.findOne({ email: email })
+      .lean()
+      .exec();
     if (!registration)
       return res.status(401).json({ message: "Invalid Email" });
 

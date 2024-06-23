@@ -16,19 +16,19 @@ const jwtValidation = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
     if (
-      !decoded.id ||
-      !validator.isMongoId(decoded.id) ||
-      !decoded.email ||
-      !decoded.isHR
+      !decoded.ID ||
+      !validator.isMongoId(decoded.ID) ||
+      !decoded.EMAIL ||
+      !decoded.ISHR
     ) {
       return res.status(401).json({
         message: "Invalid token",
       });
     }
 
-    req.body.id = decoded.id; // Assign id to req.body
-    req.body.email = decoded.email; // Assign email to req.body
-    req.body.isHR = decoded.isHR; // Assign isHR to req.body
+    req.body.ID = decoded.ID; // Assign ID to req.body
+    req.body.EMAIL = decoded.EMAIL; // Assign EMAIL to req.body
+    req.body.ISHR = decoded.ISHR; // Assign ISHR to req.body
 
     next();
   } catch (error) {
@@ -41,11 +41,32 @@ const jwtValidation = (req, res, next) => {
 
 const isHR = async (req, res, next) => {
   try {
-    let { isHR } = req.body;
-    if (!isHR) {
+    let { ISHR } = req.body;
+    if (!ISHR) {
       return res.status(403).json({
         message: "Unauthorized: Not HR",
       });
+    }
+    next();
+  } catch (error) {
+    console.error("isHR error:", error);
+    return res.status(500).json({
+      message: "isHR Failed",
+    });
+  }
+};
+
+const RegistrationValidation = async (req, res, next) => {
+  try {
+    let { name, email } = req.body;
+    if (!name || !email) {
+      return res.status(403).json({
+        message: "Missing Parameters",
+      });
+    }
+    if (!validator.isEmail(email)) {
+      console.log("Invalid Employee Email");
+      return res.status(400).json({ message: "Invalid Employee Email" });
     }
     next();
   } catch (error) {
@@ -90,4 +111,9 @@ const RegisterValidation = (req, res, next) => {
   next();
 };
 
-module.exports = { jwtValidation, isHR, RegisterValidation };
+module.exports = {
+  jwtValidation,
+  isHR,
+  RegistrationValidation,
+  RegisterValidation,
+};
