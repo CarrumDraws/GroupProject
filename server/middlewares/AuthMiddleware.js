@@ -56,6 +56,27 @@ const isHR = async (req, res, next) => {
   }
 };
 
+const RegistrationValidation = async (req, res, next) => {
+  try {
+    let { employeeName, employeeEmail } = req.body;
+    if (!employeeName || !employeeEmail) {
+      return res.status(403).json({
+        message: "Missing Parameters",
+      });
+    }
+    if (!validator.isEmail(employeeEmail)) {
+      console.log("Invalid Employee Email");
+      return res.status(400).json({ message: "Invalid Employee Email" });
+    }
+    next();
+  } catch (error) {
+    console.error("isHR error:", error);
+    return res.status(500).json({
+      message: "isHR Failed",
+    });
+  }
+};
+
 const RegisterValidation = (req, res, next) => {
   const { password, email } = req.body;
 
@@ -90,4 +111,9 @@ const RegisterValidation = (req, res, next) => {
   next();
 };
 
-module.exports = { jwtValidation, isHR, RegisterValidation };
+module.exports = {
+  jwtValidation,
+  isHR,
+  RegistrationValidation,
+  RegisterValidation,
+};
