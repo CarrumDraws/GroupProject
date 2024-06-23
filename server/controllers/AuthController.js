@@ -8,16 +8,16 @@ const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
 
 // Require Nodemailer module
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 
 // Create a transporter using SMTP
-let transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAILPASSWORD,
-  },
-});
+// let transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL,
+//     pass: process.env.EMAILPASSWORD,
+//   },
+// });
 
 // Create link to {CLIENT_EMPLOYEE_PORT/login/xxxx} with random characters in query param
 // Create a registration object in mongo
