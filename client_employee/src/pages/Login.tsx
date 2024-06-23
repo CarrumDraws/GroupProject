@@ -1,27 +1,50 @@
-import React, { useState } from 'react';
-import { Box, TextField, Button, Container } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Box, TextField, Button, Container, Typography } from '@mui/material';
 
-import { login } from '../store/userSlice.tsx';
-
-
+import { validateEmail, validatePassword } from '../utils/AuthValidator.tsx';
 
 function Login() {
-    const [username, setUserame] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errs, setErrs] = useState<string[]>([]);
     
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if(token) {
+            navigate('/profile');
+        }
+    }, [navigate]);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        console.log('Username', username);
-        console.log('password', password);
+        let validationErrors: string[] = [];
+        validateEmail(email, validationErrors);
+        validatePassword(password, validationErrors);
+
+        if(validationErrors.length > 0) {
+            setErrs(validationErrors);
+            return;
+        }
         
-        dispatch(login());
-        navigate('/profile');
+        try{
+            const serverUrl = import.meta.env.VITE_SERVER_URL;
+            const response = await axios.post(`${serverUrl}/login`, {
+                email,
+                password
+            });
+
+            if(response.data) {
+                localStorage.setItem('token', response.data.token);
+                window.location.href='/profile'
+            }
+        }catch(e) {
+            alert('Error during login.');
+        }
     }
 
     const textFieldStyle = {
@@ -64,9 +87,9 @@ function Login() {
                     }}
                 >
                     <TextField
-                        value={username}
-                        placeholder='Username'
-                        onChange={(e) => setUserame(e.target.value)}
+                        value={email}
+                        placeholder='Email'
+                        onChange={(e) => setEmail(e.target.value)}
                         margin='normal'
                         required
                         fullWidth
@@ -81,6 +104,7 @@ function Login() {
                     />
 
                     <TextField
+                        type='password'
                         value={password}
                         placeholder='Password'
                         onChange={(e) => setPassword(e.target.value)}
@@ -110,6 +134,12 @@ function Login() {
                     >
                         Sign In
                     </Button>
+                </Box>
+
+                <Box sx={{ mt:2 }}>
+                    {errs.length > 0 && errs.map((err) => (
+                        <Typography key={err} color={'red'}>{err}</Typography>
+                    ))}
                 </Box>
             </Box>
         </Container>
