@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+
 const cors = require("cors");
 const morgan = require("morgan");
 
@@ -8,6 +10,8 @@ const onboardingRouter = require("./routers/OnboardingRouter.js");
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
 
 // Frontend (React): "http://localhost:5173"
 // Frontend (Angular): "http://localhost:4200"
@@ -18,9 +22,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
 
 app.use("/", authRouter);
 app.use("/onboarding", onboardingRouter);
