@@ -17,4 +17,24 @@ export class FlashMessageService {
     };
     this.snackBar.open(message, 'Close', config);
   }
+
+  info(message: string, duration: number = 3000) {
+    const config: MatSnackBarConfig = {
+      duration,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ["info-snackbar"]
+    };
+    this.snackBar.open(message, 'Close', config);
+  }
+
+  warn(message: string, duration: number = 3000) {
+    const config: MatSnackBarConfig = {
+      duration,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ["warn-snackbar"]
+    };
+    this.snackBar.open(message, 'Close', config);
+  }
 }
