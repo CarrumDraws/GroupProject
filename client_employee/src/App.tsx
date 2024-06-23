@@ -1,7 +1,6 @@
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider } from 'react-redux';
 
-import store from './store/store.tsx';
 import NavBar from './components/NavBar.tsx';
 import Profile from './pages/Profile.tsx';
 import VisaStatusManagement from './pages/VisaStatusManagement.tsx';
@@ -12,45 +11,37 @@ import Login from './pages/Login.tsx';
 import './App.css'
 
 function App() {
-  return (
-    <Provider store={store}>
-    <Router>
-      <Routes>
-        <Route path='/' element={<Navigate to='/profile' replace/>} />
-        
-        <Route
-          path="/profile"
-          element={
-            <div>
-              <NavBar />
-              <Profile />
-            </div>
-          }
-        />
-        <Route
-          path="/visa"
-          element={
-            <div>
-              <NavBar />
-              <VisaStatusManagement />
-            </div>
-          }
-        />
-        <Route
-          path="/housing"
-          element={
-            <div>
-              <NavBar />
-              <Housing />
-            </div>
-          }
-        />
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-        <Route path="/register" element={<Registration />} />
+  useEffect(() => {
+    const checkLoggedIn = () => {
+      const token = localStorage.getItem('token');
+      if(token) {
+        setIsLoggedIn(true);
+      }else {
+        setIsLoggedIn(false);
+      }
+    }
+
+    checkLoggedIn();
+  }, []);
+
+  return (
+    <Router>
+      {isLoggedIn && <NavBar />}
+      <Routes>
+        <Route path='/' element={isLoggedIn ? <Navigate to='/profile' replace/> : <Navigate to='/login' replace/>} />
+        
+       {isLoggedIn && (<>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/visa" element={<VisaStatusManagement />} />
+          <Route path="/housing" element={<Housing />} />
+        </>)}
+
+        <Route path="/register/:token" element={<Registration />} />
         <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
-    </Provider>
   );
 }
 
