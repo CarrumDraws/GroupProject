@@ -4,24 +4,83 @@ const generateToken = require("../utils/generateToken.js");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 
+const { transporter } = require("../config/nodemailer.js");
+
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
 
-// Require Nodemailer module
-// const nodemailer = require("nodemailer");
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-// Create a transporter using SMTP
-// let transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: process.env.EMAIL,
-//     pass: process.env.EMAILPASSWORD,
-//   },
-// });
+    let employee = await Employee.findOne({ email }).lean().exec(); // check if email exists
+    if (!employee) return res.status(401).json({ message: "Invalid Email" });
+
+    // check if Password is correct
+    const isPasswordCorrect = await bcrypt.compare(password, employee.password);
+    if (!isPasswordCorrect)
+      return res.status(401).json({ message: "Invalid Password" });
+
+    // Stores ID, email, Employeename
+    const token = generateToken(employee._id, employee.email, employee.isHR);
+
+    // Generate + Return { token: {data}, employee: {data} }
+    res.status(200).json({ token: token, employee: employee });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const register = async (req, res) => {
+  try {
+    const { email, link } = req.body;
+    const password = await bcrypt.hash(
+      req.body.password,
+      Number(process.env.SALT)
+    );
+
+    // check if email exists
+    let registration = await Registration.findOne({ email: email })
+      .lean()
+      .exec();
+    if (!registration)
+      return res.status(401).json({ message: "Invalid Email" });
+
+    // check if Link matches
+    if (registration.link != link)
+      return res.status(401).json({ message: "Invalid Registration Link" });
+
+    if (registration.status)
+      return res.status(401).json({ message: "User Already Registered" });
+
+    // Create newEmployee
+    const newEmployee = new Employee({
+      email,
+      password,
+      isHR: false,
+    });
+
+    // Stores ID, email, Employeename
+    const jwttoken = generateToken(
+      newEmployee._id,
+      newEmployee.email,
+      newEmployee.isHR
+    );
+
+    await newEmployee.save();
+    await Registration.updateOne({ email }, { $set: { status: true } });
+
+    // Generate + Return { token: {data}, employee: {data} }
+    res.status(201).json({ token: jwttoken, employee: newEmployee });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 // Create link to {CLIENT_EMPLOYEE_PORT/login/xxxx} with random characters in query param
 // Create a registration object in mongo
-// [LATER] Send Email
 // [LATER] implement timeout
 const sendRegistrationToken = async (req, res) => {
   try {
@@ -68,72 +127,10 @@ const sendRegistrationToken = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
+const getRegistrationTokens = async (req, res) => {
   try {
-    const { email, link } = req.body;
-    const password = await bcrypt.hash(
-      req.body.password,
-      Number(process.env.SALT)
-    );
-
-    // check if email exists
-    let registration = await Registration.findOne({ email: email })
-      .lean()
-      .exec();
-    if (!registration)
-      return res.status(401).json({ message: "Invalid Email" });
-
-    // check if Link matches
-    console.log(registration.link);
-    console.log(link);
-    if (registration.link != link)
-      return res.status(401).json({ message: "Invalid Registration Link" });
-
-    if (registration.status)
-      return res.status(401).json({ message: "User Already Registered" });
-
-    // Create newEmployee
-    const newEmployee = new Employee({
-      email,
-      password,
-      isHR: false,
-    });
-
-    // Stores ID, email, Employeename
-    const jwttoken = generateToken(
-      newEmployee._id,
-      newEmployee.email,
-      newEmployee.isHR
-    );
-
-    await newEmployee.save();
-    await Registration.updateOne({ email }, { $set: { status: true } });
-
-    // Generate + Return { token: {data}, employee: {data} }
-    res.status(201).json({ token: jwttoken, employee: newEmployee });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    let employee = await Employee.findOne({ email }).lean().exec(); // check if email exists
-    if (!employee) return res.status(401).json({ message: "Invalid Email" });
-
-    // check if Password is correct
-    const isPasswordCorrect = await bcrypt.compare(password, employee.password);
-    if (!isPasswordCorrect)
-      return res.status(401).json({ message: "Invalid Password" });
-
-    // Stores ID, email, Employeename
-    const token = generateToken(employee._id, employee.email, employee.isHR);
-
-    // Generate + Return { token: {data}, employee: {data} }
-    res.status(200).json({ token: token, employee: employee });
+    const registrations = await Registration.find();
+    res.status(201).json(registrations);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -152,6 +149,7 @@ function generateRandomString(length) {
 
 module.exports = {
   sendRegistrationToken,
+  getRegistrationTokens,
   register,
   login,
 };

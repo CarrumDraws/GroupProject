@@ -86,28 +86,28 @@ const CarSchema = new Schema({
 });
 
 const WorkAuthSchema = new Schema({
+  workauth: {
+    type: String,
+  },
   title: {
     type: String,
-    required: true,
   },
   startdate: {
     type: Date,
-    required: true,
   },
   enddate: {
     type: Date,
-    required: true,
   },
 });
 
 const LicenseSchema = new Schema({
-  haslisence: {
+  haslicense: {
     type: Boolean,
     required: true,
   },
-  lisencenumber: String,
+  licensenumber: String,
   expdate: Date,
-  file: {
+  licensefile: {
     type: refType,
     ref: "File",
   },
@@ -156,6 +156,10 @@ const OnboardingSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  citizenshiptype: {
+    type: String,
+    enum: ["Green Card", "Citizen"],
+  },
   workauth: {
     type: WorkAuthSchema,
   },
@@ -180,7 +184,6 @@ const OnboardingSchema = new Schema({
   },
   feedback: {
     type: String,
-    required: true,
   },
 });
 

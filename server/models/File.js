@@ -10,10 +10,7 @@ const FileSchema = new Schema({
     required: true,
   },
   filename: { type: String, required: true },
-  key: { type: String, required: true }, // This can be the S3 object key
-  bucket: { type: String, required: true }, // S3 bucket name
-  url: { type: String, required: true }, // URL to access the file in S3
-  size: { type: Number, required: true },
+  filekey: { type: String, required: true }, // S3 object key
   status: {
     type: String,
     enum: ["Not Started", "Pending", "Rejected", "Approved"],
@@ -25,7 +22,6 @@ const FileSchema = new Schema({
   },
   feedback: {
     type: String,
-    required: true,
   },
 });
 
