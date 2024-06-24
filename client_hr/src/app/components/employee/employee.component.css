@@ -1,0 +1,16 @@
+mat-form-field{
+    margin: 2rem 0;
+    width: 40%;
+}
+
+#employee-body{
+    width: 80vw;
+    margin: 0 10vw;
+}
+
+h2{
+    text-align: left;
+    background-color: rgb(103, 58,183);
+    color: white;
+    height: 3rem;
+}

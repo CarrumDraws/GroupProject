@@ -30,6 +30,8 @@ import { MatButtonModule} from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule} from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { ProfileComponent } from './profile/profile.component';
 
 
 @NgModule({
@@ -47,6 +49,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
+    MatCardModule,
     StoreModule.forRoot({ auth: AuthReducer}),
     EffectsModule.forRoot([AuthEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
@@ -60,7 +63,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     HousingComponent,
     LoginComponent,
     ApplicationComponent,
-    FeedbackComponent
+    FeedbackComponent,
+    ProfileComponent
   ],
 
   providers: [],
