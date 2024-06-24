@@ -1,1 +1,25 @@
-<p>hiring works!</p>
+<h3 (click)="switchPage(true)">Ristration Token</h3>
+<h3 (click)="switchPage(false)">Onboarding Page</h3>
+
+<div *ngIf="isTokenPage; else onboardingPage">
+    <form class="example-form" [formGroup]="tokenForm" (submit)="onSendToken()">
+        <mat-form-field class="example-full-width">
+            <mat-label >Name</mat-label>
+            <input matInput type="password" placeholder="Name" formControlName="name">
+            <mat-error>required</mat-error>
+          </mat-form-field>
+    
+        <mat-form-field class="example-full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="text" placeholder="Email" formControlName="email">
+          <mat-error>required</mat-error>
+        </mat-form-field>
+        <br>
+        <br>
+        <button mat-raised-button color="primary">Send Token</button>
+    </form>   
+</div>
+
+<ng-template #onboardingPage>
+    onBoarding Page
+</ng-template>
