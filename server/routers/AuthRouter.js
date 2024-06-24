@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const {
   sendRegistrationToken,
+  getRegistrationTokens,
   register,
   login,
 } = require("../controllers/AuthController.js");
@@ -14,6 +15,8 @@ const {
 
 const authRouter = Router();
 
+authRouter.post("/login", login);
+authRouter.post("/register", RegisterValidation, register);
 authRouter.post(
   "/registration",
   jwtValidation,
@@ -21,7 +24,11 @@ authRouter.post(
   RegistrationValidation,
   sendRegistrationToken
 );
-authRouter.post("/register", RegisterValidation, register);
-authRouter.post("/login", login);
+authRouter.get(
+  "/registrationtokens",
+  jwtValidation,
+  isHR,
+  getRegistrationTokens
+);
 
 module.exports = authRouter;

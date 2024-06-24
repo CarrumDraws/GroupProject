@@ -38,7 +38,7 @@ const submitOnboarding = async (req, res) => {
   try {
     const { ID, EMAIL, ISHR } = req.body;
     console.log(ID);
-    const {
+    let {
       firstname,
       middlename,
       lastname,
@@ -58,6 +58,7 @@ const submitOnboarding = async (req, res) => {
       gender,
       citizenship,
       citizenshiptype,
+      workauth,
       title,
       startdate,
       enddate,
@@ -82,21 +83,47 @@ const submitOnboarding = async (req, res) => {
     if (!ssn) return res.status(400).send("Missing SSN Field");
     if (!dob) return res.status(400).send("Missing DOB Field");
 
+    if (!gender) return res.status(400).send("Missing Gender Field");
+    if (gender != "Male" && gender != "Female" && gender != "Other")
+      return res
+        .status(400)
+        .send("Invalid Gender Field: Must be Male, Female, or Other");
+
     if (!citizenship) return res.status(400).send("Missing Citizenship Field");
-    if (citizenship === "true") {
+    if (citizenship === "true") citizenship = true;
+    else citizenship = false;
+    if (citizenship) {
       if (!citizenshiptype)
         return res.status(400).send("Missing Citizenshiptype Field");
+      if (citizenshiptype != "Green Card" && citizenshiptype != "Citizen")
+        return res
+          .status(400)
+          .send("Invalid Citizenshiptype Type: Must be Green Card or Citizen");
     } else {
       if (!workauth || !startdate || !enddate)
         return res.status(400).send("Missing Work Authorization Fields");
-      if (workauth === "Other") {
+      if (
+        workauth != "H1-B" &&
+        workauth != "L2" &&
+        workauth != "F1(CPT/OPT)" &&
+        workauth != "H4" &&
+        workauth != "Other"
+      )
+        return res
+          .status(400)
+          .send(
+            "Invalid workauth: Must be H1-B, L2, F1(CPT/OPT), H4, or Other"
+          );
+      if (workauth === "F1(CPT/OPT)") {
         if (!optreciept) return res.status(400).send("Missing OPT Reciept");
       } else if (workauth === "Other") {
         if (!title) return res.status(400).send("Missing Title Field");
       }
     }
     if (!haslicense) return res.status(400).send("Missing Haslisence Field");
-    if (haslicense === "true") {
+    if (haslicense === "true") haslicense = true;
+    else haslicense = false;
+    if (haslicense) {
       if (!licensenumber || !expdate || !license)
         return res.status(400).send("Missing Lisence Data");
     }
@@ -150,26 +177,28 @@ const submitOnboarding = async (req, res) => {
         ssn: Number(ssn),
         dob: Date(dob),
         gender,
-        citizenship: Boolean(citizenship),
-        citizenshiptype,
+        citizenship: citizenship,
+        citizenshiptype: citizenship ? citizenshiptype : null,
         workauth: {
-          title,
-          startdate: Date(startdate),
-          enddate: Date(enddate),
+          workauth: citizenship ? null : workauth,
+          title: citizenship ? null : workauth === "Other" ? title : null,
+          startdate: citizenship ? null : Date(startdate),
+          enddate: citizenship ? null : Date(enddate),
         },
         license: {
-          haslicense: Boolean(haslicense),
-          licensenumber,
-          expdate: Date(expdate),
-          licensefile: licenseFileID,
+          haslicense: haslicense,
+          licensenumber: haslicense ? licensenumber : null,
+          expdate: haslicense ? Date(expdate) : null,
+          licensefile: haslicense ? licenseFileID : null,
         },
         references,
         contacts,
         status: "Pending",
+        feedback: null,
       },
       { new: true, upsert: true, setDefaultsOnInsert: true } // Options
     );
-
+    console.log(updatedOnboarding);
     await updatedOnboarding.save();
     res.status(200).json({
       message: "Onboarding submitted successfully",
@@ -179,6 +208,90 @@ const submitOnboarding = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+const reviewOnboardingApps = async (req, res) => {
+  try {
+    const { ID, EMAIL, ISHR } = req.body;
+    const { type } = req.query;
+    if (!type) return res.status(400).send("Missing type Query");
+    if (type !== "Pending" && type !== "Rejected" && type !== "Approved")
+      return res.status(400).send("Invalid type Query");
+
+    // Get first name, preferredname, lastname, email, link to their profile pic
+    const data = await Onboarding.find(
+      { status: type },
+      "name picture employee_id -_id"
+    )
+      .populate("employee_id", "email") // Populate employee_id with email
+      .exec();
+
+    // Remove _id from the nested name field in each document
+    const result = data.map((doc) => {
+      const plainDoc = doc.toObject(); // Converts mongo doc to plain object
+      const { _id, ...nameWithoutId } = plainDoc.name; // Remove _id from name
+      return {
+        ...plainDoc,
+        name: nameWithoutId,
+      };
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getEmployeeOnboarding = async (req, res) => {
+  try {
+    const { ID, EMAIL, ISHR } = req.body;
+    const employeeid = req.params.employeeid;
+    if (!employeeid) return res.status(400).send("Missing employeeid Param");
+
+    const data = await Onboarding.findOne({
+      employee_id: employeeid,
+    })
+      .populate("employee_id", "email")
+      .lean();
+    if (!data) return res.status(404).json({ error: "User Not Found" });
+
+    delete data._id; // Delete onboarding id for better readability
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const handleEmployeeOnboarding = async (req, res) => {
+  try {
+    const { ID, EMAIL, ISHR } = req.body;
+    const { action, feedback } = req.body;
+    const employeeid = req.params.employeeid;
+    if (!employeeid) return res.status(400).send("Missing employeeid Param");
+    if (!action) return res.status(400).send("Missing action in body");
+    if (action != "Accept" && action != "Reject")
+      return res.status(400).send("Invalid Action: must be Accept or Reject");
+
+    if (action == "Reject" && !feedback)
+      return res.status(400).send("Missing feedback in body");
+
+    const data = await Onboarding.findOneAndUpdate(
+      { employee_id: employeeid },
+      { status: action, feedback: action == "Reject" ? feedback : null },
+      { new: true }
+    );
+    if (!data)
+      return res.status(404).json({ error: "User's Onboarding Not Found" });
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// HELPER FUNCS ----
 
 const uploadFile = async (req, res) => {
   try {
@@ -276,6 +389,9 @@ async function handleOptDocument(employeeId, optFileID) {
 module.exports = {
   getOnboarding,
   submitOnboarding,
+  reviewOnboardingApps,
+  getEmployeeOnboarding,
+  handleEmployeeOnboarding,
   upload,
   uploadFile,
   retrieveFile,

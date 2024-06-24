@@ -2,6 +2,9 @@ const { Router } = require("express");
 const {
   getOnboarding,
   submitOnboarding,
+  reviewOnboardingApps,
+  getEmployeeOnboarding,
+  handleEmployeeOnboarding,
   upload,
   uploadFile,
   retrieveFile,
@@ -22,10 +25,23 @@ onboardingRouter.post(
   jwtValidation,
   submitOnboarding
 );
-// onboardingRouter.post("/:employeeid", login);
+onboardingRouter.get("/all", jwtValidation, isHR, reviewOnboardingApps);
+
+onboardingRouter.get(
+  "/:employeeid",
+  jwtValidation,
+  isHR,
+  getEmployeeOnboarding
+);
+onboardingRouter.put(
+  "/:employeeid",
+  jwtValidation,
+  isHR,
+  handleEmployeeOnboarding
+);
 // onboardingRouter.put("/:employeeid", login);
 
-// onboardingRouter.post("/upload", upload.single("picture"), uploadFile);
-// onboardingRouter.get("/getfile/:fileKey", retrieveFile);
+onboardingRouter.post("/upload", upload.single("picture"), uploadFile);
+onboardingRouter.get("/getfile/:fileKey", retrieveFile);
 
 module.exports = onboardingRouter;

@@ -86,6 +86,9 @@ const CarSchema = new Schema({
 });
 
 const WorkAuthSchema = new Schema({
+  workauth: {
+    type: String,
+  },
   title: {
     type: String,
   },
