@@ -49,9 +49,9 @@ function Login() {
 
     const textFieldStyle = {
         height: '1.5rem',
-        backgroundColor: '#D9D9D9',
+        backgroundColor: 'white',
         border: 'none',
-        borderRadius: 0,
+        borderRadius: '5px',
         '& .MuiOutlinedInputRoot': {
             '& fieldset': {
                 borderColor: 'transparent',
@@ -128,7 +128,7 @@ function Login() {
                             mt: 2,
                             mb: 2,
                             backgroundColor: '#41AFFF',
-                            borderRadius: '0',
+                            borderRadius: '5px',
                             height: '1.5rem'
                         }}
                     >
