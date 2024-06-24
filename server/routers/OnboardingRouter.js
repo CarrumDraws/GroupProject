@@ -12,10 +12,20 @@ const { jwtValidation, isHR } = require("../middlewares/AuthMiddleware.js");
 const onboardingRouter = Router();
 
 onboardingRouter.get("/", jwtValidation, getOnboarding);
-onboardingRouter.post("/", jwtValidation, submitOnboarding);
+onboardingRouter.post(
+  "/",
+  upload.fields([
+    { name: "picture", maxCount: 1 },
+    { name: "license", maxCount: 1 },
+    { name: "optreciept", maxCount: 1 },
+  ]),
+  jwtValidation,
+  submitOnboarding
+);
 // onboardingRouter.post("/:employeeid", login);
 // onboardingRouter.put("/:employeeid", login);
-onboardingRouter.post("/upload", upload.single("picture"), uploadFile);
-onboardingRouter.get("/getfile/:fileKey", retrieveFile);
+
+// onboardingRouter.post("/upload", upload.single("picture"), uploadFile);
+// onboardingRouter.get("/getfile/:fileKey", retrieveFile);
 
 module.exports = onboardingRouter;

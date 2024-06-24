@@ -14,12 +14,11 @@ const jwtValidation = (req, res, next) => {
 
     // decode token
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
     if (
       !decoded.ID ||
       !validator.isMongoId(decoded.ID) ||
       !decoded.EMAIL ||
-      !decoded.ISHR
+      decoded.ISHR == null
     ) {
       return res.status(401).json({
         message: "Invalid token",
@@ -29,7 +28,6 @@ const jwtValidation = (req, res, next) => {
     req.body.ID = decoded.ID; // Assign ID to req.body
     req.body.EMAIL = decoded.EMAIL; // Assign EMAIL to req.body
     req.body.ISHR = decoded.ISHR; // Assign ISHR to req.body
-
     next();
   } catch (error) {
     console.error("JWT validation error:", error);

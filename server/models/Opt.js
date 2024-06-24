@@ -12,22 +12,18 @@ const OptSchema = new Schema({
   optreciept: {
     type: refType,
     ref: "File",
-    required: true,
   },
   optead: {
     type: refType,
     ref: "File",
-    required: true,
   },
   i983: {
     type: refType,
     ref: "File",
-    required: true,
   },
   i20: {
     type: refType,
     ref: "File",
-    required: true,
   },
   status: {
     type: String,
