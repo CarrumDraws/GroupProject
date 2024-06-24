@@ -12,8 +12,6 @@ const Onboarding = require("../models/Onboarding.js");
 const Employee = require("../models/Employee.js");
 const File = require("../models/File.js");
 const Opt = require("../models/Opt.js");
-const File = require("../models/File.js");
-const Opt = require("../models/Opt.js");
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
