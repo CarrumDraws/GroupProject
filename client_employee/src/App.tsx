@@ -7,6 +7,7 @@ import VisaStatusManagement from './pages/VisaStatusManagement.tsx';
 import Housing from './pages/Housing.tsx';
 import Registration from './pages/Registration.tsx';
 import Login from './pages/Login.tsx';
+import { ProfileProvider } from './context/ProfileContext.tsx';
 
 import './App.css'
 
@@ -33,7 +34,11 @@ function App() {
         <Route path='/' element={isLoggedIn ? <Navigate to='/profile' replace/> : <Navigate to='/login' replace/>} />
         
        {isLoggedIn && (<>
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={
+            <ProfileProvider>
+              <Profile />
+            </ProfileProvider>
+          } />
           <Route path="/visa" element={<VisaStatusManagement />} />
           <Route path="/housing" element={<Housing />} />
         </>)}

@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Box, Button } from "@mui/material";
 
 function NavBar() {
     return (
-        <AppBar position="static" elevation={0} sx={{ background:'#DCDCDC', fontSize:'1.5rem'}}>
+        <AppBar position="static" elevation={0} sx={{ background:'#9EAABA', fontSize:'1.5rem'}}>
             <Toolbar>
                 <Box sx={{ flexGrow: 1 }}>
                     <Button component={ RouterLink } to='/profile' sx={{color: 'black'}}>
