@@ -21,5 +21,17 @@
 </div>
 
 <ng-template #onboardingPage>
-    onBoarding Page
+    <select (change)="changeFilter($event)" name="status" id="status">
+        <option value="pending">Pending</option>
+        <option value="rejected">Rejected</option>
+        <option value="approved">Approved</option>
+    </select>
+    <a href="employee" target="https://http://localhost:4200/">Go to Employee</a>
+    <h3> List of emloyees</h3>
+    <div *ngFor="let employee of employees_data">
+        <p *ngIf="employee.status === currentFilter">
+            {{ employee.name}} | {{ employee.email}} | 
+            <a href="javascript:void(0);" (click)="viewApplication(employee.id)">View Application</a>
+        </p>
+    </div>
 </ng-template>
