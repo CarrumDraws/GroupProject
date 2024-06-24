@@ -26,7 +26,7 @@ const uploadFileToS3 = async (file) => {
 
   try {
     const data = await s3Client.send(new PutObjectCommand(uploadParams));
-    return { data, key: fileid }; // Return the unique key along with the data
+    return { data, key: fileid, filename: file.originalname }; // Return the unique key along with the data
   } catch (err) {
     console.error(err);
     throw err;

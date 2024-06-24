@@ -4,24 +4,13 @@ const generateToken = require("../utils/generateToken.js");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 
+const { transporter } = require("../config/nodemailer.js");
+
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
 
-// Require Nodemailer module
-// const nodemailer = require("nodemailer");
-
-// Create a transporter using SMTP
-// let transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: process.env.EMAIL,
-//     pass: process.env.EMAILPASSWORD,
-//   },
-// });
-
 // Create link to {CLIENT_EMPLOYEE_PORT/login/xxxx} with random characters in query param
 // Create a registration object in mongo
-// [LATER] Send Email
 // [LATER] implement timeout
 const sendRegistrationToken = async (req, res) => {
   try {
@@ -84,8 +73,6 @@ const register = async (req, res) => {
       return res.status(401).json({ message: "Invalid Email" });
 
     // check if Link matches
-    console.log(registration.link);
-    console.log(link);
     if (registration.link != link)
       return res.status(401).json({ message: "Invalid Registration Link" });
 
