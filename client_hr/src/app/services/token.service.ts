@@ -13,7 +13,6 @@ export class TokenService {
 
   constructor( private http:HttpClient ) { }
 
-
   sendToken( name: string, email: string): Observable<any> {
 
     let headers = new HttpHeaders({

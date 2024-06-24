@@ -1,26 +1,28 @@
 .my-div{
+    padding-top: 5rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 700px;
 }
 
 
-.example-form {
-    min-width: 150px;
-    max-width: 500px;
-    width: 100%;
-  }
-  
-.example-full-width {
-    width: 100%;
+form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 30vw;
+
+
+    padding: 0 5vw;
 }
 
-form > *{
-    margin: 1rem 0;
+
+form > mat-form-field {
+    padding: 1rem 0;
 }
 
-form > input {
-    color: #D9D9D9
-}
 
+button{
+    width: 30%;
+    margin: 0 35%;
+}

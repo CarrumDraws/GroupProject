@@ -1,27 +1,30 @@
 .home {
     position: absolute;
     left: 0;
-    padding-left: 1rem;
-} 
+    padding-left: 2vw;
+}
+
+
+.home:hover{
+    cursor: pointer;
+}
+
 
 /* Material UI */
 #material-nav {
-    background-color:  #DCDCDC;
     display: flex;
     justify-content: flex-end;
+    border-bottom: 5px solid var(--accent-color);
 }
 
-#material-nav > span{
-    height: 100%;
-    padding: 0 0.75vw;
+
+#material-nav > button{
+    height: 50%;
+    padding: 0 2vw;
+    margin: 0 1vw;
     display: flex;
     align-items: center;
+    font-size: large;
+    color: white;
 }
-
-
-#material-nav > span:hover{
-    cursor:pointer;
-    opacity: 0.75;
-}
-
 

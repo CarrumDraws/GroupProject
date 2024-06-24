@@ -12,6 +12,8 @@ import { VisaComponent } from './components/visa/visa.component';
 import { HiringComponent } from './components/hiring/hiring.component';
 import { HousingComponent } from './components/housing/housing.component';
 import { LoginComponent } from './components/login/login.component';
+import { ApplicationComponent } from './components/application/application.component';
+import { FeedbackComponent } from './components/feedback/feedback.component';
 //NgRx
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -21,15 +23,16 @@ import { AuthEffects } from './store/auth/auth.effects';
 
 //Material UI
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatFormFieldModule} from '@angular/material/form-field';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatButtonModule} from '@angular/material/button';
+import { MatToolbarModule} from '@angular/material/toolbar';
+import { MatButtonModule} from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import {MatInputModule} from '@angular/material/input';
-
-
-
+import { MatInputModule} from '@angular/material/input';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { ProfileComponent } from './profile/profile.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 
 @NgModule({
@@ -43,9 +46,12 @@ import {MatInputModule} from '@angular/material/input';
     MatFormFieldModule,
     MatInputModule,
     MatSnackBarModule,
+    MatDialogModule,
+    MatTabsModule,
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
+    MatCardModule,
     StoreModule.forRoot({ auth: AuthReducer}),
     EffectsModule.forRoot([AuthEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
@@ -57,7 +63,10 @@ import {MatInputModule} from '@angular/material/input';
     VisaComponent,
     HiringComponent,
     HousingComponent,
-    LoginComponent
+    LoginComponent,
+    ApplicationComponent,
+    FeedbackComponent,
+    ProfileComponent
   ],
 
   providers: [],
