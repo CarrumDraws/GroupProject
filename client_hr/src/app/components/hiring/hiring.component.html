@@ -1,37 +1,63 @@
-<h3 (click)="switchPage(true)">Ristration Token</h3>
-<h3 (click)="switchPage(false)">Onboarding Page</h3>
+<mat-tab-group>
+    <mat-tab label="Registration Token">
+        <h2>Send Registration Token</h2>
+        <form class="example-form" [formGroup]="tokenForm" (submit)="onSendToken()">
+            <div id="form-input">
+                <mat-form-field class="example-full-width">
+                    <mat-label >Name</mat-label>
+                    <input matInput type="password" placeholder="Name" formControlName="name">
+                    <mat-error>required</mat-error>
+                  </mat-form-field>
+            
+                <mat-form-field class="example-full-width">
+                  <mat-label>Email</mat-label>
+                  <input matInput type="text" placeholder="Email" formControlName="email">
+                  <mat-error>required</mat-error>
+                </mat-form-field>
+                <button mat-raised-button color="basic">Send</button>
+            </div>           
+        </form>
+        <h2 id="history-title">History</h2>
+        <div *ngFor="let token of tokenHistory">
+            <mat-card appearance="outlined" [ngStyle]="{ 'border-right': token.status ? '1rem solid lightskyblue' : '1rem solid var(--accent-color)' }">
+              <mat-card-header>
+                <mat-card-title> {{ token.name }}</mat-card-title>
+                <mat-card-subtitle>
+                    <div class="email" (click)="sendEmail(token.email)">
+                        {{ token.email }}
+                    </div>
+                </mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div>Registration Link: {{token.registrationLink}}</div>
+                <div>Status:
+                    <ng-container *ngIf="token.status; else notRegistered">
+                        <span [ngStyle]="{'color': 'lightskyblue'}">Registered</span>
+                      </ng-container>
+                      <ng-template #notRegistered>
+                        <span [ngStyle]="{'color': 'var(--accent-color)'}">On Progress</span>
+                    </ng-template>
+                </div>
+              </mat-card-content>
+          </mat-card>
+          </div>
+    </mat-tab>
 
-<div *ngIf="isTokenPage; else onboardingPage">
-    <form class="example-form" [formGroup]="tokenForm" (submit)="onSendToken()">
-        <mat-form-field class="example-full-width">
-            <mat-label >Name</mat-label>
-            <input matInput type="password" placeholder="Name" formControlName="name">
-            <mat-error>required</mat-error>
-          </mat-form-field>
-    
-        <mat-form-field class="example-full-width">
-          <mat-label>Email</mat-label>
-          <input matInput type="text" placeholder="Email" formControlName="email">
-          <mat-error>required</mat-error>
-        </mat-form-field>
-        <br>
-        <br>
-        <button mat-raised-button color="primary">Send Token</button>
-    </form>   
-</div>
+    <mat-tab label="Onboarding Page">
+        <select (change)="changeFilter($event)" name="status" id="status">
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+            <option value="approved">Approved</option>
+        </select>
+        <a href="employee" target="https://http://localhost:4200/">Go to Employee</a>
+        <h3> List of emloyees</h3>
+        <div *ngFor="let employee of employees_data">
+            <p *ngIf="employee.status === currentFilter">
+                {{ employee.name}} | {{ employee.email}} | 
+                <a href="javascript:void(0);" (click)="viewApplication(employee.id)">View Application</a>
+            </p>
+        </div>
+    </mat-tab>
+</mat-tab-group>
 
-<ng-template #onboardingPage>
-    <select (change)="changeFilter($event)" name="status" id="status">
-        <option value="pending">Pending</option>
-        <option value="rejected">Rejected</option>
-        <option value="approved">Approved</option>
-    </select>
-    <a href="employee" target="https://http://localhost:4200/">Go to Employee</a>
-    <h3> List of emloyees</h3>
-    <div *ngFor="let employee of employees_data">
-        <p *ngIf="employee.status === currentFilter">
-            {{ employee.name}} | {{ employee.email}} | 
-            <a href="javascript:void(0);" (click)="viewApplication(employee.id)">View Application</a>
-        </p>
-    </div>
-</ng-template>
+

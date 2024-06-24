@@ -2,15 +2,63 @@ mat-form-field{
     margin: 2rem 0;
     width: 40%;
 }
+mat-card{
+    margin-bottom: 1rem;
+    padding-left: 3rem;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+mat-card-title{
+    color: var(--accent-color);
+}
+
+mat-card-subtitle{
+    text-align: left;
+}
+
+mat-card-content, mat-card-actions{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+mat-card-content > div{
+    margin: 0.5rem;
+    color: rgba(0, 0, 0, .54);
+}
 
 #employee-body{
-    width: 80vw;
-    margin: 0 10vw;
+    width: 70vw;
+    margin: 0 15vw;
 }
 
 h2{
+    display: flex;
+    align-items: center;
     text-align: left;
-    background-color: rgb(103, 58,183);
+    background-color: var(--primary-color);
     color: white;
     height: 3rem;
+    padding: 0 1rem;
+    margin: 0;
+}
+
+.email{
+    color:  lightskyblue;
+    text-decoration: underline;
+    margin: 1rem 0;
+    font-size:medium
+}
+
+.email:hover{
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+button{
+    color: lightskyblue;
+    height: 2.5rem;
+    border-radius: 50px;
 }

@@ -32,6 +32,7 @@ import { MatInputModule} from '@angular/material/input';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { ProfileComponent } from './profile/profile.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 
 @NgModule({
@@ -46,6 +47,7 @@ import { ProfileComponent } from './profile/profile.component';
     MatInputModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatTabsModule,
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,

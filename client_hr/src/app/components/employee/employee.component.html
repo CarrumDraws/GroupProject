@@ -4,33 +4,58 @@
         <input matInput [(ngModel)]="searchText" (input)="searchEmployees()" placeholder="Name">
     </mat-form-field>
 
-    <h2>Employee List</h2>
+    <h2>Employees</h2>
     <ng-container *ngIf="searchText">
         <div *ngIf="searchResults.length === 0">No records found</div>
         <div *ngFor="let employee of searchResults">
-          <mat-card appearance="outlined" (click)="viewEmployee(employee.id)">
-              <mat-card-header>
-                <mat-card-title>{{ employee.firstName }} {{ employee.lastName }} {{ employee.preferredName }}</mat-card-title>
-                <mat-card-subtitle>Dummpy Data</mat-card-subtitle>
-              </mat-card-header>
-              <!-- <mat-card-actions align="end">
-                <button mat-button>Detail</button>
-              </mat-card-actions> -->
-          </mat-card>
+          <mat-card appearance="outlined">
+            <mat-card-header>
+              <mat-card-title> {{ employee.lastName }}, {{ employee.firstName }} ({{ employee.preferredName }})</mat-card-title>
+              <mat-card-subtitle>
+                <div>
+                  <div class="email" (click)="sendEmail(employee.email)">
+                    {{ employee.email }}
+                  </div>
+                  <div>Phone: {{ employee.phoneNumber }}</div>
+                </div>
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div>SSN: {{employee.ssn}}</div>
+              <div>Work Authorization: {{employee.workAuthorizationTitle}}</div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button (click)="viewEmployee(employee.id)">View Profile</button>
+            </mat-card-actions>
+        </mat-card>
         </div>
       </ng-container>
       <ng-container *ngIf="!searchText">
         <div *ngFor="let employee of employees">
-          <mat-card appearance="outlined" (click)="viewEmployee(employee.id)">
+          <mat-card appearance="outlined">
               <mat-card-header>
-                <mat-card-title>{{ employee.firstName }} {{ employee.lastName }} {{ employee.preferredName }}</mat-card-title>
-                <mat-card-subtitle>Dummpy Data</mat-card-subtitle>
+                <mat-card-title> {{ employee.lastName }}, {{ employee.firstName }} ({{ employee.preferredName }})</mat-card-title>
+                <mat-card-subtitle>
+                  <div>
+                    <div class="email" (click)="sendEmail(employee.email)">
+                      {{ employee.email }}
+                    </div>
+                    <div>Phone: {{ employee.phoneNumber }}</div>
+                  </div>
+                </mat-card-subtitle>
               </mat-card-header>
-              <!-- <mat-card-actions align="end">
-                <button mat-button>Detail</button>
-              </mat-card-actions> -->
+              <mat-card-content>
+                <div>SSN: {{employee.ssn}}</div>
+                <div>Work Authorization: {{employee.workAuthorizationTitle}}</div>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button (click)="viewEmployee(employee.id)">View Profile</button>
+              </mat-card-actions>
           </mat-card>
         </div>
       </ng-container>
-
 </div>
+
+<ng-template my-card-template>
+
+</ng-template>

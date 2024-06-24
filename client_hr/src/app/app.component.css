@@ -14,6 +14,7 @@
 #material-nav {
     display: flex;
     justify-content: flex-end;
+    border-bottom: 5px solid var(--accent-color);
 }
 
 
@@ -26,3 +27,4 @@
     font-size: large;
     color: white;
 }
+

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { TokenService } from 'src/app/services/token.service';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
+import { HistoryService } from 'src/app/services/history.service';
 
 @Component({
   selector: 'app-hiring',
@@ -12,11 +13,13 @@ export class HiringComponent implements OnInit {
 
   constructor(
     private tokenService: TokenService,
-    private flashMessageService: FlashMessageService
+    private flashMessageService: FlashMessageService,
+    private historyService: HistoryService
   ) { }
 
-  isTokenPage = true;
   currentFilter: string | null = 'pending';
+
+  tokenHistory = this.historyService.getHistory();
 
   tokenForm = new FormBuilder().group({
     email: ['', [Validators.required, Validators.email]],
@@ -32,10 +35,6 @@ export class HiringComponent implements OnInit {
     //onboarding
     //create a service to call backend aip
     //To display a list of employees
-  }
-
-  switchPage(bool: boolean): void{
-    this.isTokenPage = bool;
   }
 
   onSendToken(): void{
@@ -61,6 +60,11 @@ export class HiringComponent implements OnInit {
   viewApplication(employee_id: number){
     console.log("view");
     window.open(`/application/${employee_id}`, 'http://localhost:4200');
+  }
+
+  sendEmail(email: string) {
+    const mailtoLink = `mailto:${email}`;
+    window.location.href = mailtoLink;
   }
 
   employees_data = [

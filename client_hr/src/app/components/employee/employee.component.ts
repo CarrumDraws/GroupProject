@@ -23,6 +23,11 @@ export class EmployeeComponent implements OnInit {
   searchEmployees(): void {
     this.searchResults = this.employeeService.searchEmployees(this.searchText);
   }
+  
+  sendEmail(email: string) {
+    const mailtoLink = `mailto:${email}`;
+    window.location.href = mailtoLink;
+  }
 
   viewEmployee(employee_id: number) {
     this.router.navigate(['/profile', employee_id]);

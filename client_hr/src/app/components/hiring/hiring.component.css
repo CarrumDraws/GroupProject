@@ -1,0 +1,63 @@
+mat-form-field{
+    margin: 0 1rem;
+}
+
+
+h2{
+    margin-top: 2rem;
+    color: var(--primary-color);
+}
+
+#history-title{
+    text-align: left;
+    margin: 0 15vw;
+    border-bottom: 3px solid var(--accent-color);
+}
+
+button{
+    color: var(--accent-color);
+}
+
+
+mat-card{
+    margin: 0 15vw 1rem;
+    padding-left: 3rem;
+    display: flex;
+    justify-content: space-evenly;
+    width: 70vw;
+
+}
+
+mat-card-title{
+    color: var(--accent-color);
+}
+
+mat-card-content, mat-card-actions{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: left;
+    text-align: left;
+}
+
+mat-card-content > div{
+    margin: 0.5rem;
+    color: rgba(0, 0, 0, .54);
+}
+
+
+.email{
+    color:  lightskyblue;
+    text-decoration: underline;
+    margin: 1rem 0;
+    font-size:medium
+}
+
+.email:hover{
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+
+
+
