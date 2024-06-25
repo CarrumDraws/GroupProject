@@ -1,25 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { TokenService } from 'src/app/services/token.service';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
 import { HistoryService } from 'src/app/services/history.service';
+import { TokenLink } from 'src/app/interface/tokenLink';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-hiring',
   templateUrl: './hiring.component.html',
   styleUrls: ['./hiring.component.css']
 })
-export class HiringComponent implements OnInit {
+export class HiringComponent implements OnInit{
 
   constructor(
     private tokenService: TokenService,
     private flashMessageService: FlashMessageService,
-    private historyService: HistoryService
+    private historyService: HistoryService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   currentFilter: string | null = 'pending';
 
-  tokenHistory = this.historyService.getHistory();
+  tokenHistory$: Observable<TokenLink[]> | null = null;
 
   tokenForm = new FormBuilder().group({
     email: ['', [Validators.required, Validators.email]],
@@ -28,14 +31,26 @@ export class HiringComponent implements OnInit {
 
   ngOnInit(): void {
 
-    //tokenHIstory
     //create a service to call backend aip
     //To display a list of history
+    // this.historyService.getHistory().subscribe({
+    //   next:  (response) => { 
+    //     this.tokenHistory = response.reverse()
+    //   },
+    //   error: (error) => {
+    //     this.flashMessageService.warn(error.error.error)
+    //   },
+    //   complete: () => {}
+    // });
+    this.tokenHistory$ = this.historyService.getHistory().pipe(
+      map(response => response.reverse())
+    );
 
-    //onboarding
+      //onboarding
     //create a service to call backend aip
     //To display a list of employees
   }
+
 
   onSendToken(): void{
     if(this.tokenForm.valid){
@@ -43,13 +58,23 @@ export class HiringComponent implements OnInit {
       const email = this.tokenForm.get('email')!.value!;
       
       this.tokenService.sendToken(name, email).subscribe({
-        next:  (respose) => this.flashMessageService.info("Token sent."),
+        next:  (respose) => {
+          this.flashMessageService.info("Token sent.");
+        },
         error: (error) => {
           this.flashMessageService.warn(error.error.error)
         },
         complete: () => {}
       });
     }
+
+    //reload the history list when user sends token, to get the newest updated data
+    this.tokenHistory$ = this.historyService.getHistory().pipe(
+      map(response => response.reverse())
+    );
+
+    //reset form
+    this.tokenForm.reset();
   }
 
   changeFilter(event: Event):void{
@@ -58,7 +83,7 @@ export class HiringComponent implements OnInit {
   }
 
   viewApplication(employee_id: number){
-    console.log("view");
+
     window.open(`/application/${employee_id}`, 'http://localhost:4200');
   }
 

@@ -5,7 +5,7 @@
             <div id="form-input">
                 <mat-form-field class="example-full-width">
                     <mat-label >Name</mat-label>
-                    <input matInput type="password" placeholder="Name" formControlName="name">
+                    <input matInput type="text" placeholder="Name" formControlName="name">
                     <mat-error>required</mat-error>
                   </mat-form-field>
             
@@ -14,11 +14,11 @@
                   <input matInput type="text" placeholder="Email" formControlName="email">
                   <mat-error>required</mat-error>
                 </mat-form-field>
-                <button mat-raised-button color="basic">Send</button>
+                <button mat-raised-button color="basic" type="submit">Send</button>
             </div>           
         </form>
         <h2 id="history-title">History</h2>
-        <div *ngFor="let token of tokenHistory">
+        <div *ngFor="let token of (tokenHistory$ | async)">
             <mat-card appearance="outlined" [ngStyle]="{ 'border-right': token.status ? '1rem solid lightskyblue' : '1rem solid var(--accent-color)' }">
               <mat-card-header>
                 <mat-card-title> {{ token.name }}</mat-card-title>
@@ -29,7 +29,7 @@
                 </mat-card-subtitle>
               </mat-card-header>
               <mat-card-content>
-                <div>Registration Link: {{token.registrationLink}}</div>
+                <div>Registration Link: {{token.link}}</div>
                 <div>Status:
                     <ng-container *ngIf="token.status; else notRegistered">
                         <span [ngStyle]="{'color': 'lightskyblue'}">Registered</span>
@@ -40,7 +40,7 @@
                 </div>
               </mat-card-content>
           </mat-card>
-          </div>
+        </div>
     </mat-tab>
 
     <mat-tab label="Onboarding Page">
