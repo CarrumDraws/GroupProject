@@ -45,16 +45,14 @@
 
     <mat-tab label="Onboarding Page">
         <select (change)="changeFilter($event)" name="status" id="status">
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-            <option value="approved">Approved</option>
+            <option value="Pending">Pending</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Approved">Approved</option>
         </select>
-        <h3> List of emloyees</h3>
-        <div *ngFor="let employee of employees_data">
-            <p *ngIf="employee.status === currentFilter">
-                {{ employee.name}} | {{ employee.email}} | 
-                <a href="javascript:void(0);" (click)="viewApplication(employee.id)">View Application</a>
-            </p>
+        <h3> List of Application</h3>
+        <div *ngFor="let application of (applications$ | async)">
+            {{application.employee_id.email}}| {{application.name.firstname}}({{application.name.preferredname}} ) 
+            {{application.name.firstname}}| <a href="javascript:void(0);" (click)="viewApplication(application.employee_id._id)">View Application</a>
         </div>
     </mat-tab>
 </mat-tab-group>

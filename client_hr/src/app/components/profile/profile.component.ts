@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { onboardingDummyData } from '../dummyData';
-
-
+import { ProfileService } from 'src/app/services/profile.service';
+import { Profile } from 'src/app/interface/profile';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -11,13 +11,13 @@ import { onboardingDummyData } from '../dummyData';
 })
 export class ProfileComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute) { }
+  profile$: Observable<Profile | null> = new Observable<Profile | null>(); 
 
-  employeeId: number = this.route.snapshot.params['employeeId'];
-
-  employee = onboardingDummyData;
+  constructor(private route: ActivatedRoute, private profileService: ProfileService) { }
 
   ngOnInit(): void {
+    const employeeId = "667a350722a96c9de64d682c"; // Replace with dynamic ID if needed
+    this.profile$ = this.profileService.getProfile(employeeId);
   }
 
 }

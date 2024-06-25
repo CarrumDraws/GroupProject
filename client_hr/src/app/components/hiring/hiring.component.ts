@@ -6,6 +6,8 @@ import { HistoryService } from 'src/app/services/history.service';
 import { TokenLink } from 'src/app/interface/tokenLink';
 import { Observable, map, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { OnboardingService } from 'src/app/services/onboarding.service';
+import { ApplicationOverview } from 'src/app/interface/applicationOverview';
 
 @Component({
   selector: 'app-hiring',
@@ -18,30 +20,33 @@ export class HiringComponent implements OnInit{
     private tokenService: TokenService,
     private flashMessageService: FlashMessageService,
     private historyService: HistoryService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private onboardingService: OnboardingService
   ) { }
 
-  currentFilter: string | null = 'pending';
+  currentFilter: string = 'Pending';
 
   tokenHistory$: Observable<TokenLink[]> | null = null;
+  applications$: Observable<ApplicationOverview[]> | null = null;
 
   tokenForm = new FormBuilder().group({
     email: ['', [Validators.required, Validators.email]],
     name: ['', [Validators.required, Validators.pattern('^[a-zA-Z ]*$')]]
   })
 
-  
-
-
   ngOnInit(): void {
 
     this.fetchHistoryData();
+    this.getApplicationByStatus(this.currentFilter);
   }
 
   fetchHistoryData(){
     this.tokenHistory$ = this.historyService.getHistory().pipe(
       map(response => response.reverse())
     );
+  }
+  getApplicationByStatus(status: string):void{
+    this.applications$ = this.onboardingService.getApplicationByStatus(status);
   }
 
 
@@ -73,6 +78,7 @@ export class HiringComponent implements OnInit{
   changeFilter(event: Event):void{
     const target = event.target as HTMLSelectElement;
     this.currentFilter = target.value;
+    this.getApplicationByStatus(this.currentFilter)
   }
 
   viewApplication(employee_id: number){
@@ -85,13 +91,13 @@ export class HiringComponent implements OnInit{
     window.location.href = mailtoLink;
   }
 
-  employees_data = [
-    { id: 1, name: "firstname last", email: "employeeOne@email.com", status: "pending"},
-    { id: 2, name: "Youfirst yourlast", email: "employeeTwo@email.com", status: "pending"},
-    { id: 3, name: "myfirstname mylast", email: "employeeThree@email.com", status: "approved"},
-    { id: 4, name: "fake name", email: "employee4@email.com", status: "rejected"},
-    { id: 5, name: "invisible", email: "employee5@email.com", status: "approved"},
-    { id: 6, name: "invalid name", email: "employee6@email.com", status: "approved"},
-  ]
+  // employees_data = [
+  //   { id: 1, name: "firstname last", email: "employeeOne@email.com", status: "pending"},
+  //   { id: 2, name: "Youfirst yourlast", email: "employeeTwo@email.com", status: "pending"},
+  //   { id: 3, name: "myfirstname mylast", email: "employeeThree@email.com", status: "approved"},
+  //   { id: 4, name: "fake name", email: "employee4@email.com", status: "rejected"},
+  //   { id: 5, name: "invisible", email: "employee5@email.com", status: "approved"},
+  //   { id: 6, name: "invalid name", email: "employee6@email.com", status: "approved"},
+  // ]
 
 }

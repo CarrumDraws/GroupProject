@@ -1,5 +1,42 @@
-<div>
-    <h1>Name</h1>
-    <h3>{{employee.name.firstname}} ({{employee.name.preferredname}}) {{employee.name.middlename}} {{employee.name.lastname}}</h3>
-    <h3>{{employee.ssn}} ({{employee.dob}}) {{employee.name.middlename}} {{employee.name.lastname}}</h3>  
+<div *ngIf="(profile$ | async) as profile">
+    <h1>Picture place holder</h1>
+    <h2>Name</h2>
+    <p>
+        {{ profile.profile.name.firstname }}
+        ({{ profile.profile.name.preferredname }})
+        {{ profile.profile.name.lastname }}
+    </p>
+    <h2>Address</h2>
+    <p>
+        {{ profile.profile.address.buildaptnum}}
+        {{ profile.profile.address.street}}
+        {{ profile.profile.address.city}}
+        {{ profile.profile.address.state}}
+        {{ profile.profile.address.zip}}
+    </p>
+    <h2>Contact</h2>
+        {{ profile.profile.employee_id.email}}
+        {{ profile.profile.phone.cell}}
+        {{ profile.profile.phone.work}}
+    <h2>Employment</h2>
+    <ng-container *ngIf="profile.profile.citizenship; else visa">
+        <p>Citizen or Permanent Resident type: {{profile.profile.citizenshiptype}}</p>
+    </ng-container>
+    <ng-template #visa>
+        {{ profile.profile.workauth.workauth}}
+        {{ profile.profile.workauth.title}}
+        {{ profile.profile.workauth.startdate | date}}
+        {{ profile.profile.workauth. enddate | date}}        
+    </ng-template>
+    <h2>Contacts</h2>
+    <div *ngFor="let contact of profile.profile.contacts">
+        {{ contact.firstname}}
+        {{ contact.lastname}}
+        {{ contact.middlename}}
+        {{ contact.email}} 
+        {{ contact.phone}}
+        {{ contact.relationship}} 
+    </div>
+    <h2>Folders PlaceHolder</h2>
+
 </div>

@@ -4,7 +4,9 @@ import { FeedbackComponent } from '../feedback/feedback.component';
 import { MatDialog } from '@angular/material/dialog';
 import { onboardingDummyData } from '../dummyData';
 import { FileService } from 'src/app/services/file.service';
-import { map } from 'rxjs';
+import { Observable, map } from 'rxjs';
+import { OnboardingService } from 'src/app/services/onboarding.service';
+import { ApplicationDetail } from 'src/app/interface/applicationDetail';
 
 @Component({
   selector: 'app-application',
@@ -14,16 +16,24 @@ import { map } from 'rxjs';
 export class ApplicationComponent implements OnInit {
 
   employeeId: number = this.route.snapshot.params['employeeId'];
-  application = onboardingDummyData;
+  application: ApplicationDetail | null = null; 
 
   constructor(
     private route: ActivatedRoute,
     public dialog: MatDialog,
-    private fileService: FileService
+    private fileService: FileService,
+    private onboardingService: OnboardingService
   ) { }
 
   ngOnInit(): void {
-    console.log(this.application);
+    this.onboardingService.getApplicationById(this.employeeId).subscribe({
+      next: (data) => {
+        this.application = data;
+      },
+      error: (error) => {
+        console.error('Error fetching application details', error);
+      }
+    });
   }
 
 
