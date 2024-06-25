@@ -1,21 +1,10 @@
 const express = require("express");
-const multer = require("multer");
 
-// Main DB Connection Logic Happens Here!
-const generateToken = require("../utils/generateToken.js");
 const { uploadFileToS3, getFileUrl } = require("../config/s3.js");
-
-const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
+const processFile = require("../utils/processFile.js");
 
 const Onboarding = require("../models/Onboarding.js");
-const Employee = require("../models/Employee.js");
-const File = require("../models/File.js");
 const Opt = require("../models/Opt.js");
-
-// Configure multer for memory storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 const getOnboarding = async (req, res) => {
   try {
@@ -23,7 +12,9 @@ const getOnboarding = async (req, res) => {
 
     const data = await Onboarding.findOne({
       employee_id: ID,
-    });
+    })
+      .populate("employee_id")
+      .select("-_id");
     if (!data) return res.status(404).json({ error: "Data Not Found" }); // is this best practice...?
 
     res.status(200).json(data);
@@ -90,6 +81,12 @@ const submitOnboarding = async (req, res) => {
         .send("Invalid Gender Field: Must be Male, Female, or Other");
 
     if (!citizenship) return res.status(400).send("Missing Citizenship Field");
+    if (citizenship != "true" && citizenship != "false")
+      return res
+        .status(400)
+        .send(
+          "Invalid Citizenship Field: Must be true or false (Case Sensitive)"
+        );
     if (citizenship === "true") citizenship = true;
     else citizenship = false;
     if (citizenship) {
@@ -341,81 +338,6 @@ function validateContact(contact) {
   return true;
 }
 
-async function processFile(employeeId, file, filetype) {
-  if (file) {
-    const { key, filename } = await uploadFileToS3(file);
-    const newFile = new File({
-      employee_id: employeeId,
-      filekey: key,
-      filename: filename,
-      notification_sent: "",
-      status: "Pending",
-    });
-    await newFile.save();
-    console.log("Created " + filetype + " File");
-    return newFile._id;
-  }
-  return null;
-}
-
-async function handleOptDocument(employeeId, optFileID) {
-  try {
-    // Upsert operation with findOneAndUpdate
-    const updatedOpt = await Opt.findOneAndUpdate(
-      { employee_id: employeeId }, // Find document by employee_id
-      {
-        employee_id: employeeId,
-        optreciept: optFileID,
-        status: "OPT Receipt",
-      },
-      {
-        new: true,
-        upsert: true,
-        setDefaultsOnInsert: true,
-      }
-    );
-
-    console.log(
-      `Opt document ${updatedOpt ? "updated" : "created"} successfully:`,
-      updatedOpt.status
-    );
-    return updatedOpt; // Return the updated or newly created Opt document
-  } catch (error) {
-    console.error("Error handling Opt document:", error);
-    throw error; // Propagate the error for handling in the caller function
-  }
-}
-
-function validateContact(contact) {
-  contact.phone = Number(contact.phone);
-  if (
-    !contact.firstname ||
-    !contact.lastname ||
-    !contact.phone ||
-    !contact.email ||
-    !contact.relationship
-  )
-    return false;
-  return true;
-}
-
-async function processFile(employeeId, file, filetype) {
-  if (file) {
-    const { key, filename } = await uploadFileToS3(file);
-    const newFile = new File({
-      employee_id: employeeId,
-      filekey: key,
-      filename: filename,
-      notification_sent: "",
-      status: "Pending",
-    });
-    await newFile.save();
-    console.log("Created " + filetype + " File");
-    return newFile._id;
-  }
-  return null;
-}
-
 async function handleOptDocument(employeeId, optFileID) {
   try {
     // Upsert operation with findOneAndUpdate
@@ -450,7 +372,6 @@ module.exports = {
   reviewOnboardingApps,
   getEmployeeOnboarding,
   handleEmployeeOnboarding,
-  upload,
   uploadFile,
   retrieveFile,
 };

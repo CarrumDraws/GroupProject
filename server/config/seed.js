@@ -22,15 +22,14 @@ const Report = require("../models/Report.js");
       Report.deleteMany(),
     ]);
 
-    let password = "Abc1@2";
-    password = await bcrypt.hash(password, Number(process.env.SALT));
-
-    const user = new Employee({
+    let HRPass = "Abc123@";
+    HRPass = await bcrypt.hash(HRPass, Number(process.env.SALT));
+    const HRPerson = new Employee({
       email: "HREmployee@gmail.com",
-      password: password,
+      password: HRPass,
       isHR: true,
     });
-    await user.save();
+    await HRPerson.save();
 
     console.log("DB initialized");
   } catch (error) {

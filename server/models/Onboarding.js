@@ -6,35 +6,28 @@ const refType = Schema.Types.ObjectId;
 const AddressSchema = new Schema({
   buildaptnum: {
     type: Number,
-    required: true,
   },
   street: {
     type: String,
-    required: true,
   },
   city: {
     type: String,
-    required: true,
   },
   state: {
     type: String,
-    required: true,
   },
   zip: {
     type: String,
-    required: true,
   },
 });
 
 const PersonSchema = new Schema({
   firstname: {
     type: String,
-    required: true,
   },
   middlename: String,
   lastname: {
     type: String,
-    required: true,
   },
   preferredname: String,
 });
@@ -42,28 +35,23 @@ const PersonSchema = new Schema({
 const ContactSchema = new Schema({
   firstname: {
     type: String,
-    required: true,
   },
   middlename: String,
   lastname: {
     type: String,
-    required: true,
   },
   phone: {
     type: Number,
-    required: true,
   },
   email: { type: String, required: true },
   relationship: {
     type: String,
-    required: true,
   },
 });
 
 const PhoneSchema = new Schema({
   cell: {
     type: Number,
-    required: true,
   },
   work: {
     type: Number,
@@ -73,15 +61,12 @@ const PhoneSchema = new Schema({
 const CarSchema = new Schema({
   make: {
     type: String,
-    required: true,
   },
   model: {
     type: String,
-    required: true,
   },
   color: {
     type: String,
-    required: true,
   },
 });
 
@@ -103,7 +88,6 @@ const WorkAuthSchema = new Schema({
 const LicenseSchema = new Schema({
   haslicense: {
     type: Boolean,
-    required: true,
   },
   licensenumber: String,
   expdate: Date,
@@ -117,11 +101,9 @@ const OnboardingSchema = new Schema({
   employee_id: {
     type: refType,
     ref: "Employee",
-    required: true,
   },
   name: {
     type: PersonSchema,
-    required: true,
   },
   picture: {
     type: refType,
@@ -129,32 +111,25 @@ const OnboardingSchema = new Schema({
   },
   address: {
     type: AddressSchema,
-    required: true,
   },
   phone: {
     type: PhoneSchema,
-    required: true,
   },
   car: {
     type: CarSchema,
-    required: true,
   },
   ssn: {
     type: Number,
-    required: true,
   },
   dob: {
     type: Date,
-    required: true,
   },
   gender: {
     type: String,
     enum: ["Male", "Female", "Other"],
-    required: true,
   },
   citizenship: {
     type: Boolean,
-    required: true,
   },
   citizenshiptype: {
     type: String,
@@ -165,7 +140,6 @@ const OnboardingSchema = new Schema({
   },
   license: {
     type: LicenseSchema,
-    required: true,
   },
   references: [
     {
@@ -180,7 +154,6 @@ const OnboardingSchema = new Schema({
   status: {
     type: String,
     enum: ["Not Started", "Pending", "Rejected", "Approved"],
-    required: true,
   },
   feedback: {
     type: String,
