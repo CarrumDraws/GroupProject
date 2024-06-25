@@ -81,6 +81,12 @@ const submitOnboarding = async (req, res) => {
         .send("Invalid Gender Field: Must be Male, Female, or Other");
 
     if (!citizenship) return res.status(400).send("Missing Citizenship Field");
+    if (citizenship != "true" && citizenship != "false")
+      return res
+        .status(400)
+        .send(
+          "Invalid Citizenship Field: Must be true or false (Case Sensitive)"
+        );
     if (citizenship === "true") citizenship = true;
     else citizenship = false;
     if (citizenship) {

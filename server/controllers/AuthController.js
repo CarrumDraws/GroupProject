@@ -8,6 +8,7 @@ const { transporter } = require("../config/nodemailer.js");
 
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
+const Onboarding = require("../models/Onboarding.js");
 
 const login = async (req, res) => {
   try {
@@ -61,6 +62,55 @@ const register = async (req, res) => {
       isHR: false,
     });
 
+    // Create new Empty Onboarding
+    const newOnboarding = new Onboarding({
+      employee_id: newEmployee._id,
+      name: {
+        firstname: "",
+        middlename: "",
+        lastname: "",
+        preferredname: "",
+      },
+      picture: null, // Picture will be null- in this case, it will have to be supplied by the frontend.
+      address: {
+        buildaptnum: null,
+        street: "",
+        city: "",
+        state: "",
+        zip: "",
+      },
+      phone: {
+        cell: null,
+        work: null,
+      },
+      car: {
+        make: "",
+        model: "",
+        color: "",
+      },
+      ssn: null,
+      dob: null,
+      gender: "Male",
+      citizenship: null,
+      citizenshiptype: "Citizen",
+      workauth: {
+        workauth: "",
+        title: "",
+        startdate: null,
+        enddate: null,
+      },
+      license: {
+        haslicense: null,
+        licensenumber: "",
+        expdate: null,
+        licensefile: null, // Assuming refType allows null or you might set it to a valid ObjectId if needed
+      },
+      references: [],
+      contacts: [],
+      status: "Not Started",
+      feedback: "",
+    });
+
     // Stores ID, email, Employeename
     const jwttoken = generateToken(
       newEmployee._id,
@@ -69,6 +119,7 @@ const register = async (req, res) => {
     );
 
     await newEmployee.save();
+    await newOnboarding.save();
     await Registration.updateOne({ email }, { $set: { status: true } });
 
     // Generate + Return { token: {data}, employee: {data} }
