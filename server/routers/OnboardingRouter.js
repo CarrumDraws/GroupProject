@@ -1,16 +1,19 @@
 const { Router } = require("express");
+const multer = require("multer");
 const {
   getOnboarding,
   submitOnboarding,
   reviewOnboardingApps,
   getEmployeeOnboarding,
   handleEmployeeOnboarding,
-  upload,
   uploadFile,
   retrieveFile,
 } = require("../controllers/OnboardingController.js");
 
 const { jwtValidation, isHR } = require("../middlewares/AuthMiddleware.js");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const onboardingRouter = Router();
 
@@ -26,7 +29,6 @@ onboardingRouter.post(
   submitOnboarding
 );
 onboardingRouter.get("/all", jwtValidation, isHR, reviewOnboardingApps);
-
 onboardingRouter.get(
   "/:employeeid",
   jwtValidation,
@@ -39,7 +41,8 @@ onboardingRouter.put(
   isHR,
   handleEmployeeOnboarding
 );
-// onboardingRouter.put("/:employeeid", login);
+
+// TESTING ROUTES ----
 
 onboardingRouter.post("/upload", upload.single("picture"), uploadFile);
 onboardingRouter.get("/getfile/:fileKey", retrieveFile);
