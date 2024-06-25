@@ -3,6 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FeedbackComponent } from '../feedback/feedback.component';
 import { MatDialog } from '@angular/material/dialog';
 import { onboardingDummyData } from '../dummyData';
+import { FileService } from 'src/app/services/file.service';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-application',
@@ -16,15 +18,21 @@ export class ApplicationComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private fileService: FileService
   ) { }
 
   ngOnInit(): void {
     console.log(this.application);
   }
 
-  viewFile(fileKey: string){
-    
+
+  viewFile(fileKey: string): void {
+    this.fileService.getFileUrl(fileKey).pipe(
+      map((response: any) => {
+        window.open(response.url);
+      })
+    ).subscribe();
   }
 
   openFeedbackDialog(): void {

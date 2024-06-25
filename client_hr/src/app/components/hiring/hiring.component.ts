@@ -4,7 +4,8 @@ import { TokenService } from 'src/app/services/token.service';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
 import { HistoryService } from 'src/app/services/history.service';
 import { TokenLink } from 'src/app/interface/tokenLink';
-import { Observable, map } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-hiring',
@@ -26,56 +27,48 @@ export class HiringComponent implements OnInit{
 
   tokenForm = new FormBuilder().group({
     email: ['', [Validators.required, Validators.email]],
-    name: ['', Validators.required]
+    name: ['', [Validators.required, Validators.pattern('^[a-zA-Z ]*$')]]
   })
+
+  
+
 
   ngOnInit(): void {
 
-    //create a service to call backend aip
-    //To display a list of history
-    // this.historyService.getHistory().subscribe({
-    //   next:  (response) => { 
-    //     this.tokenHistory = response.reverse()
-    //   },
-    //   error: (error) => {
-    //     this.flashMessageService.warn(error.error.error)
-    //   },
-    //   complete: () => {}
-    // });
+    this.fetchHistoryData();
+  }
+
+  fetchHistoryData(){
     this.tokenHistory$ = this.historyService.getHistory().pipe(
       map(response => response.reverse())
     );
-
-      //onboarding
-    //create a service to call backend aip
-    //To display a list of employees
   }
 
 
-  onSendToken(): void{
-    if(this.tokenForm.valid){
+  onSendToken(): void {
+    if (this.tokenForm.valid) {
       const name = this.tokenForm.get('name')!.value!;
       const email = this.tokenForm.get('email')!.value!;
-      
-      this.tokenService.sendToken(name, email).subscribe({
-        next:  (respose) => {
+
+      this.tokenService.sendToken(name, email).pipe(
+        switchMap(() => {
           this.flashMessageService.info("Token sent.");
-        },
+          // Reload the history list to get the newest updated data
+          return this.historyService.getHistory();
+        }),
+        map(response => response.reverse())
+      ).subscribe({
+        next: (_) => { this.fetchHistoryData(); },
         error: (error) => {
-          this.flashMessageService.warn(error.error.error)
+          this.flashMessageService.warn(error.error.error);
         },
-        complete: () => {}
+        complete: () => {
+          this.tokenForm.reset();
+        }
       });
     }
-
-    //reload the history list when user sends token, to get the newest updated data
-    this.tokenHistory$ = this.historyService.getHistory().pipe(
-      map(response => response.reverse())
-    );
-
-    //reset form
-    this.tokenForm.reset();
   }
+
 
   changeFilter(event: Event):void{
     const target = event.target as HTMLSelectElement;
@@ -84,7 +77,7 @@ export class HiringComponent implements OnInit{
 
   viewApplication(employee_id: number){
 
-    window.open(`/application/${employee_id}`, 'http://localhost:4200');
+    window.open(`/application/${employee_id}`, environment.myUrl);
   }
 
   sendEmail(email: string) {

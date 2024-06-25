@@ -6,13 +6,13 @@
                 <mat-form-field class="example-full-width">
                     <mat-label >Name</mat-label>
                     <input matInput type="text" placeholder="Name" formControlName="name">
-                    <mat-error>required</mat-error>
+                    <mat-error>required valid name</mat-error>
                   </mat-form-field>
             
                 <mat-form-field class="example-full-width">
                   <mat-label>Email</mat-label>
                   <input matInput type="text" placeholder="Email" formControlName="email">
-                  <mat-error>required</mat-error>
+                  <mat-error>required valid email</mat-error>
                 </mat-form-field>
                 <button mat-raised-button color="basic" type="submit">Send</button>
             </div>           
@@ -49,7 +49,6 @@
             <option value="rejected">Rejected</option>
             <option value="approved">Approved</option>
         </select>
-        <a href="employee" target="https://http://localhost:4200/">Go to Employee</a>
         <h3> List of emloyees</h3>
         <div *ngFor="let employee of employees_data">
             <p *ngIf="employee.status === currentFilter">

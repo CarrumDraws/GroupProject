@@ -40,7 +40,7 @@ export const onboardingDummyData = {
       haslicense: true,
       licensenumber: 'A1234567',
       expdate: new Date('2025-01-01'),
-      licensefile: '1b65a01d-aecb-4b2a-90e7-6fa0e0066dd3'
+      licensefile: '61107ecc-12d8-4a86-bffb-e0d87e031c6c'
     },
     references: [
       {

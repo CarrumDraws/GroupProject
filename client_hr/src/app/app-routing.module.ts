@@ -8,7 +8,7 @@ import { HousingComponent } from './components/housing/housing.component';
 import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './store/auth/auth.guard';
 import { ApplicationComponent } from './components/application/application.component';
-import { ProfileComponent } from './profile/profile.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 const routes: Routes = [
   
