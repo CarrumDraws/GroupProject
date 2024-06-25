@@ -46,7 +46,7 @@ const Login: React.FC<LoginProps> = ({ onboardingStatus }) => {
                 localStorage.setItem('token', response.data.token);
 
                 if(onboardingStatus !== 'Approved') {
-                    window.location.href='/onboardng';
+                    window.location.href='/onboarding';
                 }else {
                     window.location.href='/profile';
                 }
