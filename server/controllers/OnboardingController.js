@@ -23,7 +23,9 @@ const getOnboarding = async (req, res) => {
 
     const data = await Onboarding.findOne({
       employee_id: ID,
-    });
+    })
+      .populate("employee_id")
+      .select("-_id");
     if (!data) return res.status(404).json({ error: "Data Not Found" }); // is this best practice...?
 
     res.status(200).json(data);
