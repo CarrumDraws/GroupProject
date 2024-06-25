@@ -1,21 +1,10 @@
 const express = require("express");
-const multer = require("multer");
 
-// Main DB Connection Logic Happens Here!
-const generateToken = require("../utils/generateToken.js");
 const { uploadFileToS3, getFileUrl } = require("../config/s3.js");
-
-const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
+const processFile = require("../utils/processFile.js");
 
 const Onboarding = require("../models/Onboarding.js");
-const Employee = require("../models/Employee.js");
-const File = require("../models/File.js");
 const Opt = require("../models/Opt.js");
-
-// Configure multer for memory storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 const getOnboarding = async (req, res) => {
   try {
@@ -343,81 +332,6 @@ function validateContact(contact) {
   return true;
 }
 
-async function processFile(employeeId, file, filetype) {
-  if (file) {
-    const { key, filename } = await uploadFileToS3(file);
-    const newFile = new File({
-      employee_id: employeeId,
-      filekey: key,
-      filename: filename,
-      notification_sent: "",
-      status: "Pending",
-    });
-    await newFile.save();
-    console.log("Created " + filetype + " File");
-    return newFile._id;
-  }
-  return null;
-}
-
-async function handleOptDocument(employeeId, optFileID) {
-  try {
-    // Upsert operation with findOneAndUpdate
-    const updatedOpt = await Opt.findOneAndUpdate(
-      { employee_id: employeeId }, // Find document by employee_id
-      {
-        employee_id: employeeId,
-        optreciept: optFileID,
-        status: "OPT Receipt",
-      },
-      {
-        new: true,
-        upsert: true,
-        setDefaultsOnInsert: true,
-      }
-    );
-
-    console.log(
-      `Opt document ${updatedOpt ? "updated" : "created"} successfully:`,
-      updatedOpt.status
-    );
-    return updatedOpt; // Return the updated or newly created Opt document
-  } catch (error) {
-    console.error("Error handling Opt document:", error);
-    throw error; // Propagate the error for handling in the caller function
-  }
-}
-
-function validateContact(contact) {
-  contact.phone = Number(contact.phone);
-  if (
-    !contact.firstname ||
-    !contact.lastname ||
-    !contact.phone ||
-    !contact.email ||
-    !contact.relationship
-  )
-    return false;
-  return true;
-}
-
-async function processFile(employeeId, file, filetype) {
-  if (file) {
-    const { key, filename } = await uploadFileToS3(file);
-    const newFile = new File({
-      employee_id: employeeId,
-      filekey: key,
-      filename: filename,
-      notification_sent: "",
-      status: "Pending",
-    });
-    await newFile.save();
-    console.log("Created " + filetype + " File");
-    return newFile._id;
-  }
-  return null;
-}
-
 async function handleOptDocument(employeeId, optFileID) {
   try {
     // Upsert operation with findOneAndUpdate
@@ -452,7 +366,6 @@ module.exports = {
   reviewOnboardingApps,
   getEmployeeOnboarding,
   handleEmployeeOnboarding,
-  upload,
   uploadFile,
   retrieveFile,
 };

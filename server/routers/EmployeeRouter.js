@@ -1,10 +1,10 @@
 const { Router } = require("express");
+const multer = require("multer");
 const {
   getAll,
   getOne,
   updateInfo,
   getInfo,
-  upload,
 } = require("../controllers/EmployeeController.js");
 
 const {
@@ -13,6 +13,10 @@ const {
   RegisterValidation,
   RegistrationValidation,
 } = require("../middlewares/AuthMiddleware.js");
+
+// Configure multer for memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const employeeRouter = Router();
 
@@ -23,7 +27,8 @@ employeeRouter.put(
   jwtValidation,
   updateInfo
 );
-// employeeRouter.get("/all", jwtValidation, isHR, getOne);
-// employeeRouter.get("/:employeeid", jwtValidation, isHR, getAll);
+
+employeeRouter.get("/all", jwtValidation, isHR, getAll);
+employeeRouter.get("/:employeeid", jwtValidation, isHR, getOne);
 
 module.exports = employeeRouter;

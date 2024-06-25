@@ -1,21 +1,10 @@
-// Main DB Connection Logic Happens Here!
-const generateToken = require("../utils/generateToken.js");
-const multer = require("multer");
-
-const { uploadFileToS3, getFileUrl } = require("../config/s3.js");
-
-const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
+const processFile = require("../utils/processFile.js");
 
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
 const Onboarding = require("../models/Onboarding.js");
 const File = require("../models/File.js");
 const Opt = require("../models/Opt.js");
-
-// Configure multer for memory storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 const getInfo = async (req, res) => {
   try {
@@ -181,27 +170,24 @@ const updateInfo = async (req, res) => {
 
 const getOne = async (req, res) => {
   try {
-    const { name, email } = req.body;
-    let token = generateRandomString(16);
+    const { ID, EMAIL, ISHR } = req.body;
+    const employeeid = req.params.employeeid;
+    if (!employeeid)
+      return res.status(400).json({ error: "Missing Employeeid Param" });
+    let profile = await Onboarding.findOne({
+      employee_id: employeeid,
+    })
+      .populate("employee_id", "email") // Populate employee_id with email
+      .exec();
+    if (!profile) return res.status(404).json({ error: "Data Not Found" });
+    profile = profile.toObject(); // Converts mongo doc to plain object
+    const { _id, ...profileWithoutId } = profile; // Remove _id from name
+    profile = profileWithoutId;
 
-    const { CLIENT_EMPLOYEE_PORT } = process.env;
-    const link = CLIENT_EMPLOYEE_PORT + "/updateInfo/" + token;
-
-    const existingRegistration = await Registration.findOne({
-      email: email,
+    const opt = await Opt.findOne({
+      employee_id: ID,
     });
-    if (existingRegistration)
-      return res.status(400).json({ error: "Email Already in Use" });
-
-    const newRegistration = new Registration({
-      email: email,
-      name: name,
-      link,
-      status: false,
-    });
-
-    await newRegistration.save();
-    res.status(201).json(newRegistration);
+    res.status(200).json({ profile, opt });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -210,45 +196,33 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const registrations = await Registration.find();
-    res.status(201).json(registrations);
+    const { ID, EMAIL, ISHR } = req.body;
+    let profiles = await Onboarding.find()
+      .populate("employee_id") // Populate employee_id with email and isHR, exclude _id
+      .select("name phone ssn workauth -_id") // Select only specific fields from Onboarding
+      .exec();
+
+    if (!profiles.length) {
+      return res.status(404).json({ error: "Data Not Found" });
+    }
+
+    // Filter out profiles where the populated employee_id.isHR is true
+    profiles = profiles.filter((profile) => !profile.employee_id.isHR);
+
+    if (!profiles.length) {
+      return res.status(404).json({ error: "No Non-HR Onboardings Found" });
+    }
+
+    res.status(200).json(profiles);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-async function processFile(employeeId, file, filetype) {
-  if (file) {
-    const { key, filename } = await uploadFileToS3(file);
-    const newFile = new File({
-      employee_id: employeeId,
-      filekey: key,
-      filename: filename,
-      notification_sent: "",
-      status: "Pending",
-    });
-    await newFile.save();
-    console.log("Created " + filetype + " File");
-    return newFile._id;
-  }
-  return null;
-}
-
-// Generate a random URL-safe string
-function generateRandomString(length) {
-  return crypto
-    .randomBytes(length)
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .substring(0, length);
-}
-
 module.exports = {
   getOne,
   getAll,
   updateInfo,
   getInfo,
-  upload,
 };
