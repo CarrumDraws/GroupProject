@@ -4,7 +4,7 @@
     <textarea matInput placeholder="Enter your feedback" [(ngModel)]="feedbackText" rows="5"></textarea>
   </mat-form-field>
 </div>
-<div mat-dialog-actions>
-  <button mat-button (click)="closeDialog()">Cancel</button>
-  <button mat-button color="primary" (click)="submitFeedback()">Submit</button>
+<div id='button-container' mat-dialog-actions>
+  <button mat-raised-button (click)="closeDialog()">Cancel</button>
+  <button mat-raised-button (click)="submitFeedback()">Submit</button>
 </div>
