@@ -29,8 +29,8 @@ export class ProfileComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const employeeId = "667a350722a96c9de64d682c";
-    // const employeeId: string = this.route.snapshot.params['employeeId'];
+    // const employeeId = "667a350722a96c9de64d682c";
+    const employeeId: string = this.route.snapshot.params['employeeId'];
 
     //get profile and profile picture
     this.profile$ = this.profileService.getProfile(employeeId);

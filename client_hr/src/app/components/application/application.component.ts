@@ -70,9 +70,11 @@ import { FileService } from 'src/app/services/file.service';
 import { OnboardingService } from 'src/app/services/onboarding.service';
 import { ApplicationDetail } from 'src/app/interface/applicationDetail';
 import { Observable } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-application',
@@ -90,9 +92,11 @@ export class ApplicationComponent implements OnInit {
     private fileService: FileService,
     private onboardingService: OnboardingService,
     private router: Router,
-    private flashMessageService: FlashMessageService 
+    private flashMessageService: FlashMessageService ,
+    private http: HttpClient
   ) {
     this.application$ = this.onboardingService.getApplicationById(this.employeeId).pipe(
+      tap((response: ApplicationDetail)=>{ console.log(response.status)}),
       map((data: ApplicationDetail | null) => {
         if (data === null) {
           this.router.navigate(['/employee']);
@@ -118,9 +122,20 @@ export class ApplicationComponent implements OnInit {
     ).subscribe();
   }
 
-  openFeedbackDialog(): void {
+  approved(){
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    });
+    
+    // Make API call using HttpClient
+    this.http.put(`${environment.serverUrl}/onboarding/${this.employeeId}`, { feedback: "", action: "Accept"}, { headers })
+      .subscribe( ( _ : any) => { this.flashMessageService.info('Application has been approved!'); });
+  }
+
+  openFeedbackDialog(employeeId: number): void {
     const dialogRef = this.dialog.open(FeedbackComponent, {
-      width: '400px'
+      width: '400px',
+      data : {employeeId: employeeId}
     });
 
     dialogRef.afterClosed().subscribe(result => {

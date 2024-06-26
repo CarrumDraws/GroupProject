@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-feedback',
@@ -12,6 +13,7 @@ export class FeedbackComponent{
   feedbackText: string = '';
 
   constructor(
+    @Inject(MAT_DIALOG_DATA) public data: { employeeId: number },
     public dialogRef: MatDialogRef<FeedbackComponent>,
     private http: HttpClient
   ) {}
@@ -21,10 +23,15 @@ export class FeedbackComponent{
   }
 
   submitFeedback(): void {
+
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    });
+    
     // Make API call using HttpClient
-    this.http.post('https://our-link-to-api-call', { feedback: this.feedbackText })
+    this.http.put(`${environment.serverUrl}/onboarding/${this.data.employeeId}`, { feedback: this.feedbackText, action: "Reject"}, { headers })
       .subscribe(response => {
-        console.log('Feedback submitted successfully:', response);
+        console.log(`Feedback submitted successfully: ${this.data.employeeId}`, response);
         this.closeDialog();
       }, error => {
         console.error('Error submitting feedback:', error);
