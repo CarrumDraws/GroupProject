@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { EmployeeService } from 'src/app/services/employee.service';
 import { Router } from '@angular/router';
+import { Employee } from 'src/app/interface/employee';
+import { map } from 'rxjs';
+
 
 @Component({
   selector: 'app-employee',
@@ -9,15 +12,21 @@ import { Router } from '@angular/router';
 })
 export class EmployeeComponent implements OnInit {
 
-  employees: any[];
+  employees: Employee[] | null = null;
   searchResults: any[] = [];
   searchText: string = '';
 
-  constructor(private employeeService: EmployeeService, private router: Router) {
-    this.employees = this.employeeService.getEmployees();
-  }
+  constructor(private employeeService: EmployeeService, private router: Router) { }
   
   ngOnInit(): void {
+    this.employeeService.getEmployees().pipe(
+      map((response: Employee[]) => {
+        // Sort employees by last name
+        return response.sort((a: Employee, b: Employee) => a.name.lastname.localeCompare(b.name.lastname));
+      })
+    ).subscribe((sortedEmployees: Employee[]) => {
+      this.employees = sortedEmployees;
+    });
   }
 
   searchEmployees(): void {
@@ -29,7 +38,7 @@ export class EmployeeComponent implements OnInit {
     window.location.href = mailtoLink;
   }
 
-  viewEmployee(employee_id: number) {
+  viewEmployee(employee_id: string) {
     this.router.navigate(['/profile', employee_id]);
   }
 }

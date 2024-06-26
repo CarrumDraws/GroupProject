@@ -8,6 +8,7 @@ import { Observable, map, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { OnboardingService } from 'src/app/services/onboarding.service';
 import { ApplicationOverview } from 'src/app/interface/applicationOverview';
+import { MatSelectChange } from '@angular/material/select';
 
 @Component({
   selector: 'app-hiring',
@@ -75,10 +76,9 @@ export class HiringComponent implements OnInit{
   }
 
 
-  changeFilter(event: Event):void{
-    const target = event.target as HTMLSelectElement;
-    this.currentFilter = target.value;
+  changeFilter():void{
     this.getApplicationByStatus(this.currentFilter)
+    console.log(this.currentFilter);
   }
 
   viewApplication(employee_id: number){

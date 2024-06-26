@@ -43,16 +43,27 @@
         </div>
     </mat-tab>
 
-    <mat-tab label="Onboarding Page">
-        <select (change)="changeFilter($event)" name="status" id="status">
-            <option value="Pending">Pending</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Approved">Approved</option>
-        </select>
-        <h3> List of Application</h3>
+    <mat-tab label="Onboarding Page" id="onboarding-body">
+        <mat-form-field id="filter">
+            <mat-label>Filter</mat-label>
+            <mat-select [(value)]="currentFilter" (selectionChange)="changeFilter()">
+                <mat-option value="Pending">Pending</mat-option>
+                <mat-option value="Rejected">Rejected</mat-option>
+                <mat-option value="Approved">Approved</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <h2 id="application-title">Applications</h2>
         <div *ngFor="let application of (applications$ | async)">
-            {{application.employee_id.email}}| {{application.name.firstname}}({{application.name.preferredname}} ) 
-            {{application.name.firstname}}| <a href="javascript:void(0);" (click)="viewApplication(application.employee_id._id)">View Application</a>
+            <mat-card>
+                <mat-card-header>
+                    <mat-card-title>{{application.name.firstname}}({{application.name.preferredname}}), {{application.name.firstname}} </mat-card-title>
+                    <mat-card-subtitle class="email" (click)="sendEmail(application.employee_id.email)">{{application.employee_id.email}}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-actions>
+                    <button mat-button (click)="viewApplication(application.employee_id._id)">View Application</button>
+                </mat-card-actions>
+            </mat-card> 
         </div>
     </mat-tab>
 </mat-tab-group>

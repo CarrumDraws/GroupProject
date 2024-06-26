@@ -26,3 +26,15 @@ button{
     width: 30%;
     margin: 0 35%;
 }
+
+#logout-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+#logout-button{
+    font-size: larger;
+    width: 5rem;
+}

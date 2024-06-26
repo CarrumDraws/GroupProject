@@ -8,9 +8,10 @@ h2{
     color: var(--primary-color);
 }
 
-#history-title{
+#history-title, #application-title{
     text-align: left;
     margin: 0 15vw;
+    padding-left: 2rem;
     border-bottom: 3px solid var(--accent-color);
 }
 
@@ -45,7 +46,6 @@ mat-card-content > div{
     color: rgba(0, 0, 0, .54);
 }
 
-
 .email{
     color:  lightskyblue;
     text-decoration: underline;
@@ -58,6 +58,9 @@ mat-card-content > div{
     color: var(--primary-color);
 }
 
-
+#filter{ 
+    margin-top: 2rem;
+    margin-right: -40vw;
+}
 
 
