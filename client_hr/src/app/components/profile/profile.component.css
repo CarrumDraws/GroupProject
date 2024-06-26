@@ -1,0 +1,81 @@
+#profile-body{
+    display: flex;
+}
+
+
+#file-column{
+    margin: 2rem 0 0 5vw;
+    overflow: auto;
+    height: 95vh;
+}
+
+mat-card{
+    width: 50vw;
+    margin: 2rem 0 0 20rem;
+}
+
+mat-card, mat-card-content{
+    text-align: left;
+}
+
+mat-card-title{
+    padding-top: 1rem;
+    text-align: left;
+    color: var(--primary-color);
+}
+
+mat-card-content{
+    text-align: left;
+    font-size: large;
+    color: rgb(0,0,0, 0.75);
+}
+p{
+    text-align: left;
+    margin: 0;
+    padding-bottom: 0.5rem;
+}
+
+th{
+    text-align: right;
+    padding-bottom: 0.5rem;
+}
+
+td{
+    padding-left: 1rem;
+    padding-bottom: 0.25rem;
+    text-align: left;
+}
+
+
+#profile-img{
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+.contact-type, .work-type{
+    color: var(--accent-color);
+}
+
+.contacts-header{
+    text-align: center;
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.contacts-data{
+    text-align: center;
+}
+
+.file{
+    padding-top: 2rem;
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+.file:hover{
+    cursor: pointer;
+}

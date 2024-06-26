@@ -33,6 +33,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { ProfileComponent } from './components/profile/profile.component';
 import { MatTabsModule } from '@angular/material/tabs';
+import {MatSelectModule} from '@angular/material/select';
+import { FileComponent } from './components/file/file.component';
+import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
 
 
 @NgModule({
@@ -48,6 +51,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatSnackBarModule,
     MatDialogModule,
     MatTabsModule,
+    MatSelectModule,
     ReactiveFormsModule,
     FormsModule,
     HttpClientModule,
@@ -66,7 +70,9 @@ import { MatTabsModule } from '@angular/material/tabs';
     LoginComponent,
     ApplicationComponent,
     FeedbackComponent,
-    ProfileComponent
+    ProfileComponent,
+    FileComponent,
+    ImageDialogComponent
   ],
 
   providers: [],

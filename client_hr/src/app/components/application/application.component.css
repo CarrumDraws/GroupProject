@@ -2,6 +2,19 @@ mat-form-field{
     margin: 1rem;
 }
 
+mat-card-title{
+    color: var(--primary-color);
+}
+
+mat-card{
+    margin: 1rem;
+    border-top: 3px solid var(--accent-color);
+}
+
+mat-label, input{
+    font-size: larger;
+}
+
 fieldset{
     width: 70vw;
     margin: 1rem 15vw;
@@ -12,12 +25,27 @@ fieldset{
 }
 
 button{
-    border: 1px solid var(--primary-color);
     border-radius: 20px;
     margin: 1rem;
-
 }
 
 *{
     color:black;
+}
+
+#application-body{
+    display: flex;
+    flex-direction: column;
+    width: 70vw;
+    margin: 0 15vw;
+}
+
+.card-row{
+    display: flex;
+}
+
+h1{
+    margin-top: 1rem;
+    text-align: left;
+    color: var(--primary-color);
 }

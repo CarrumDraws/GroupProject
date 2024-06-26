@@ -9,6 +9,7 @@ import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './store/auth/auth.guard';
 import { ApplicationComponent } from './components/application/application.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { FileComponent } from './components/file/file.component';
 
 const routes: Routes = [
   
@@ -19,6 +20,7 @@ const routes: Routes = [
   {path: 'housing', component: HousingComponent, canActivate: [AuthGuard]},
   {path: 'application/:employeeId', component: ApplicationComponent, canActivate: [AuthGuard]},
   {path: 'profile/:employeeId', component: ProfileComponent, canActivate: [AuthGuard]},
+  {path: 'file', component: FileComponent, canActivate: [AuthGuard] },
    // Catch-all route, redirect unmatched routes to the home page
   { path: '**', redirectTo: '' }, // Or display a 404 component
 
