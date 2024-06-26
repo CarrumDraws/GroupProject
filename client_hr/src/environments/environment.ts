@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   serverUrl: "http://localhost:5500",
-  myUrl: 'http://localhost:4200'
+  myUrl: 'http://localhost:4200',
+  myEncodeKey: 'ewqnuiy21h34iu132b54i3rfnbibu32hb6tiu423jy24i'
 };
 
 /*

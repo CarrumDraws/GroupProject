@@ -34,6 +34,8 @@ import { MatCardModule } from '@angular/material/card';
 import { ProfileComponent } from './components/profile/profile.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import {MatSelectModule} from '@angular/material/select';
+import { FileComponent } from './components/file/file.component';
+import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
 
 
 @NgModule({
@@ -68,7 +70,9 @@ import {MatSelectModule} from '@angular/material/select';
     LoginComponent,
     ApplicationComponent,
     FeedbackComponent,
-    ProfileComponent
+    ProfileComponent,
+    FileComponent,
+    ImageDialogComponent
   ],
 
   providers: [],
