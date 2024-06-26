@@ -1,20 +1,27 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useOnboarding } from '../context/OnboardingContext.tsx';
 
 interface ProtectedRouteProps {
-  isLoggedIn: boolean;
-  onboardingStatus: string;
   children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ isLoggedIn, onboardingStatus, children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { isLoggedIn, onboardingData } = useOnboarding();
+
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 
-  if (onboardingStatus !== 'Approved') {
+  if (onboardingData?.status === 'Accept' && window.location.pathname == '/onboarding') {
+    return <Navigate to="/profile" replace />;
+  }
+
+  if (onboardingData?.status !== 'Accept' && window.location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
+
+
 
   return <>{children}</>;
 };

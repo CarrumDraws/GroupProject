@@ -4,28 +4,30 @@ import axios from 'axios';
 import { Box, TextField, Button, Container, Typography } from '@mui/material';
 
 import { validateEmail, validatePassword } from '../utils/AuthValidator.tsx';
+import { useOnboarding } from '../context/OnboardingContext.tsx';
 
 interface LoginProps {
-    onboardingStatus: string;
+    onboardingStatus: string | undefined;
 }
 
-const Login: React.FC<LoginProps> = ({ onboardingStatus }) => {
+const Login: React.FC<LoginProps> = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errs, setErrs] = useState<string[]>([]);
     
+    const { onboardingData, setIsLoggedIn } = useOnboarding();
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token) {
-            if(onboardingStatus === 'Approved') {
+            if(onboardingData?.status === 'Accept') {
                 navigate('/profile');
             }else {
                 navigate('/onboarding');
             }
         }
-    }, [navigate]);
+    }, [navigate, onboardingData]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -48,11 +50,12 @@ const Login: React.FC<LoginProps> = ({ onboardingStatus }) => {
 
             if(response.data) {
                 localStorage.setItem('token', response.data.token);
+                setIsLoggedIn(true);
 
-                if(onboardingStatus !== 'Approved') {
-                    window.location.href='/onboarding';
+                if(onboardingData?.status !== 'Accept') {
+                    navigate('/onboarding');
                 }else {
-                    window.location.href='/profile';
+                    navigate('profile');
                 }
             }
         }catch(e) {

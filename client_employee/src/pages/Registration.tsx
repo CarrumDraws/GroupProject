@@ -22,26 +22,26 @@ function Registration() {
         validatePassword(password, validationErrors);
         validateConfirmation(password, confirmation, validationErrors);
 
-        if(validationErrors.length > 0) {
+        if (validationErrors.length > 0) {
             setErrs(validationErrors);
             return;
         }
 
-        try{
+        try {
             const serverUrl = import.meta.env.VITE_SERVER_URL;
             const employeeUrl = import.meta.env.VITE_EMPLOYEE_URL;
-            
+
             const response = await axios.post(`${serverUrl}/register`, {
                 email,
                 password,
                 link: `${employeeUrl}/register/${token}`
             });
 
-            if(response.data) {
+            if (response.data) {
                 alert('Registration successful!');
                 navigate('/login');
             }
-        }catch(e) {
+        } catch (e) {
             console.log(e);
             alert('Error during registration.');
         }
@@ -69,9 +69,9 @@ function Registration() {
         <Container maxWidth='sm'>
             <Box
                 sx={{
-                    display:'flex',
+                    display: 'flex',
                     flexDirection: 'column',
-                    alignItems:'center',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     height: '100vh'
                 }}
@@ -154,7 +154,7 @@ function Registration() {
                     </Button>
                 </Box>
 
-                <Box sx={{ mt:2 }}>
+                <Box sx={{ mt: 2 }}>
                     {errs.length > 0 && errs.map((err) => (
                         <Typography key={err} color={'red'}>{err}</Typography>
                     ))}
