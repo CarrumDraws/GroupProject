@@ -5,7 +5,11 @@ import { Box, TextField, Button, Container, Typography } from '@mui/material';
 
 import { validateEmail, validatePassword } from '../utils/AuthValidator.tsx';
 
-function Login() {
+interface LoginProps {
+    onboardingStatus: string;
+}
+
+const Login: React.FC<LoginProps> = ({ onboardingStatus }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errs, setErrs] = useState<string[]>([]);
@@ -15,7 +19,11 @@ function Login() {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token) {
-            navigate('/profile');
+            if(onboardingStatus === 'Approved') {
+                navigate('/profile');
+            }else {
+                navigate('/onboarding');
+            }
         }
     }, [navigate]);
 
@@ -40,10 +48,15 @@ function Login() {
 
             if(response.data) {
                 localStorage.setItem('token', response.data.token);
-                window.location.href='/profile'
+
+                if(onboardingStatus !== 'Approved') {
+                    window.location.href='/onboarding';
+                }else {
+                    window.location.href='/profile';
+                }
             }
         }catch(e) {
-            alert('Error during login.');
+            alert(e);
         }
     }
 
