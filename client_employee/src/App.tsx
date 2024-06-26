@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
+import ProtectedRoute from './utils/ProtectedRoute.tsx';
 import NavBar from './components/NavBar.tsx';
 import Profile from './pages/Profile.tsx';
 import VisaStatusManagement from './pages/VisaStatusManagement.tsx';
@@ -43,24 +44,36 @@ function App() {
       <Routes>
         <Route path='/' element={
           isLoggedIn ?
-            <Navigate to={onboardingStatus !== 'Approved' ? '/onboarding' : '/profile'} replace/> :
-            <Navigate to='/login' replace/>
+            <Navigate to={onboardingStatus !== 'Approved' ? '/onboarding' : '/profile'} replace /> :
+            <Navigate to='/login' replace />
           }
         />
-        
-       {isLoggedIn && (<>
-          <Route path="/profile" element={
-            <ProfileProvider>
-              <Profile />
-            </ProfileProvider>
-          } />
-          <Route path="/visa" element={<VisaStatusManagement />} />
-          <Route path="/housing" element={<Housing />} />
-          <Route path='/onboarding' element={<Onboarding initialStatus={onboardingStatus}/>} />
-        </>)}
 
-        <Route path="/register/:token" element={<Registration />} />
-        <Route path="/login" element={<Login onboardingStatus={onboardingStatus}/>} />
+        <Route path='/login' element={<Login onboardingStatus={onboardingStatus} />} />
+        <Route path='/register/:token' element={<Registration />} />
+
+        {isLoggedIn && (
+          <>
+            <Route path="/profile" element={
+              <ProtectedRoute isLoggedIn={isLoggedIn} onboardingStatus={onboardingStatus}>
+                <ProfileProvider>
+                  <Profile />
+                </ProfileProvider>
+              </ProtectedRoute>
+            } />
+            <Route path="/visa" element={
+              <ProtectedRoute isLoggedIn={isLoggedIn} onboardingStatus={onboardingStatus}>
+                <VisaStatusManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/housing" element={
+              <ProtectedRoute isLoggedIn={isLoggedIn} onboardingStatus={onboardingStatus}>
+                <Housing />
+              </ProtectedRoute>
+            } />
+            <Route path='/onboarding' element={<Onboarding initialStatus={onboardingStatus} />} />
+          </>
+        )}
       </Routes>
     </Router>
   );

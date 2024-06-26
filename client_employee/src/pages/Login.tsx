@@ -19,7 +19,11 @@ const Login: React.FC<LoginProps> = ({ onboardingStatus }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token) {
-            navigate('/profile');
+            if(onboardingStatus === 'Approved') {
+                navigate('/profile');
+            }else {
+                navigate('/onboarding');
+            }
         }
     }, [navigate]);
 

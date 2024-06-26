@@ -1,23 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import axios from 'axios';
 
-import { Box, TextField, Button, Container, Typography, Select, MenuItem, InputLabel } from '@mui/material';
-import { formatDate } from 'react-datepicker/dist/date_utils';
+import { Box, Button, Container, Typography, Select, MenuItem, InputLabel } from '@mui/material';
+
+import { Person, PersonKeys } from '../components/Person.tsx'; // not a component but an interface
+import OnboardingField from '../components/OnboardingField.tsx';
+import OnboardingFileInput from '../components/OnboardingFileInput.tsx';
+import OnboardingPersonInput from '../components/OnboardingPersonInput.tsx';
 
 interface OnboardingProps {
     initialStatus: string;
 }
 
-const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
-    type Person = {
-        firstname: string;
-        middlename: string;
-        lastname: string;
-        phone: string;
-        email: string;
-        relationship: string;
-    };
+interface FormData {
+    firstname: string;
+    middlename: string;
+    lastname: string;
+    preferredname: string;
+    picture: File | null;
+    buildaptnum: string;
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+    cell: string;
+    work: string;
+    make: string;
+    model: string;
+    color: string;
+    email: string;
+    ssn: string;
+    dob: string;
+    gender: string;
+    citizenship: string;
+    citizenshiptype: string;
+    workauth: string;
+    optreciept: File | null;
+    title: string;
+    startdate: string;
+    enddate: string;
+    haslicense: boolean;
+    licensenumber: string;
+    expdate: string;
+    license: File | null;
+    references: Person[];
+    contacts: Person[];
+}
 
+type FormDataKeys = keyof FormData;
+
+const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
     const initialPerson = {
         firstname: '',
         middlename: '',
@@ -30,13 +62,16 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
     const [onboardingStatus, setOnboardingStatus] = useState<string>(initialStatus);
     const [feedback, setFeedback] = useState('');
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    const [refErrors, setRefErrors] = useState<string[]>([]);
     const [ecErrors, setEcErrors] = useState<string[]>([]);
-    const [formData, setFormData] = useState({
+    const [currentReference, setCurrentReference] = useState<Person>(initialPerson);
+    const [currentEmergencyContact, setCurrentEmergencyContact] = useState<Person>(initialPerson);
+    const [formData, setFormData] = useState<FormData>({
         firstname: '',
         middlename: '',
         lastname: '',
         preferredname: '',
-        picture: '',
+        picture: null,
         buildaptnum: '',
         street: '',
         city: '',
@@ -54,19 +89,20 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
         citizenship:'',
         citizenshiptype: '',
         workauth: '',
-        optreciept: '',
+        optreciept: null,
         title: '',
         startdate: '',
         enddate: '',
         haslicense: false,
         licensenumber: '',
         expdate: '',
-        license: '',
+        license: null,
         references: [] as Person[],
         contacts: [] as Person[]
     });
-    const [currentReference, setCurrentReference] = useState(initialPerson);
-    const [currentEmergencyContact, setCurrentEmergencyContact] = useState(initialPerson);
+    
+
+    const isDisabled = initialStatus === 'Pending' || initialStatus === 'Approved';
 
     useEffect(() => {
         if(onboardingStatus === 'Rejected') {
@@ -82,103 +118,123 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
         });
     };
 
-    const handleSelectChange = (e: { target: { name: string; value: string; }; }) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    };
-
-    const handleFileChange = (event: { target: { files: any; }; }) => {
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
-        const newUploadedFiles = [...uploadedFiles];
-
-        for(let i = 0; i < files.length; i++) {
-            newUploadedFiles.push(files[i]);
+        if (files) {
+            setUploadedFiles([...uploadedFiles, ...Array.from(files)]);
         }
-
-        setUploadedFiles(newUploadedFiles);
     };
 
-    const handleReferenceChange = (e: { target: { name: string; value: string; }; }) => {
+    const handlePersonChange = (setter: React.Dispatch<React.SetStateAction<Person>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setCurrentReference({
-            ...currentReference,
+        setter(prev => ({
+            ...prev,
             [name]: value
-        });
+        }));
     };
 
-    const handleEmergencyContactChange = (e: { target: { name: string; value: string; }; }) => {
-        const { name, value } = e.target;
-        setCurrentEmergencyContact({
-            ...currentEmergencyContact,
-            [name]: value
-        });
+    const addPerson = (
+        currentPerson: Person,
+        setter: React.Dispatch<React.SetStateAction<Person>>,
+        arrKey: keyof typeof formData,
+        errorsSetter: React.Dispatch<React.SetStateAction<string[]>>,
+        errors: string[]
+      ) => {
+        const requiredFields: PersonKeys[] = ['firstname', 'lastname', 'phone', 'email', 'relationship'];
+        const missingFields = requiredFields.filter(field => !currentPerson[field]);
+      
+        if (missingFields.length === 0) {
+          setFormData(prev => ({
+            ...prev,
+            [arrKey]: [...(prev[arrKey] as Person[]), currentPerson]
+          }));
+          setter(initialPerson);
+          if (errors.length) errorsSetter([]);
+        } else {
+          const errorMessage = 'Missing required field(s).';
+          if (!errors.includes(errorMessage)) {
+            errorsSetter([...errors, errorMessage]);
+          }
+        }
+      };
+    
+
+    const deletePerson = (arrKey: keyof FormData, person: Person) => {
+        setFormData(prev => ({
+            ...prev,
+            [arrKey]: (prev[arrKey] as Person[]).filter(p => 
+                p.firstname !== person.firstname || 
+                p.middlename !== person.middlename || 
+                p.lastname !== person.lastname || 
+                p.phone !== person.phone || 
+                p.email !== person.email || 
+                p.relationship !== person.relationship)
+        }));
     };
 
-    const addCurrentReference = () => {
-        const refError = document.getElementById('refError');
+    const generateNameLabel = (field: string) => {
+        switch (field.toLowerCase()) {
+          case 'firstname':
+            return 'First Name*';
+          case 'middlename':
+            return 'Middle Name';
+          case 'lastname':
+            return 'Last Name*';
+          default:
+            return '';
+        }
+    };
 
-        if(currentReference.firstname && currentReference.lastname && currentReference.phone &&
-            currentReference.email && currentReference.relationship) {
-            
-            const updatedRefs = [...formData.references, currentReference];
-            setFormData({
-                ...formData,
-                references: updatedRefs
-            });
+    const getRequiredFields = (): FormDataKeys[] => {
+        const requiredFields: FormDataKeys[] = [
+            'firstname',
+            'lastname',
+            'buildaptnum',
+            'street',
+            'city',
+            'state',
+            'zip',
+            'cell',
+            'citizenship'
+        ];
 
-            setCurrentReference(initialPerson);
-
-            if(refError) {
-                refError.textContent = '';
+        if (formData.citizenship === 'Not Citizen') {
+            requiredFields.push('workauth');
+            if (formData.workauth === 'Other') {
+                requiredFields.push('title');
             }
-        }else if(refError){
-            refError.textContent = 'Missing required field(s).';
         }
-    }
 
-    const addEmergencyContact = () => {
-        if(currentEmergencyContact.firstname && currentEmergencyContact.lastname &&
-            currentEmergencyContact.phone && currentEmergencyContact.email &&
-            currentEmergencyContact.relationship) {
-            
-            const updatedEcs = [...formData.contacts, currentEmergencyContact];
-            setFormData({
-                ...formData,
-                contacts: updatedEcs
-            });
-
-            setCurrentEmergencyContact(initialPerson);
-        }else {
-            setEcErrors([...ecErrors, 'Missing requird field(s).']);
+        if (formData.haslicense) {
+            requiredFields.push('licensenumber');
         }
-    }
 
-    const handleDeleteReference = (fn: string, ln: string) => {
-        const updatedRefs = [...formData.references].filter((r) => r.firstname != fn && r.lastname != ln);
-        
-        setFormData({
-            ...formData,
-            references: updatedRefs
-        });
-    }
+        return requiredFields;
+    };
 
-    const handleDeleteEmergencyContact = (fn: string, ln: string) => {
-        const updatedEcs = [...formData.contacts].filter((ec) => ec.firstname != fn && ec.lastname != ln);
-        setFormData({
-            ...formData,
-            contacts: updatedEcs
-        });
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
     }
 
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
+        // Check if there is a required field missing
+        const requiredFields = getRequiredFields();
+        const missingFields = requiredFields.filter(field => !formData[field]);
+
+        if (missingFields.length > 0) {
+            const requiredError = document.getElementById('requiredError');
+            if(requiredError) {
+                requiredError.textContent = 'Missing required field(s).'
+            }
+            return;
+        }
+
         // submit form to server
         
-        setOnboardingStatus('Pending');
+        //setOnboardingStatus('Pending');
     };
 
     const centerRowBoxStyle = {
@@ -188,25 +244,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
     const centerColumnBoxStyle = {
         display: 'flex', flexDirection:'column', alignItems:'center'
     }
-
-    const textFieldStyleShort = {
-        height: '2rem',
-        '& input': {
-            height: '1.5rem',
-            padding: '0 0.5rem'
-        },
-        border: '0.5px solid #9EAABA'
-    };
-
-    const textFieldStyleLong = {
-        height: '2rem',
-        width: '39.5rem',
-        '& input': {
-            height: '1.5rem',
-            padding: '0 0.5rem'
-        },
-        border: '0.5px solid #9EAABA'
-    };
 
     const typographyStyle = { mr:'0.5rem', color:'black' };
     
@@ -225,9 +262,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
         border: '0.5px solid #9EAABA'
     };
 
+
+
     return (
         <Container sx={{ display: 'flex', width: '100%', justifyContent:'center', paddingTop: '1rem' }}>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <Typography
                     display='flex'
                     justifyContent='center'
@@ -239,324 +278,128 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                     Basic Information
                 </Typography>
                 <Box sx={centerRowBoxStyle}>
-                    <TextField
-                        name='firstname'
-                        value={formData.firstname}
-                        onChange={handleInputChange}
-                        placeholder='First Name*'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField placeholder='Middle Name'
-                        name='middlename'
-                        value={formData.middlename}
-                        onChange={handleInputChange}
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField
-                        name='lastname'
-                        value={formData.lastname}
-                        onChange={handleInputChange}
-                        placeholder='Last Name*'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
+                    {(['firstname', 'middlename', 'lastname'] as const).map(field => (
+                        <OnboardingField 
+                            key={field} 
+                            isLong={false} 
+                            label={generateNameLabel(field)} 
+                            type='text' 
+                            name={field} 
+                            value={formData[field]} 
+                            onChange={handleInputChange} 
+                            isDisabled={isDisabled} 
+                        />
+                    ))}
                 </Box>
 
                 <Box sx={centerColumnBoxStyle}>
-                    <TextField
+                    <OnboardingField
+                        isLong={true}
+                        label='Preferred Name'
+                        type='text'
                         name='preferredname'
                         value={formData.preferredname}
                         onChange={handleInputChange}
-                        placeholder='Preferred Name'
-                        InputProps={{
-                            style: textFieldStyleLong,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem', mb: '1.5rem' }}
+                        isDisabled={isDisabled}
                     />
 
-                    <Box sx={centerRowBoxStyle}>
-                        <Typography
-                            sx={typographyStyle}
-                        >
-                            Choose Profile Picture
-                        </Typography>
-                        <input 
-                            type='file'
-                            name='picture'
-                            onChange={handleFileChange}
+                    <OnboardingFileInput
+                        boxStyle={{...centerRowBoxStyle, paddingTop:'1.5rem'}}
+                        titleStyle={typographyStyle}
+                        title='Choose Profile Picture'
+                        name='picture'
+                        onChange={handleFileChange}
+                        isDisabled={isDisabled}
+                    />
+                </Box>
+
+                <Box sx={centerRowBoxStyle} paddingTop='0.5rem'>
+                    {(['buildaptnum', 'street', 'city', 'state', 'zip'] as const).map(field => (
+                        <OnboardingField
+                            key={field}
+                            isLong={false}
+                            label={field === 'buildaptnum' ? 'Building/Apt # *' : `${field.charAt(0).toUpperCase() + field.slice(1)}*`}
+                            type='text'
+                            name={field}
+                            value={formData[field]}
+                            onChange={handleInputChange}
+                            isDisabled={isDisabled}
                         />
-                    </Box>
-                </Box>
-
-                <Box sx={{display: 'flex', flexDirection: 'row', paddingTop: '0.5rem'}}>
-                    <TextField
-                        name='buildaptnum'
-                        value={formData.buildaptnum}
-                        onChange={handleInputChange}
-                        placeholder='Building/Apt # *'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField
-                        name='street'
-                        value={formData.street}
-                        onChange={handleInputChange}
-                        placeholder='Street Name*'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField
-                        name='city'
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        placeholder='City*'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField
-                        name='state'
-                        value={formData.state}
-                        onChange={handleInputChange}
-                        placeholder='State*'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField
-                        name='zip'
-                        value={formData.zip}
-                        onChange={handleInputChange}
-                        placeholder='Zip*'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
+                    ))}
                 </Box>
 
                 <Box sx={centerRowBoxStyle}>
-                    <TextField
-                        name='cell'
-                        value={formData.cell}
-                        onChange={handleInputChange}
-                        placeholder='Cell Phone'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField
-                        name='work'
-                        value={formData.work}
-                        onChange={handleInputChange}
-                        placeholder='Work Phone'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
+                    {(['cell', 'work'] as const).map(field => (
+                        <OnboardingField
+                            key={field}
+                            isLong={false}
+                            label={`${field.charAt(0).toUpperCase() + field.slice(1)} Phone${field === 'cell' ? '*' : ''}`}
+                            type='text'
+                            name={field}
+                            value={formData[field]}
+                            onChange={handleInputChange}
+                            isDisabled={isDisabled}
+                        />
+                    ))}
                 </Box>
 
                 <Box sx={centerRowBoxStyle}>
-                    <TextField
-                        name='make'
-                        value={formData.make}
-                        onChange={handleInputChange}
-                        placeholder='Car Make'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-
-                    <TextField
-                        name='model'
-                        value={formData.model}
-                        onChange={handleInputChange}
-                        placeholder='Car Model'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                    />
-                    <TextField
-                        name='color'
-                        value={formData.color}
-                        onChange={handleInputChange}
-                        placeholder='Car Color'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                     />
+                    {(['make', 'model', 'color'] as const).map(field => (
+                        <OnboardingField
+                            key={field}
+                            isLong={false}
+                            label={`Car ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                            type='text'
+                            name={field}
+                            value={formData[field]}
+                            onChange={handleInputChange}
+                            isDisabled={isDisabled}
+                        />
+                    ))}
                 </Box>
 
                 <Box sx={{ display:'flex', justifyContent:'center' }}>
-                    <TextField
+                    <OnboardingField
+                        isLong={true}
+                        label='Email'
+                        type='text'
+                        name=''
                         value={formData.email}
-                        InputProps={{
-                            style: textFieldStyleLong,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                        disabled
+                        onChange={()=>{}}
+                        isDisabled={true}
                     />
                 </Box>
 
                 <Box sx={centerRowBoxStyle}>
-                    <TextField
+                    <OnboardingField
+                        isLong={false}
+                        label='SSN'
+                        type='text'
                         name='ssn'
                         value={formData.ssn}
                         onChange={handleInputChange}
-                        placeholder='SSN'
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
-                     />
+                        isDisabled={isDisabled}
+                    />
 
                     <Typography sx={selectionLabelStyle}>Date of Birth</Typography>
-                    <TextField
+                    <OnboardingField
+                        isLong={false}
+                        label=''
                         type='date'
                         name='dob'
                         value={formData.dob}
                         onChange={handleInputChange}
-                        InputProps={{
-                            style: textFieldStyleShort,
-                            inputProps: {
-                                style: {
-                                    textAlign: 'center',
-                                    marginRight: '0.5rem'
-                                },
-                            }
-                        }}
-                        sx={{ mt: '1rem', mr: '0.5rem' }}
+                        isDisabled={isDisabled}
                     />
                     
                     <InputLabel id="gender-label" sx={selectionLabelStyle}>Gender</InputLabel>
                     <Select
                         name='gender'
                         value={formData.gender}
-                        onChange={handleSelectChange}
+                        onChange={handleInputChange}
                         labelId='gender-label'
                         sx={selectionStyle}
+                        disabled={isDisabled}
                     >
                         <MenuItem value='Male'>Male</MenuItem>
                         <MenuItem value='Female'>Female</MenuItem>
@@ -571,9 +414,10 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                     <Select
                         name='citizenship'
                         value={formData.citizenship}
-                        onChange={handleSelectChange}
+                        onChange={handleInputChange}
                         labelId='citizenship-label'
                         sx={selectionStyle}
+                        disabled={isDisabled}
                     >
                         <MenuItem value='Is Citizen'>Yes</MenuItem>
                         <MenuItem value='Not Citizen'>No</MenuItem>
@@ -585,13 +429,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                         case 'Is Citizen':
                             return (
                                 <Box sx={centerRowBoxStyle}>
-                                    <InputLabel id="citizen-label" sx={selectionLabelStyle}>Select Type: </InputLabel>
+                                    <InputLabel id="citizen-label" sx={selectionLabelStyle}>
+                                        Select Type:
+                                    </InputLabel>
+
                                     <Select
                                         name='citizenshiptype'
                                         value={formData.citizenshiptype}
-                                        onChange={handleSelectChange}
+                                        onChange={handleInputChange}
                                         labelId='citizen-label'
                                         sx={selectionStyle}
+                                        disabled={isDisabled}
                                     >
                                         <MenuItem value='Green Card'>Green Card</MenuItem>
                                         <MenuItem value='Citizen'>Citizen</MenuItem>
@@ -602,19 +450,21 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                             return (
                                 (<Box>
                                     <Box sx={centerRowBoxStyle}>
-                                        <InputLabel id="workauth-label" sx={selectionLabelStyle}>What is your work authorization?</InputLabel>
+                                        <InputLabel id="workauth-label" sx={selectionLabelStyle}>
+                                            What is your work authorization?
+                                        </InputLabel>
+
                                         <Select
                                             name='workauth'
                                             value={formData.workauth}
-                                            onChange={handleSelectChange}
+                                            onChange={handleInputChange}
                                             labelId='workauth-label'
                                             sx={selectionStyle}
+                                            disabled={isDisabled}
                                         >
-                                            <MenuItem value='H1-B'>H1-B</MenuItem>
-                                            <MenuItem value='L2'>L2</MenuItem>
-                                            <MenuItem value='F1(CPT/OPT)'>F1(CPT/OPT)</MenuItem>
-                                            <MenuItem value='H4'>H4</MenuItem>
-                                            <MenuItem value='Other'>Other</MenuItem>
+                                            {['H1-B', 'L2', 'F1(CPT/OPT)', 'H4', 'Other'].map((auth, _index) => (
+                                                <MenuItem key={auth} value={auth}>{auth}</MenuItem>
+                                            ))}
                                         </Select>
                                     </Box>
 
@@ -622,33 +472,26 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                                         switch(formData.workauth){
                                             case 'F1(CPT/OPT)':
                                                 return (
-                                                    <Box sx={{ display:'flex', justifyContent:'center', mt:'1rem' }}>
-                                                        <Typography
-                                                            sx={typographyStyle}
-                                                        >
-                                                            Upload OPT Reciept
-                                                        </Typography>
-                                                        <input type='file' />
-                                                    </Box>
+                                                    <OnboardingFileInput
+                                                        boxStyle={{ display:'flex', justifyContent:'center', mt:'1.5rem', mb: '1rem' }}
+                                                        titleStyle={typographyStyle}
+                                                        title='Upload OPT Reciept'
+                                                        name='optreciept'
+                                                        onChange={handleFileChange}
+                                                        isDisabled={isDisabled}
+                                                    />
                                                 );
-                                            case 'H1-B':
-                                            case 'L2':
-                                            case 'H4':
                                             case 'Other':
                                                 return (
                                                     <Box sx={{ display:'flex', justifyContent:'center' }}>
-                                                        <TextField
-                                                            placeholder='Visa Title'
-                                                            InputProps={{
-                                                                style: textFieldStyleLong,
-                                                                inputProps: {
-                                                                    style: {
-                                                                        textAlign: 'center',
-                                                                        marginRight: '0.5rem'
-                                                                    },
-                                                                }
-                                                            }}
-                                                            sx={{ mt: '1rem', mr: '0.5rem' }}
+                                                        <OnboardingField
+                                                            isLong={true}
+                                                            label='Visa Title*'
+                                                            type='text'
+                                                            name='title'
+                                                            value={formData.title}
+                                                            onChange={handleInputChange}
+                                                            isDisabled={isDisabled}
                                                         />
                                                     </Box>
                                                 );
@@ -658,44 +501,26 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
             
                                     <Box sx={centerRowBoxStyle}>
                                         <Typography sx={selectionLabelStyle}>Start Date</Typography>
-                                        <TextField
+                                        <OnboardingField
+                                            isLong={false}
+                                            label=''
                                             type='date'
                                             name='startdate'
                                             value={formData.startdate}
                                             onChange={handleInputChange}
-                                            InputProps={{
-                                                style: textFieldStyleShort,
-                                                inputProps: {
-                                                    style: {
-                                                        textAlign: 'center',
-                                                        marginRight: '0.5rem'
-                                                    },
-                                                }
-                                            }}
-                                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                                        >
-                                            Start Date
-                                        </TextField>
+                                            isDisabled={isDisabled}
+                                        />
             
                                         <Typography sx={selectionLabelStyle}>End Date</Typography>
-                                        <TextField
+                                        <OnboardingField
+                                            isLong={false}
+                                            label=''
                                             type='date'
                                             name='enddate'
                                             value={formData.enddate}
                                             onChange={handleInputChange}
-                                            InputProps={{
-                                                style: textFieldStyleShort,
-                                                inputProps: {
-                                                    style: {
-                                                        textAlign: 'center',
-                                                        marginRight: '0.5rem'
-                                                    },
-                                                }
-                                            }}
-                                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                                        >
-                                            End Date
-                                        </TextField>
+                                            isDisabled={isDisabled}
+                                        />
                                     </Box>
                                 </Box>)
                             );
@@ -704,20 +529,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                 })()}
 
                 <Box sx={centerRowBoxStyle}>
-                    <InputLabel id="license-label" sx={selectionLabelStyle}>Do you have a driver's license?</InputLabel>
+                    <InputLabel id="license-label" sx={selectionLabelStyle}>
+                        Do you have a driver's license?
+                    </InputLabel>
+
                     <Select
                         name='haslicense'
                         value={formData.haslicense ? 'Yes' : 'No'}
-                        onChange={(e: { target: { name: string; value: string; }; }) => {
-                            const { name, value } = e.target;
-                            setFormData({
-                                ...formData,
-                                [name]: (value === 'Yes')
-                            });
-                        }}
+                        onChange={(e) => setFormData({ ...formData, haslicense: e.target.value === 'Yes' })}
                         labelId='license-label'
                         sx={selectionStyle}
-                    >
+                        disabled={isDisabled}>
                         <MenuItem value='Yes'>Yes</MenuItem>
                         <MenuItem value='No'>No</MenuItem>
                     </Select>
@@ -726,323 +548,67 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                 { formData.haslicense ?
                     <Box>
                         <Box sx={centerRowBoxStyle}>
-                            <TextField
+                            <OnboardingField
+                                isLong={false}
+                                label='License Number'
+                                type='text'
                                 name='licensenumber'
                                 value={formData.licensenumber}
                                 onChange={handleInputChange}
-                                placeholder='License Number'
-                                InputProps={{
-                                    style: textFieldStyleShort,
-                                    inputProps: {
-                                        style: {
-                                            textAlign: 'center',
-                                            marginRight: '0.5rem'
-                                        },
-                                    }
-                                }}
-                                sx={{ mt: '1rem', mr: '0.5rem' }}
+                                isDisabled={isDisabled}
                             />
 
                             <Typography sx={selectionLabelStyle}>Expiration Date</Typography>
-                            <TextField
+                            <OnboardingField
+                                isLong={false}
+                                label=''
                                 type='date'
                                 name='expdate'
                                 value={formData.expdate}
                                 onChange={handleInputChange}
-                                InputProps={{
-                                    style: textFieldStyleShort,
-                                    inputProps: {
-                                        style: {
-                                            textAlign: 'center',
-                                            marginRight: '0.5rem'
-                                        },
-                                    }
-                                }}
-                                sx={{ mt: '1rem', mr: '0.5rem', mb: '1rem' }}
+                                isDisabled={isDisabled}
                             />
                         </Box>
 
-                        <Box sx={centerRowBoxStyle}>
-                            <Typography sx={typographyStyle}>Please upload a copy of your license</Typography>
-                            <input
-                                type='file'
-                                name='license'
-                                onChange={handleFileChange}
-                            />
-                        </Box>
+                        <OnboardingFileInput
+                            boxStyle={{...centerRowBoxStyle, mt: '1.5rem'}}
+                            titleStyle={typographyStyle}
+                            title='Please upload a copy of your license'
+                            name='license'
+                            onChange={handleFileChange}
+                            isDisabled={isDisabled}
+                        />
                     </Box> :
                     <></>
                 }
+                
+                <OnboardingPersonInput
+                    boxRowStyle={centerRowBoxStyle}
+                    boxColumnStyle={centerColumnBoxStyle}
+                    title='Reference'
+                    errors={refErrors}
+                    personArr={formData.references}
+                    handleDelete={(person) => deletePerson('references', person)}
+                    currentPerson={currentReference}
+                    handlePersonChange={handlePersonChange(setCurrentReference)}
+                    isDisabled={isDisabled}
+                    handleAdd={() => addPerson(currentReference,setCurrentReference, 'references', setRefErrors, refErrors)}
+                />
 
-                <Typography
-                    display='flex'
-                    justifyContent='center'
-                    paddingTop='1.5rem'
-                    fontSize='1.5rem'
-                    color='#8696A7'
-                    sx={{ textDecoration: 'underline' }}
-                >
-                    Reference
-                </Typography>
+                <OnboardingPersonInput
+                    boxRowStyle={centerRowBoxStyle}
+                    boxColumnStyle={centerColumnBoxStyle}
+                    title='Emergency Contact'
+                    errors={ecErrors}
+                    personArr={formData.contacts}
+                    handleDelete={(person) => deletePerson('contacts', person)}
+                    currentPerson={currentEmergencyContact}
+                    handlePersonChange={handlePersonChange(setCurrentEmergencyContact)}
+                    isDisabled={isDisabled}
+                    handleAdd={() => addPerson(currentEmergencyContact, setCurrentEmergencyContact, 'contacts', setEcErrors, ecErrors)}
+                />
 
-                <Typography id='refError' color='red' sx={centerRowBoxStyle}></Typography>
-
-                <Box sx={centerRowBoxStyle} paddingTop='0.5rem'>
-                    {formData.references.map((r) => (
-                        <Box key={`${r.firstname}-${r.lastname}-${r.relationship}`} sx={centerColumnBoxStyle} paddingLeft='1.5rem' paddingRight='1.5rem'>
-                            <Typography>{r.firstname} {r.middlename} {r.lastname} ({r.relationship}): </Typography>
-                            <Typography>{r.phone}</Typography>
-                            <Typography>{r.email}</Typography>
-                            <Button sx={{ mt:0, paddingTop:0 }} onClick={() => handleDeleteReference(r.firstname, r.lastname)}>Delete</Button>
-                        </Box>
-                    ))}
-                </Box>
-                <Box sx={centerColumnBoxStyle}>
-                    <Box sx={centerRowBoxStyle}>
-                        <TextField
-                            name='firstname'
-                            value={currentReference.firstname}
-                            onChange={handleReferenceChange}
-                            placeholder='First Name*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-
-                        <TextField
-                            name='middlename'
-                            value={currentReference.middlename}
-                            onChange={handleReferenceChange}
-                            placeholder='Middle Name'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-
-                        <TextField
-                            name='lastname'
-                            value={currentReference.lastname}
-                            onChange={handleReferenceChange}
-                            placeholder='Last Name*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-                    </Box>
-
-                    <Box sx={centerRowBoxStyle}>
-                        <TextField
-                            name='phone'
-                            value={currentReference.phone}
-                            onChange={handleReferenceChange}
-                            placeholder='Phone*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-                        
-                        <TextField
-                            name='email'
-                            value={currentReference.email}
-                            onChange={handleReferenceChange}
-                            placeholder='Email*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-                        
-                        <TextField
-                            name='relationship'
-                            value={currentReference.relationship}
-                            onChange={handleReferenceChange}
-                            placeholder='Relationship*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem', mb: '1rem' }}
-                        />
-                    </Box>
-
-                    <Button onClick={addCurrentReference}>Save</Button>
-                </Box>
-
-                <Typography
-                    display='flex'
-                    justifyContent='center'
-                    paddingTop='1rem'
-                    fontSize='1.5rem'
-                    color='#8696A7'
-                    sx={{ textDecoration: 'underline' }}
-                >
-                    Emergency Contact(s)
-                </Typography>
-
-                <Box sx={centerColumnBoxStyle}>
-                    {ecErrors.map((e) => (
-                        <Typography color='red'>{e}</Typography>
-                    ))}
-                </Box>
-
-                <Box sx={centerColumnBoxStyle}>
-                    {formData.contacts.map((c) => (
-                        <Box key={`${c.firstname}-${c.lastname}-${c.relationship}`} sx={centerColumnBoxStyle}>
-                            <Typography>{c.firstname} {c.middlename} {c.lastname} ({c.relationship}): </Typography>
-                            <Typography>{c.phone}</Typography>
-                            <Typography>{c.email}</Typography>
-                            <Button sx={{ mt:0, paddingTop:0 }} onClick={() => handleDeleteEmergencyContact(c.firstname, c.lastname)}>Delete</Button>
-                        </Box>
-                    ))}
-                </Box>
-                <Box sx={centerColumnBoxStyle}>
-                    <Box sx={centerRowBoxStyle}>
-                        <TextField
-                            name='firstname'
-                            value={currentEmergencyContact.firstname}
-                            onChange={handleEmergencyContactChange}
-                            placeholder='First Name*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-
-                        <TextField
-                            name='middlename'
-                            value={currentEmergencyContact.middlename}
-                            onChange={handleEmergencyContactChange}
-                            placeholder='Middle Name'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-
-                        <TextField
-                            name='lastname'
-                            value={currentEmergencyContact.lastname}
-                            onChange={handleEmergencyContactChange}
-                            placeholder='Last Name*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-                    </Box>
-
-                    <Box sx={centerRowBoxStyle}>
-                        <TextField
-                            name='phone'
-                            value={currentEmergencyContact.phone}
-                            onChange={handleEmergencyContactChange}
-                            placeholder='Phone*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-                        
-                        <TextField
-                            name='email'
-                            value={currentEmergencyContact.email}
-                            onChange={handleEmergencyContactChange}
-                            placeholder='Email*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem' }}
-                        />
-                        
-                        <TextField
-                            name='relationship'
-                            value={currentEmergencyContact.relationship}
-                            onChange={handleEmergencyContactChange}
-                            placeholder='Relationship*'
-                            InputProps={{
-                                style: textFieldStyleShort,
-                                inputProps: {
-                                    style: {
-                                        textAlign: 'center',
-                                        marginRight: '0.5rem'
-                                    },
-                                }
-                            }}
-                            sx={{ mt: '1rem', mr: '0.5rem', mb: '1rem' }}
-                        />
-                    </Box>
-
-                    <Button onClick={addEmergencyContact}>Save</Button>
-
+                <Box sx={centerRowBoxStyle}>
                     { uploadedFiles.length !== 0 ?
                         <Box>
                             <Typography
@@ -1064,8 +630,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                         </Box> :
                         <></>
                     }
+                </Box>
 
-                    <Button>Submit</Button>
+                <Box sx={centerColumnBoxStyle}>
+                    <Typography id='requiredError' color='red'></Typography>
+                    <Box sx={centerRowBoxStyle}>
+                        <Button type='submit' sx={{ fontSize:'1rem', paddingRight: '1.5rem' }}>Submit</Button>
+                        <Button onClick={handleLogout} sx={{ color:'red', borderColor:'red', fontSize: '1rem', paddingLeft: '1.5rem' }}>Log Out</Button>
+                    </Box>
                 </Box>
             </form>
         </Container>
