@@ -346,6 +346,9 @@ async function handleOptDocument(employeeId, optFileID) {
       {
         employee_id: employeeId,
         optreciept: optFileID,
+        optead: null,
+        i983: null,
+        i20: null,
         status: "OPT Receipt",
       },
       {

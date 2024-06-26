@@ -10,8 +10,9 @@ const retrieveFile = async (req, res) => {
     const file = await File.findOne({ _id: fileid });
     if (!file) return res.status(404).send("File not found");
     const url = await getFileUrl(file.filekey);
+    const fileObject = file.toObject();
     res.status(200).send({
-      message: "Pre-signed URL generated successfully",
+      ...fileObject,
       url: url,
     });
   } catch (error) {

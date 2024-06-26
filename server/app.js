@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const authRouter = require("./routers/AuthRouter.js");
 const onboardingRouter = require("./routers/OnboardingRouter.js");
 const employeeRouter = require("./routers/EmployeeRouter.js");
+const optRouter = require("./routers/OptRouter.js");
 const fileRouter = require("./routers/FileRouter.js");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use(
 app.use("/", authRouter);
 app.use("/onboarding", onboardingRouter);
 app.use("/employee", employeeRouter);
+app.use("/opt", optRouter);
 app.use("/file", fileRouter);
 
 module.exports = app;
