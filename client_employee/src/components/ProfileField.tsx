@@ -1,5 +1,7 @@
 import { Box, Typography, TextField } from '@mui/material';
 
+import { formatDateWithSlash } from '../utils/utilMethos.tsx';
+
 interface ProfileFieldProps {
     label: string;
     type: string;
@@ -9,13 +11,6 @@ interface ProfileFieldProps {
     editMode: boolean;
 }
 
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const year = date.getFullYear();
-    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
-}
 
 const textFieldStyle = {
     sx:{
@@ -36,7 +31,7 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, type, name, value, o
             {editMode ?
                 <TextField type={type} name={name} value={value} onChange={onChange} InputProps={textFieldStyle} /> :
                 (type == 'date'?
-                    <Typography paddingLeft='0.5rem'>{formatDate(value)}</Typography> :
+                    <Typography paddingLeft='0.5rem'>{formatDateWithSlash(value)}</Typography> :
                     <Typography paddingLeft='0.5rem'>{value}</Typography>
                 )
             }

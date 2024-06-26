@@ -1,6 +1,6 @@
 import { Box, Button, SxProps, Theme, Typography } from "@mui/material";
 
-import { Person } from './Person.tsx';
+import { Person } from '../types/Person.tsx';
 import OnboardingField from "./OnboardingField.tsx";
 
 interface OnboardingPersonInputProps{
@@ -56,7 +56,7 @@ const OnboardingPersonInput : React.FC<OnboardingPersonInputProps> = ({
 
             <Box sx={boxColumnStyle}>
                 {errors.map((e) => (
-                    <Typography color='red'>{e}</Typography>
+                    <Typography key={e} color='red'>{e}</Typography>
                 ))}
             </Box>
 
@@ -66,7 +66,7 @@ const OnboardingPersonInput : React.FC<OnboardingPersonInputProps> = ({
                             <Typography>{p.firstname} {p.middlename} {p.lastname} ({p.relationship}): </Typography>
                             <Typography>{p.phone}</Typography>
                             <Typography>{p.email}</Typography>
-                            <Button sx={{ mt:0, paddingTop:0 }} onClick={() => handleDelete(p)}>Delete</Button>
+                            <Button sx={{ mt:0, paddingTop:0 }} onClick={() => handleDelete(p)} disabled={isDisabled}>Delete</Button>
                         </Box>
                     ))}
                 </Box>
@@ -101,7 +101,7 @@ const OnboardingPersonInput : React.FC<OnboardingPersonInputProps> = ({
                         ))}
                     </Box>
 
-                    <Button onClick={handleAdd}>Save</Button>
+                    <Button onClick={handleAdd} disabled={isDisabled}>Save</Button>
                 </Box>
         </>
     );

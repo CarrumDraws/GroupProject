@@ -1,16 +1,17 @@
-import { useState, useEffect, ChangeEvent } from 'react';
-import axios from 'axios';
+import { useState, ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Box, Button, Container, Typography, Select, MenuItem, InputLabel } from '@mui/material';
 
-import { Person, PersonKeys } from '../components/Person.tsx'; // not a component but an interface
+import LoadingScreen from '../components/LoadingScreen.tsx';
 import OnboardingField from '../components/OnboardingField.tsx';
 import OnboardingFileInput from '../components/OnboardingFileInput.tsx';
 import OnboardingPersonInput from '../components/OnboardingPersonInput.tsx';
-
-interface OnboardingProps {
-    initialStatus: string;
-}
+import EmployeeInfo from '../types/EmployeeInfo.tsx';
+import { Person, PersonKeys } from '../types/Person.tsx';
+import axiosInstance from '../interceptors/axiosInstance.tsx';
+import { formatDateWithDash } from '../utils/utilMethos.tsx';
+import { useOnboarding } from '../context/OnboardingContext.tsx';
 
 interface FormData {
     firstname: string;
@@ -28,18 +29,17 @@ interface FormData {
     make: string;
     model: string;
     color: string;
-    email: string;
     ssn: string;
     dob: string;
     gender: string;
     citizenship: string;
     citizenshiptype: string;
     workauth: string;
-    optreciept: File | null;
+    optreciept: File | null; // not in the GET Onboarding data
     title: string;
     startdate: string;
     enddate: string;
-    haslicense: boolean;
+    haslicense: string;
     licensenumber: string;
     expdate: string;
     license: File | null;
@@ -49,7 +49,7 @@ interface FormData {
 
 type FormDataKeys = keyof FormData;
 
-const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
+const Onboarding = () => {
     const initialPerson = {
         firstname: '',
         middlename: '',
@@ -59,56 +59,123 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
         relationship: ''
     }
 
-    const [onboardingStatus, setOnboardingStatus] = useState<string>(initialStatus);
-    const [feedback, setFeedback] = useState('');
-    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    const emptyEmployeeInfo: EmployeeInfo = {
+        employee_id: {
+            _id: '',
+            email: '',
+            password: '',
+            isHR: false,
+            __v: -1
+        },
+        name: {
+            firstname: '',
+            middlename: '',
+            lastname: '',
+            preferredname: '',
+            _id: ''
+        },
+        picture: null,
+        address: {
+            buildaptnum: null,
+            street: '',
+            city: '',
+            state: '',
+            zip: '',
+            _id: ''
+        },
+        phone: {
+            cell: null,
+            work: null,
+            _id: ''
+        },
+        car: {
+            make: '',
+            model: '',
+            color: '',
+            _id: ''
+        },
+        ssn: null,
+        dob: null,
+        gender: '',
+        citizenship: null,
+        citizenshiptype: '',
+        workauth: {
+            workauth: '',
+            title: '',
+            startdate: null,
+            enddate: null,
+            _id: ''
+        },
+        license: {
+            haslicense: 'false',
+            licensenumber: '',
+            expdate: null,
+            licensefile: null,
+            _id: ''
+        },
+        references: [],
+        contacts: [],
+        status: 'Not Started',
+        feedback: '',
+        __v: -1
+    }
+
+    const { onboardingData, isLoading } = useOnboarding();
+    if(isLoading) {
+        return <LoadingScreen />;
+    }
+
+    const initialData = onboardingData ? onboardingData : emptyEmployeeInfo;
+
+    const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>({});
     const [refErrors, setRefErrors] = useState<string[]>([]);
     const [ecErrors, setEcErrors] = useState<string[]>([]);
     const [currentReference, setCurrentReference] = useState<Person>(initialPerson);
     const [currentEmergencyContact, setCurrentEmergencyContact] = useState<Person>(initialPerson);
     const [formData, setFormData] = useState<FormData>({
-        firstname: '',
-        middlename: '',
-        lastname: '',
-        preferredname: '',
-        picture: null,
-        buildaptnum: '',
-        street: '',
-        city: '',
-        state: '',
-        zip: '',
-        cell: '',
-        work: '',
-        make: '',
-        model: '',
-        color: '',
-        email: '',
-        ssn: '',
-        dob: '',
-        gender: '',
-        citizenship:'',
-        citizenshiptype: '',
-        workauth: '',
+        firstname: initialData.name.firstname,
+        middlename: initialData.name.middlename,
+        lastname: initialData.name.lastname,
+        preferredname: initialData.name.preferredname,
+        picture: initialData.picture ? initialData.picture : null,
+        buildaptnum: initialData.address.buildaptnum ? initialData.address.buildaptnum : '',
+        street: initialData.address.street,
+        city: initialData.address.city,
+        state: initialData.address.state,
+        zip: initialData.address.zip,
+        cell: initialData.phone.cell ? initialData.phone.cell : '',
+        work: initialData.phone.work ? initialData.phone.work : '',
+        make: initialData.car.make,
+        model: initialData.car.model,
+        color: initialData.car.color,
+        ssn: initialData.ssn ? initialData.ssn : '',
+        dob: initialData.dob ? formatDateWithDash(initialData.dob) : '',
+        gender: initialData.gender,
+        citizenship: initialData.citizenship ? initialData.citizenship : 'false',
+        citizenshiptype: initialData.citizenshiptype,
+        workauth: initialData.workauth.workauth,
         optreciept: null,
-        title: '',
-        startdate: '',
-        enddate: '',
-        haslicense: false,
-        licensenumber: '',
-        expdate: '',
-        license: null,
-        references: [] as Person[],
-        contacts: [] as Person[]
+        title: initialData.workauth.title,
+        startdate: initialData.workauth.startdate ? initialData.workauth.startdate : '',
+        enddate: initialData.workauth.enddate ? initialData.workauth.enddate : '',
+        haslicense: initialData.license.haslicense === 'true' ? 'true' : 'false',
+        licensenumber: initialData.license.licensenumber,
+        expdate: initialData.license.expdate ? formatDateWithDash(initialData.license.expdate) : '',
+        license: initialData.license.licensefile,
+        references: initialData.references,
+        contacts: initialData.contacts
     });
     
+    const navigate = useNavigate();
+    console.log(onboardingData?.status);
 
-    const isDisabled = initialStatus === 'Pending' || initialStatus === 'Approved';
+    let isDisabled = false;
+    if(onboardingData && (onboardingData?.status === 'Pending' || onboardingData?.status === 'Accept')) {
+        isDisabled = true;
+    }
 
-    useEffect(() => {
-        if(onboardingStatus === 'Rejected') {
-            // fetch feedback then set it
-        }
-    }, [onboardingStatus]);
+    const feedback = initialData ? initialData.feedback : '';
+    console.log(feedback);
 
     const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
         const { name, value } = e.target;
@@ -119,9 +186,20 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
     };
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const { name } = event.target;
         const files = event.target.files;
-        if (files) {
-            setUploadedFiles([...uploadedFiles, ...Array.from(files)]);
+        if (files && files.length > 0) {
+            const file = files[0];
+            console.log(file);
+            setFormData({
+                ...formData,
+                [name]: file
+            });
+
+            setUploadedFiles(prevFiles => {
+                const updatedFiles = { ...prevFiles, [name]: file };
+                return updatedFiles;
+            });
         }
     };
 
@@ -144,17 +222,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
         const missingFields = requiredFields.filter(field => !currentPerson[field]);
       
         if (missingFields.length === 0) {
-          setFormData(prev => ({
-            ...prev,
-            [arrKey]: [...(prev[arrKey] as Person[]), currentPerson]
-          }));
-          setter(initialPerson);
-          if (errors.length) errorsSetter([]);
+            setFormData(prev => ({
+                ...prev,
+                [arrKey]: [...(prev[arrKey] as Person[]), currentPerson]
+            }));
+            setter(initialPerson);
+            if (errors.length) errorsSetter([]);
         } else {
-          const errorMessage = 'Missing required field(s).';
-          if (!errors.includes(errorMessage)) {
-            errorsSetter([...errors, errorMessage]);
-          }
+            const errorMessage = 'Missing required field(s).';
+            if (!errors.includes(errorMessage)) {
+                errorsSetter([...errors, errorMessage]);
+            }
         }
       };
     
@@ -195,18 +273,25 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
             'state',
             'zip',
             'cell',
-            'citizenship'
+            'ssn',
+            'dob',
+            'gender',
+            'citizenship',
+            'haslicense'
         ];
 
         if (formData.citizenship === 'Not Citizen') {
-            requiredFields.push('workauth');
+            requiredFields.push('workauth', 'startdate', 'enddate');
+            if(formData.workauth === 'F1(CPT/OPT)') {
+                requiredFields.push('optreciept');
+            }
             if (formData.workauth === 'Other') {
                 requiredFields.push('title');
             }
         }
 
-        if (formData.haslicense) {
-            requiredFields.push('licensenumber');
+        if (formData.haslicense === 'ture') {
+            requiredFields.push('licensenumber', 'expdate', 'license');
         }
 
         return requiredFields;
@@ -217,24 +302,70 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
         window.location.href = '/login';
     }
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         // Check if there is a required field missing
         const requiredFields = getRequiredFields();
         const missingFields = requiredFields.filter(field => !formData[field]);
 
+        const requiredError = document.getElementById('requiredError');
+        if(requiredError) {
+            requiredError.textContent = '';
+        }
         if (missingFields.length > 0) {
-            const requiredError = document.getElementById('requiredError');
-            if(requiredError) {
-                requiredError.textContent = 'Missing required field(s).'
+            if (requiredError) {
+                requiredError.textContent = 'Missing required field(s)';
             }
             return;
         }
 
+        // Check if there is at least one emergency contact
+        if (formData.contacts.length < 1) {
+            const errorMessage = 'You need at least one emergency contact.';
+            if (!ecErrors.includes(errorMessage)) {
+                setEcErrors([...ecErrors, errorMessage]);
+            }
+            return;
+        }
+
+        // Create FormData object
+        const data = new FormData();
+
+        // Append form fields to FormData
+        Object.keys(formData).forEach(key => {
+            const value = (formData as FormData)[key as FormDataKeys];
+            
+            if (value instanceof File) {
+                if (value !== null) {
+                    console.log(`Appending file - ${key}:`, value);
+                    data.append(key, value);
+                }
+            } else if (Array.isArray(value)) {
+                data.append(key, JSON.stringify(value));
+            } else {
+                data.append(key, value !== null ? value : '');
+            }
+        });
+
         // submit form to server
-        
-        //setOnboardingStatus('Pending');
+        try {
+            const response = await axiosInstance.post(`${import.meta.env.VITE_SERVER_URL}/onboarding`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (response.status === 200) {
+                alert('Form submitted successfully.');
+                if(requiredError) {
+                    requiredError.textContent = '';
+                }
+                navigate('/profile');
+            }
+        } catch (error: any) {
+            alert('Error submitting form:' + error.message);
+        }
     };
 
     const centerRowBoxStyle = {
@@ -265,7 +396,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
 
 
     return (
-        <Container sx={{ display: 'flex', width: '100%', justifyContent:'center', paddingTop: '1rem' }}>
+        <Container sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems:'center', paddingTop: '1rem' }}>
+            { feedback === '' ? <></> : <Typography variant="body1" paragraph color='red'>{feedback}</Typography>}
+            
             <form onSubmit={handleSubmit}>
                 <Typography
                     display='flex'
@@ -364,7 +497,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                         label='Email'
                         type='text'
                         name=''
-                        value={formData.email}
+                        value={initialData.employee_id.email}
                         onChange={()=>{}}
                         isDisabled={true}
                     />
@@ -403,7 +536,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                     >
                         <MenuItem value='Male'>Male</MenuItem>
                         <MenuItem value='Female'>Female</MenuItem>
-                        <MenuItem value='N/A'>I do not wish to answer</MenuItem>
+                        <MenuItem value='Other'>I do not wish to answer</MenuItem>
                     </Select>
                 </Box>
 
@@ -419,14 +552,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                         sx={selectionStyle}
                         disabled={isDisabled}
                     >
-                        <MenuItem value='Is Citizen'>Yes</MenuItem>
-                        <MenuItem value='Not Citizen'>No</MenuItem>
+                        <MenuItem value='true'>Yes</MenuItem>
+                        <MenuItem value='false'>No</MenuItem>
                     </Select>
                 </Box>
 
                 {(() => {
                     switch(formData.citizenship){
-                        case 'Is Citizen':
+                        case 'true':
                             return (
                                 <Box sx={centerRowBoxStyle}>
                                     <InputLabel id="citizen-label" sx={selectionLabelStyle}>
@@ -535,17 +668,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
 
                     <Select
                         name='haslicense'
-                        value={formData.haslicense ? 'Yes' : 'No'}
-                        onChange={(e) => setFormData({ ...formData, haslicense: e.target.value === 'Yes' })}
+                        value={formData.haslicense}
+                        onChange={(e) => setFormData({ ...formData, haslicense: e.target.value })}
                         labelId='license-label'
                         sx={selectionStyle}
                         disabled={isDisabled}>
-                        <MenuItem value='Yes'>Yes</MenuItem>
-                        <MenuItem value='No'>No</MenuItem>
+                        <MenuItem value='true'>Yes</MenuItem>
+                        <MenuItem value='false'>No</MenuItem>
                     </Select>
                 </Box>
 
-                { formData.haslicense ?
+                { formData.haslicense === 'true' ?
                     <Box>
                         <Box sx={centerRowBoxStyle}>
                             <OnboardingField
@@ -609,7 +742,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                 />
 
                 <Box sx={centerRowBoxStyle}>
-                    { uploadedFiles.length !== 0 ?
+                    {Object.keys(uploadedFiles).length !== 0 ? (
                         <Box>
                             <Typography
                                 display='flex'
@@ -622,14 +755,15 @@ const Onboarding: React.FC<OnboardingProps> = ({ initialStatus }) => {
                                 Uploaded Documents
                             </Typography>
 
-                            {uploadedFiles.map((f) => (
-                                <Box key={f.name} sx={centerColumnBoxStyle}>
-                                    <Button>{f.name}</Button>
+                            {Object.keys(uploadedFiles).map((key) => (
+                                <Box key={key} sx={centerColumnBoxStyle}>
+                                    <Button>{key == 'optreciept' ? 'OPT Reciept' : key} : {uploadedFiles[key].name}</Button>
                                 </Box>
                             ))}
-                        </Box> :
+                        </Box>
+                    ) : (
                         <></>
-                    }
+                    )}
                 </Box>
 
                 <Box sx={centerColumnBoxStyle}>
