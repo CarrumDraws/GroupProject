@@ -5,20 +5,20 @@
             <div id="form-input">
                 <mat-form-field class="example-full-width">
                     <mat-label >Name</mat-label>
-                    <input matInput type="password" placeholder="Name" formControlName="name">
-                    <mat-error>required</mat-error>
+                    <input matInput type="text" placeholder="Name" formControlName="name">
+                    <mat-error>required valid name</mat-error>
                   </mat-form-field>
             
                 <mat-form-field class="example-full-width">
                   <mat-label>Email</mat-label>
                   <input matInput type="text" placeholder="Email" formControlName="email">
-                  <mat-error>required</mat-error>
+                  <mat-error>required valid email</mat-error>
                 </mat-form-field>
-                <button mat-raised-button color="basic">Send</button>
+                <button mat-raised-button color="basic" type="submit">Send</button>
             </div>           
         </form>
         <h2 id="history-title">History</h2>
-        <div *ngFor="let token of tokenHistory">
+        <div *ngFor="let token of (tokenHistory$ | async)">
             <mat-card appearance="outlined" [ngStyle]="{ 'border-right': token.status ? '1rem solid lightskyblue' : '1rem solid var(--accent-color)' }">
               <mat-card-header>
                 <mat-card-title> {{ token.name }}</mat-card-title>
@@ -29,7 +29,7 @@
                 </mat-card-subtitle>
               </mat-card-header>
               <mat-card-content>
-                <div>Registration Link: {{token.registrationLink}}</div>
+                <div>Registration Link: {{token.link}}</div>
                 <div>Status:
                     <ng-container *ngIf="token.status; else notRegistered">
                         <span [ngStyle]="{'color': 'lightskyblue'}">Registered</span>
@@ -40,22 +40,19 @@
                 </div>
               </mat-card-content>
           </mat-card>
-          </div>
+        </div>
     </mat-tab>
 
     <mat-tab label="Onboarding Page">
         <select (change)="changeFilter($event)" name="status" id="status">
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-            <option value="approved">Approved</option>
+            <option value="Pending">Pending</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Approved">Approved</option>
         </select>
-        <a href="employee" target="https://http://localhost:4200/">Go to Employee</a>
-        <h3> List of emloyees</h3>
-        <div *ngFor="let employee of employees_data">
-            <p *ngIf="employee.status === currentFilter">
-                {{ employee.name}} | {{ employee.email}} | 
-                <a href="javascript:void(0);" (click)="viewApplication(employee.id)">View Application</a>
-            </p>
+        <h3> List of Application</h3>
+        <div *ngFor="let application of (applications$ | async)">
+            {{application.employee_id.email}}| {{application.name.firstname}}({{application.name.preferredname}} ) 
+            {{application.name.firstname}}| <a href="javascript:void(0);" (click)="viewApplication(application.employee_id._id)">View Application</a>
         </div>
     </mat-tab>
 </mat-tab-group>

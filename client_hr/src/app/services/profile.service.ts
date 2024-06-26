@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TokenLink } from '../interface/tokenLink';
+import { Profile } from '../interface/profile';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
@@ -7,18 +7,18 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class HistoryService {
+export class ProfileService {
 
-  private history: TokenLink[] = [];
+  constructor(private http:HttpClient) { }
 
-  constructor(private http:HttpClient) {  }
-
-  getHistory(): Observable<any> {
+  getProfile(id: any): Observable<Profile>{
 
     let headers = new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     });
+    
 
-    return this.http.get<any>(`${environment.serverUrl}/registrationtokens`, { headers });
+    return this.http.get<Profile>(`${environment.serverUrl}/employee/${id}`, { headers });
   }
+
 }

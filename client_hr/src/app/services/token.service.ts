@@ -9,7 +9,7 @@ import { FlashMessageService } from './flash-message.service';
 })
 export class TokenService {
 
-  private serverUrl = 'http://localhost:5000';
+  private serverUrl = environment.serverUrl;
 
   constructor( private http:HttpClient ) { }
 

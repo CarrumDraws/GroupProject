@@ -1,9 +1,205 @@
+<!-- <h1>EmployeeId: {{employeeId}}</h1>
+{{application}} -->
 
-<h1>EmployeeId: {{employeeId}}</h1>
 
-<p>call api to get user information with their employee id</p>
-<p>dynamically render "approve" and "reject" button based on their application status</p>
-<button mat-button color="primary">Approve</button>
-<button mat-button color="primary" (click)="openFeedbackDialog()">Reject</button>
-<p>clicking these button will make api call to change the status of the employee</p>
 
+<fieldset>
+    <legend>Name</legend>
+    <mat-form-field>
+        <mat-label>First Name</mat-label>
+        <input matInput disabled value="{{application!.name.firstname}}">
+    </mat-form-field>
+    <!-- <mat-form-field>
+        <mat-label>Middle Name</mat-label>
+        <input matInput disabled value="{{application!.name.middlename}}">
+    </mat-form-field> -->
+    <mat-form-field >
+        <mat-label>Last Name</mat-label>
+        <input matInput disabled value="{{application!.name.lastname}}">
+    </mat-form-field>
+    <mat-form-field >
+        <mat-label>Preferred Name</mat-label>
+        <input matInput disabled value="({{application!.name.lastname}})">
+    </mat-form-field>
+</fieldset>
+
+<fieldset>
+    <legend>Adddress</legend>
+    <mat-form-field>
+        <mat-label>Street</mat-label>
+        <input matInput disabled value="{{application!.address.street}}">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>building/Apt</mat-label>
+        <input matInput disabled value="{{application!.address.buildaptnum}}">
+    </mat-form-field>
+    <mat-form-field >
+        <mat-label>City</mat-label>
+        <input matInput disabled value="{{application!.address.city}}">
+    </mat-form-field>
+    <mat-form-field >
+        <mat-label>State</mat-label>
+        <input matInput disabled value="({{application!.address.state}})">
+    </mat-form-field>
+    <mat-form-field >
+        <mat-label>Zip</mat-label>
+        <input matInput disabled value="({{application!.address.zip}})">
+    </mat-form-field>
+</fieldset>
+
+<fieldset>
+    <legend>Contact Info</legend>
+    <mat-form-field>
+        <mat-label>Cell Phone</mat-label>
+        <input matInput disabled value="{{application!.phone.cell}}">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Work Phone</mat-label>
+        <input matInput disabled value="{{application!.phone.work}}">
+    </mat-form-field>
+    <mat-form-field >
+        <mat-label>Email</mat-label>
+        <input matInput disabled value="{{application!.employee_id.email}}">
+    </mat-form-field>
+</fieldset>
+
+<fieldset>
+    <legend>Personal Info</legend>
+    <mat-form-field>
+        <mat-label>SSN</mat-label>
+        <input matInput disabled value="{{application!.ssn}}">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>DOB</mat-label>
+        <input matInput disabled value="{{application!.dob | date}}">
+    </mat-form-field>
+    <mat-form-field >
+        <mat-label>Gender</mat-label>
+        <input matInput disabled value="{{application!.gender}}">
+    </mat-form-field>
+</fieldset>
+
+<fieldset>
+    <legend>Car</legend>
+    <mat-form-field>
+        <mat-label>Make</mat-label>
+        <input matInput disabled value="{{application!.car.make}}">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Model</mat-label>
+        <input matInput disabled value="{{application!.car.model}}">
+    </mat-form-field>
+    <mat-form-field >
+        <mat-label>Color</mat-label>
+        <input matInput disabled value="{{application!.car.color}}">
+    </mat-form-field>
+</fieldset>
+
+<fieldset>
+    <legend>Work Status</legend>
+    <ng-container *ngIf="application!.citizenship ; else workAuth">
+        <mat-form-field>
+            <mat-label>Citizenship / Permanent Resident?</mat-label>
+            <input matInput disabled value="{{application!.citizenship}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Type</mat-label>
+            <input matInput disabled value="{{application!.citizenshiptype || 'N/A'}}">
+        </mat-form-field>
+    </ng-container>
+    <ng-template #workAuth>
+        <mat-form-field>
+            <mat-label>Workauth</mat-label>
+            <input matInput disabled value="{{application!.workauth.workauth}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Start Date</mat-label>
+            <input matInput disabled value="{{application!.workauth.startdate | date}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>End Date</mat-label>
+            <input matInput disabled value="{{application!.workauth.enddate | date}}">
+        </mat-form-field>
+    </ng-template>
+</fieldset>
+
+
+<fieldset>
+    <legend>License</legend>
+    <mat-form-field>
+        <mat-label>License Number</mat-label>
+        <input matInput disabled value="{{application!.license.licensenumber || 'N/A'}}">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Expiring Date</mat-label>
+        <input matInput disabled value="{{application!.license.expdate || 'N/A'}}">
+    </mat-form-field>
+        <a mat-button (click)="viewFile(application!.license.licensefile)">View License</a>
+</fieldset>
+
+<fieldset>
+    <legend>References</legend>
+    <ng-container *ngFor="let reference of application!.references; let i = index;">
+        <h5>Reference {{i + 1}}</h5>
+        <mat-form-field>
+            <mat-label>Fist Name</mat-label>
+            <input matInput disabled value="{{reference.firstname}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Middle Name</mat-label>
+            <input matInput disabled value="{{reference.middlename}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Last Name</mat-label>
+            <input matInput disabled value="{{reference.lastname}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Phone</mat-label>
+            <input matInput disabled value="{{reference.phone}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput disabled value="{{reference.email}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Relationship</mat-label>
+            <input matInput disabled value="{{reference.relationship}}">
+        </mat-form-field>
+    </ng-container>
+</fieldset>
+
+<fieldset>
+    <legend>Emegency Contacts</legend>
+    <ng-container *ngFor="let contact of application!.contacts; let i = index;">
+        <h5>Contact {{i + 1}}</h5>
+        <mat-form-field>
+            <mat-label>Fist Name</mat-label>
+            <input matInput disabled value="{{contact.firstname}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Middle Name</mat-label>
+            <input matInput disabled value="{{contact.middlename}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Last Name</mat-label>
+            <input matInput disabled value="{{contact.lastname}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Phone</mat-label>
+            <input matInput disabled value="{{contact.phone}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Email</mat-label>
+            <input matInput disabled value="{{contact.email}}">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Relationship</mat-label>
+            <input matInput disabled value="{{contact.relationship}}">
+        </mat-form-field>
+    </ng-container>
+</fieldset>
+
+<div id="button-wrapper">
+    <button mat-button color="primary">Approve</button>
+    <button mat-button color="primary" (click)="openFeedbackDialog()">Reject</button>
+</div>

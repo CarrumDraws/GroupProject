@@ -1,65 +1,89 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnChanges, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { TokenService } from 'src/app/services/token.service';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
 import { HistoryService } from 'src/app/services/history.service';
+import { TokenLink } from 'src/app/interface/tokenLink';
+import { Observable, map, switchMap } from 'rxjs';
+import { environment } from 'src/environments/environment';
+import { OnboardingService } from 'src/app/services/onboarding.service';
+import { ApplicationOverview } from 'src/app/interface/applicationOverview';
 
 @Component({
   selector: 'app-hiring',
   templateUrl: './hiring.component.html',
   styleUrls: ['./hiring.component.css']
 })
-export class HiringComponent implements OnInit {
+export class HiringComponent implements OnInit{
 
   constructor(
     private tokenService: TokenService,
     private flashMessageService: FlashMessageService,
-    private historyService: HistoryService
+    private historyService: HistoryService,
+    private cdr: ChangeDetectorRef,
+    private onboardingService: OnboardingService
   ) { }
 
-  currentFilter: string | null = 'pending';
+  currentFilter: string = 'Pending';
 
-  tokenHistory = this.historyService.getHistory();
+  tokenHistory$: Observable<TokenLink[]> | null = null;
+  applications$: Observable<ApplicationOverview[]> | null = null;
 
   tokenForm = new FormBuilder().group({
     email: ['', [Validators.required, Validators.email]],
-    name: ['', Validators.required]
+    name: ['', [Validators.required, Validators.pattern('^[a-zA-Z ]*$')]]
   })
 
   ngOnInit(): void {
 
-    //tokenHIstory
-    //create a service to call backend aip
-    //To display a list of history
-
-    //onboarding
-    //create a service to call backend aip
-    //To display a list of employees
+    this.fetchHistoryData();
+    this.getApplicationByStatus(this.currentFilter);
   }
 
-  onSendToken(): void{
-    if(this.tokenForm.valid){
+  fetchHistoryData(){
+    this.tokenHistory$ = this.historyService.getHistory().pipe(
+      map(response => response.reverse())
+    );
+  }
+  getApplicationByStatus(status: string):void{
+    this.applications$ = this.onboardingService.getApplicationByStatus(status);
+  }
+
+
+  onSendToken(): void {
+    if (this.tokenForm.valid) {
       const name = this.tokenForm.get('name')!.value!;
       const email = this.tokenForm.get('email')!.value!;
-      
-      this.tokenService.sendToken(name, email).subscribe({
-        next:  (respose) => this.flashMessageService.info("Token sent."),
+
+      this.tokenService.sendToken(name, email).pipe(
+        switchMap(() => {
+          this.flashMessageService.info("Token sent.");
+          // Reload the history list to get the newest updated data
+          return this.historyService.getHistory();
+        }),
+        map(response => response.reverse())
+      ).subscribe({
+        next: (_) => { this.fetchHistoryData(); },
         error: (error) => {
-          this.flashMessageService.warn(error.error.error)
+          this.flashMessageService.warn(error.error.error);
         },
-        complete: () => {}
+        complete: () => {
+          this.tokenForm.reset();
+        }
       });
     }
   }
 
+
   changeFilter(event: Event):void{
     const target = event.target as HTMLSelectElement;
     this.currentFilter = target.value;
+    this.getApplicationByStatus(this.currentFilter)
   }
 
   viewApplication(employee_id: number){
-    console.log("view");
-    window.open(`/application/${employee_id}`, 'http://localhost:4200');
+
+    window.open(`/application/${employee_id}`, environment.myUrl);
   }
 
   sendEmail(email: string) {
@@ -67,13 +91,13 @@ export class HiringComponent implements OnInit {
     window.location.href = mailtoLink;
   }
 
-  employees_data = [
-    { id: 1, name: "firstname last", email: "employeeOne@email.com", status: "pending"},
-    { id: 2, name: "Youfirst yourlast", email: "employeeTwo@email.com", status: "pending"},
-    { id: 3, name: "myfirstname mylast", email: "employeeThree@email.com", status: "approved"},
-    { id: 4, name: "fake name", email: "employee4@email.com", status: "rejected"},
-    { id: 5, name: "invisible", email: "employee5@email.com", status: "approved"},
-    { id: 6, name: "invalid name", email: "employee6@email.com", status: "approved"},
-  ]
+  // employees_data = [
+  //   { id: 1, name: "firstname last", email: "employeeOne@email.com", status: "pending"},
+  //   { id: 2, name: "Youfirst yourlast", email: "employeeTwo@email.com", status: "pending"},
+  //   { id: 3, name: "myfirstname mylast", email: "employeeThree@email.com", status: "approved"},
+  //   { id: 4, name: "fake name", email: "employee4@email.com", status: "rejected"},
+  //   { id: 5, name: "invisible", email: "employee5@email.com", status: "approved"},
+  //   { id: 6, name: "invalid name", email: "employee6@email.com", status: "approved"},
+  // ]
 
 }
