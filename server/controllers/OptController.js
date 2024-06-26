@@ -1,4 +1,6 @@
 const processFile = require("../utils/processFile.js");
+const idToFileLink = require("../utils/idToFileLink.js");
+const { transporter } = require("../config/nodemailer.js");
 
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
@@ -277,23 +279,156 @@ const handleOpt = async (req, res) => {
 const getVisaEmployees = async (req, res) => {
   try {
     const { ID, EMAIL, ISHR } = req.body;
-    let profiles = await Onboarding.find()
-      .populate("employee_id") // Populate employee_id with email and isHR, exclude _id
-      .select("name phone ssn workauth -_id") // Select only specific fields from Onboarding
+    let profiles = await Onboarding.find({ citizenship: false })
+      .populate("employee_id") // Populate employee_id
+      .select("name picture workauth -_id") // Select only specific fields from Onboarding
       .exec();
+    let combinedProfiles = await Promise.all(
+      profiles.map(async (profile) => {
+        const pictureUrl = await idToFileLink(profile.picture); // convert pic to url
+        const optDocument = await Opt.findOne({
+          employee_id: profile.employee_id,
+        });
+        if (optDocument) {
+          //   // Convert optDocument IDs to URLs
+          //   const optrecieptUrl = await idToFileLink(optDocument.optreciept);
+          //   const opteadUrl = await idToFileLink(optDocument.optead);
+          //   const i20Url = await idToFileLink(optDocument.i20);
 
-    if (!profiles.length) {
-      return res.status(404).json({ error: "Data Not Found" });
-    }
+          //   // Convert i983 array IDs to URLs
+          //   const i983Urls = optDocument.i983
+          //     ? await Promise.all(
+          //         optDocument.i983.map(async (id) => await idToFileLink(id))
+          //       )
+          //     : null;
+
+          return {
+            ...profile.toObject(),
+            picture: pictureUrl,
+            opt: optDocument,
+            // opt: {
+            //   ...optDocument.toObject(),
+            //   optreciept: optrecieptUrl,
+            //   optead: opteadUrl,
+            //   i20: i20Url,
+            //   i983: i983Urls,
+            // },
+          };
+        } else {
+          return {
+            ...profile.toObject(),
+            picture: pictureUrl,
+            opt: null,
+          };
+        }
+      })
+    );
 
     // Filter out profiles where the populated employee_id.isHR is true
-    profiles = profiles.filter((profile) => !profile.employee_id.isHR);
+    combinedProfiles = combinedProfiles.filter(
+      (profile) => !profile.employee_id.isHR
+    );
 
-    if (!profiles.length) {
-      return res.status(404).json({ error: "No Non-HR Onboardings Found" });
+    // Get OPT data as well, convert them all to files...
+
+    res.status(200).json(combinedProfiles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const sendNotification = async (req, res) => {
+  try {
+    const { ID, EMAIL, ISHR } = req.body;
+    const employeeid = req.params.employeeid;
+
+    if (!employeeid) return res.status(400).send("Missing employeeid Param");
+
+    let employee = await Employee.findOne({
+      _id: employeeid,
+    });
+    if (!employee) return res.status(404).json({ error: "Employee Not Found" });
+    let opt = await Opt.findOne({
+      employee_id: employeeid,
+    });
+    if (!opt) return res.status(404).json({ error: "Opt Not Found" });
+
+    if (
+      opt.status != "OPT Receipt" &&
+      opt.status != "OPT EAD" &&
+      opt.status != "I-983" &&
+      opt.status != "I-20"
+    )
+      return res
+        .status(400)
+        .send("Employee is not currently processing OPT files");
+
+    // Check if they need the Notification --------------------
+    let fileid;
+    let fileidtwo;
+    switch (opt.status) {
+      case "OPT Receipt":
+        fileid = opt.optreciept;
+        break;
+      case "OPT EAD":
+        fileid = opt.optead;
+        break;
+      case "I-983":
+        fileid = opt.i983[0];
+        fileidtwo = opt.i983[1];
+        break;
+      default:
+        fileid = opt.i20;
     }
 
-    res.status(200).json(profiles);
+    // Check First File
+    let fileA = await File.findById(fileid);
+    if (!fileA)
+      return res.status(404).json({ error: "Previous OPT File Not Found" });
+    if (fileA.status === "Approved" || fileA.status === "Pending") {
+      if (opt.status === "I-983") {
+        // Check Second File
+        if (fileidtwo) {
+          let fileB = await File.findById(fileidtwo);
+          if (!fileB)
+            return res
+              .status(404)
+              .json({ error: "Previous OPT File Not Found" });
+          if (fileB.status === "Approved" || fileB.status === "Pending") {
+            return res.status(400).json({
+              error:
+                "No need for Notification: both I-983 files are either waiting for your approval (Pending) or Approved",
+            });
+          }
+        }
+      } else {
+        return res.status(400).json({
+          error:
+            "No need for Notification: File is waiting for your approval (Pending) or Approved",
+        });
+      }
+    }
+
+    // Send Email
+    let mailOptions = {
+      from: process.env.EMAIL,
+      to: employee.email,
+      subject: `Reminder: Send/Update your ${opt.status} File`,
+      text: `Hello, ${employee.name}!\n\nRemember to send/update your ${opt.status} File.\nWe cannot continue to process you until this file has been sent/updated.`,
+    };
+
+    // transporter.sendMail(mailOptions, (error) => {
+    //   if (error) {
+    //     console.log(error);
+    //     res.status(500).send("Failed to send email");
+    //   }
+    //   console.log("Email Sent");
+    // });
+
+    return res.status(200).json({
+      message: `Successfully Sent Notification to ${employee.email} about their ${opt.status} file.`,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -305,4 +440,5 @@ module.exports = {
   getVisaEmployees,
   postOpt,
   getOpt,
+  sendNotification,
 };
