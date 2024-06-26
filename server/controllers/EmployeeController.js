@@ -1,4 +1,5 @@
 const processFile = require("../utils/processFile.js");
+const idToFileLink = require("../utils/idToFileLink.js");
 
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
@@ -16,6 +17,8 @@ const getInfo = async (req, res) => {
       .exec();
     if (!profile) return res.status(404).json({ error: "Data Not Found" }); // is this best practice...?
     profile = profile.toObject(); // Converts mongo doc to plain object
+    // const pictureUrl = await idToFileLink(profile.picture);
+    // profile = { ...profile, picture: pictureUrl };
     const { _id, ...profileWithoutId } = profile; // Remove _id from name
     profile = profileWithoutId;
 
@@ -199,15 +202,24 @@ const getAll = async (req, res) => {
     const { ID, EMAIL, ISHR } = req.body;
     let profiles = await Onboarding.find()
       .populate("employee_id") // Populate employee_id with email and isHR, exclude _id
-      .select("name phone ssn workauth -_id") // Select only specific fields from Onboarding
+      .select("name phone picture ssn workauth -_id") // Select only specific fields from Onboarding
       .exec();
-
     if (!profiles.length) {
       return res.status(404).json({ error: "Data Not Found" });
     }
 
     // Filter out profiles where the populated employee_id.isHR is true
     profiles = profiles.filter((profile) => !profile.employee_id.isHR);
+    // Filter out profiles where there isn't a firstname
+    profiles = profiles.filter((profile) => profile.name.firstname);
+
+    // Get profile picture URL's
+    profiles = await Promise.all(
+      profiles.map(async (profile) => {
+        profile.picture = await idToFileLink(profile.picture);
+        return profile;
+      })
+    );
 
     if (!profiles.length) {
       return res.status(404).json({ error: "No Non-HR Onboardings Found" });
