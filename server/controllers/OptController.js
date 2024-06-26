@@ -58,9 +58,56 @@ const postOpt = async (req, res) => {
     if (!opt) return res.status(404).json({ error: "Data Not Found" });
 
     if (opt.status != type)
-      return res.status(400).send("type doesn't match current OPT Status");
+      return res.status(400).send("type doesn't match current OPT Stage");
 
-    // Upload New File(s)
+    // Verify that Current OPT's file(s) are NOT pending or approved -------
+    let fileid;
+    let fileidtwo; // Used for checking I-983
+    switch (type) {
+      case "OPT Receipt":
+        fileid = opt.optreciept;
+        break;
+      case "OPT EAD":
+        fileid = opt.optead;
+        break;
+      case "I-983":
+        fileid = opt.i983[0];
+        fileidtwo = opt.i983[1];
+        break;
+      default:
+        fileid = opt.i20;
+    }
+
+    // Check First File
+    if (fileid) {
+      let file = await File.findById(fileid);
+      if (!file)
+        return res.status(404).json({ error: "Previous OPT File Not Found" });
+      if (file.status != "Rejected") {
+        if (opt.status === "I-983") {
+          // Check Second File
+          if (fileidtwo) {
+            let fileB = await File.findById(fileidtwo);
+            if (!fileB)
+              return res
+                .status(404)
+                .json({ error: "Previous OPT File Not Found" });
+            if (fileB.status != "Rejected") {
+              return res.status(400).json({
+                error:
+                  "Can't Post new I-983 files- both are either Pending or Approved",
+              });
+            }
+          }
+        } else {
+          return res.status(400).json({
+            error: "Can't Post to filetype thats currently Pending or Approved",
+          });
+        }
+      }
+    }
+
+    // Upload New File(s) ----------
     const fileoneID = await processFile(ID, fileone, "fileone");
     const filetwoID =
       type === "I-983" ? await processFile(ID, filetwo, "filetwo") : null;
@@ -68,7 +115,7 @@ const postOpt = async (req, res) => {
     // Construct the updateObject dynamically based on the field
     let updateObject = {};
     switch (type) {
-      case "Opt Receipt":
+      case "OPT Receipt":
         updateObject = {
           optreciept: fileoneID,
         };
@@ -130,18 +177,25 @@ const handleOpt = async (req, res) => {
       feedback: action === "Rejected" ? feedback : null,
     };
 
-    if (action === "Rejected")
-      res.status(200).json({
-        message: "Sucessfully Rejected File with feedback: " + feedback,
-      });
-
     // Update File ---
-    const file = await File.findByIdAndUpdate(
+    let file = await File.findById(fileid);
+    if (!file) return res.status(404).json({ error: "File Not Found" });
+    if (file.status !== "Not Started" && file.status !== "Pending") {
+      return res.status(400).json({
+        error: "Can't Update a file thats already Accepted or Rejected",
+      });
+    }
+    file = await File.findByIdAndUpdate(
       fileid,
       { $set: updateObject },
       { new: true, runValidators: true }
     );
     if (!file) return res.status(404).json({ error: "File Not Found" });
+
+    if (action === "Rejected")
+      return res.status(200).json({
+        message: "Sucessfully Rejected File with feedback: " + feedback,
+      });
 
     // Update Employee's OPT status ---
     // Find the opt of the employee whose file we're looking at
@@ -169,17 +223,51 @@ const handleOpt = async (req, res) => {
         return res.status(400).send("Invalid Opt Status");
     }
 
-    // Update OPT's status
-    const updatedOpt = await Opt.findOneAndUpdate(
-      { employee_id: ID },
-      { $set: { status: newStatus } },
-      { new: true, runValidators: true }
-    );
-    if (!updatedOpt) return res.status(404).send("Opt document not found");
+    // Update OPT's status for non-i983 files
+    if (opt.status != "I-983") {
+      const updatedOpt = await Opt.findOneAndUpdate(
+        { employee_id: file.employee_id },
+        { $set: { status: newStatus } },
+        { new: true, runValidators: true }
+      );
+      if (!updatedOpt) return res.status(404).send("Opt document not found");
 
-    res.status(200).json({
-      message: "Sucessfully Accepted File",
-    });
+      return res.status(200).json({
+        message: "Sucessfully Accepted File",
+      });
+    } else {
+      // Check if other file is approved or not
+      // Find OPT where this fileid is in the i983 array
+      let myopt = await Opt.findOne({ i983: { $in: [fileid] } });
+      if (!myopt)
+        return res
+          .status(404)
+          .json({ error: "Opt which I-983 Document belongs to Not Found" });
+      let otherid = myopt.i983[0] == fileid ? myopt.i983[1] : myopt.i983[0];
+      console.log(otherid); // Found otherid
+
+      let otheridfile = await File.findById(otherid);
+      if (!otheridfile)
+        return res.status(404).json({ error: "Other I-983 File Not Found" });
+
+      // Check if otheridfile is approved
+      if (otheridfile.status === "Approved") {
+        const updatedOpt = await Opt.findOneAndUpdate(
+          { employee_id: file.employee_id },
+          { $set: { status: newStatus } },
+          { new: true, runValidators: true }
+        );
+        if (!updatedOpt) return res.status(404).send("Opt document not found");
+
+        return res.status(200).json({
+          message: "Sucessfully Accepted Both I-983 Files",
+        });
+      } else {
+        return res.status(200).json({
+          message: "Successfully Accepted One File for I-983",
+        });
+      }
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

@@ -22,8 +22,6 @@ const optRouter = Router();
 
 optRouter.get("/", jwtValidation, getOpt);
 
-optRouter.patch("/:fileid", jwtValidation, isHR, handleOpt);
-optRouter.get("/visaholders", jwtValidation, isHR, getVisaEmployees);
 optRouter.post(
   "/:type",
   upload.fields([
@@ -31,7 +29,11 @@ optRouter.post(
     { name: "filetwo", maxCount: 1 },
   ]),
   jwtValidation,
-  postOpt
+  postOpt // Adds files + Updates OPT files that matches opt.status
 );
+optRouter.patch("/:fileid", jwtValidation, isHR, handleOpt); // Rejects / Accepts a specific file.
+// On reject, adds reject to file status + adds feedback
+// On Accept, adds accepted to file status + updates employee's OPT status
+optRouter.get("/visaholders", jwtValidation, isHR, getVisaEmployees);
 
 module.exports = optRouter;
