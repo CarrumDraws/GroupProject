@@ -31,6 +31,8 @@ const getOpt = async (req, res) => {
 const postOpt = async (req, res) => {
   try {
     const { ID, EMAIL, ISHR } = req.body;
+    console.log(ID);
+    console.log(EMAIL);
     const type = req.params.type;
     if (!type) return res.status(400).send("Missing type Param");
     if (
@@ -45,12 +47,6 @@ const postOpt = async (req, res) => {
           "Invalid type Param: Must be OPT Receipt, OPT EAD, I-983, or I-20"
         );
 
-    const fileone = req.files["fileone"]?.[0];
-    const filetwo = req.files["filetwo"]?.[0];
-    if (!fileone) return res.status(400).send("Missing Fileone");
-    if (type === "I-983" && !filetwo)
-      return res.status(400).send("Missing Filetwo");
-
     // Get OPT Object
     let opt = await Opt.findOne({
       employee_id: ID,
@@ -61,6 +57,21 @@ const postOpt = async (req, res) => {
 
     if (opt.status != type)
       return res.status(400).send("type doesn't match current OPT Stage");
+
+    const fileone = req.files?.["fileone"]?.[0];
+    const filetwo = req.files?.["filetwo"]?.[0];
+    if (!fileone)
+      return res
+        .status(400)
+        .send(
+          "Missing Fileone: If using Postman, ensure that the files you're submitting are present on your local machine."
+        );
+    if (type === "I-983" && !filetwo)
+      return res
+        .status(400)
+        .send(
+          "Missing Filetwo: If using Postman, ensure that the files you're submitting are present on your local machine."
+        );
 
     // Verify that Current OPT's file(s) are NOT pending or approved -------
     let fileid;
@@ -73,8 +84,8 @@ const postOpt = async (req, res) => {
         fileid = opt.optead;
         break;
       case "I-983":
-        fileid = opt.i983[0];
-        fileidtwo = opt.i983[1];
+        fileid = opt.i983?.[0];
+        fileidtwo = opt.i983?.[1];
         break;
       default:
         fileid = opt.i20;

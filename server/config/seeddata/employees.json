@@ -1,0 +1,47 @@
+[
+  {
+    "email": "alice@example.com",
+    "password": "alicePassword123",
+    "isHR": false
+  },
+  {
+    "email": "bob@example.com",
+    "password": "bobPassword456",
+    "isHR": false
+  },
+  {
+    "email": "charlie@example.com",
+    "password": "charliePassword789",
+    "isHR": false
+  },
+  {
+    "email": "david@example.com",
+    "password": "davidPassword123",
+    "isHR": false
+  },
+  {
+    "email": "emma@example.com",
+    "password": "emmaPassword456",
+    "isHR": false
+  },
+  {
+    "email": "frank@example.com",
+    "password": "frankPassword789",
+    "isHR": false
+  },
+  {
+    "email": "grace@example.com",
+    "password": "gracePassword123",
+    "isHR": false
+  },
+  {
+    "email": "henry@example.com",
+    "password": "henryPassword456",
+    "isHR": false
+  },
+  {
+    "email": "irene@example.com",
+    "password": "irenePassword789",
+    "isHR": false
+  }
+]
