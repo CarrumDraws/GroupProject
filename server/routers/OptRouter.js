@@ -11,6 +11,7 @@ const {
 const {
   jwtValidation,
   isHR,
+  isntHR,
   RegisterValidation,
   RegistrationValidation,
 } = require("../middlewares/AuthMiddleware.js");
@@ -21,7 +22,7 @@ const upload = multer({ storage: storage });
 
 const optRouter = Router();
 
-optRouter.get("/", jwtValidation, getOpt);
+optRouter.get("/", jwtValidation, isntHR, getOpt);
 
 // Adds files + Updates OPT files that matches opt.status
 optRouter.post(
@@ -31,6 +32,7 @@ optRouter.post(
     { name: "filetwo", maxCount: 1 },
   ]),
   jwtValidation,
+  isntHR,
   postOpt
 );
 

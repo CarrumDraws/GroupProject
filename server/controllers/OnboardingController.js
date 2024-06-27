@@ -2,6 +2,7 @@ const express = require("express");
 
 const { uploadFileToS3, getFileUrl } = require("../config/s3.js");
 const processFile = require("../utils/processFile.js");
+const idToFileLink = require("../utils/idToFileLink.js");
 
 const Onboarding = require("../models/Onboarding.js");
 const Opt = require("../models/Opt.js");
@@ -224,22 +225,30 @@ const reviewOnboardingApps = async (req, res) => {
       return res.status(400).send("Invalid type Query");
 
     // Get first name, preferredname, lastname, email, link to their profile pic
-    const data = await Onboarding.find(
+    let onboardings = await Onboarding.find(
       { status: type },
       "name picture employee_id -_id"
     )
-      .populate("employee_id", "email") // Populate employee_id with email
+      .populate("employee_id", "email isHR") // Populate employee_id with email
       .exec();
 
-    // Remove _id from the nested name field in each document
-    const result = data.map((doc) => {
-      const plainDoc = doc.toObject(); // Converts mongo doc to plain object
-      const { _id, ...nameWithoutId } = plainDoc.name; // Remove _id from name
-      return {
-        ...plainDoc,
-        name: nameWithoutId,
-      };
-    });
+    // Filter out onboardings where the populated employee_id.isHR is true
+    onboardings = onboardings.filter((profile) => !profile.employee_id.isHR);
+
+    // Process Data
+    const result = await Promise.all(
+      onboardings.map(async (profile) => {
+        console.log(profile);
+        profile = profile.toObject(); // Converts mongo profile to plain object
+        const { _id, ...nameWithoutId } = profile.name; // Remove _id from name
+        const pictureUrl = await idToFileLink(profile.picture);
+        return {
+          ...profile,
+          picture: pictureUrl,
+          name: nameWithoutId,
+        };
+      })
+    );
 
     res.status(200).json(result);
   } catch (error) {

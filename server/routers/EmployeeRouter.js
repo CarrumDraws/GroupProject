@@ -10,6 +10,7 @@ const {
 const {
   jwtValidation,
   isHR,
+  isntHR,
   RegisterValidation,
   RegistrationValidation,
 } = require("../middlewares/AuthMiddleware.js");
@@ -20,11 +21,12 @@ const upload = multer({ storage: storage });
 
 const employeeRouter = Router();
 
-employeeRouter.get("/", jwtValidation, getInfo);
+employeeRouter.get("/", jwtValidation, isntHR, getInfo);
 employeeRouter.put(
   "/:field",
   upload.fields([{ name: "picture", maxCount: 1 }]),
   jwtValidation,
+  isntHR,
   updateInfo
 );
 

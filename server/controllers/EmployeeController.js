@@ -184,6 +184,9 @@ const getOne = async (req, res) => {
       .exec();
     if (!profile) return res.status(404).json({ error: "Data Not Found" });
     profile = profile.toObject(); // Converts mongo doc to plain object
+    const pictureUrl = await idToFileLink(profile.picture);
+    profile.picture = pictureUrl;
+
     const { _id, ...profileWithoutId } = profile; // Remove _id from name
     profile = profileWithoutId;
 
@@ -216,8 +219,10 @@ const getAll = async (req, res) => {
     // Get profile picture URL's
     profiles = await Promise.all(
       profiles.map(async (profile) => {
-        profile.picture = await idToFileLink(profile.picture);
-        return profile;
+        profile = profile.toObject(); // Convert to normal object
+
+        const pictureUrl = await idToFileLink(profile.picture);
+        return { ...profile, picture: pictureUrl };
       })
     );
 
