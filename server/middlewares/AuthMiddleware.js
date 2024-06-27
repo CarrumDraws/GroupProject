@@ -54,6 +54,23 @@ const isHR = async (req, res, next) => {
   }
 };
 
+const isntHR = async (req, res, next) => {
+  try {
+    let { ISHR } = req.body;
+    if (ISHR) {
+      return res.status(403).json({
+        message: "Unauthorized: Non-HR Employees Only!",
+      });
+    }
+    next();
+  } catch (error) {
+    console.error("isntHR error:", error);
+    return res.status(500).json({
+      message: "isntHR Failed",
+    });
+  }
+};
+
 const RegistrationValidation = async (req, res, next) => {
   try {
     let { name, email } = req.body;
@@ -112,6 +129,7 @@ const RegisterValidation = (req, res, next) => {
 module.exports = {
   jwtValidation,
   isHR,
+  isntHR,
   RegistrationValidation,
   RegisterValidation,
 };
