@@ -29,7 +29,7 @@ export class FeedbackComponent{
     });
     
     // Make API call using HttpClient
-    this.http.put(`${environment.serverUrl}/onboarding/${this.data.employeeId}`, { feedback: this.feedbackText, action: "Reject"}, { headers })
+    this.http.put(`${environment.serverUrl}/onboarding/${this.data.employeeId}`, { feedback: this.feedbackText, action: "Rejected"}, { headers })
       .subscribe(response => {
         console.log(`Feedback submitted successfully: ${this.data.employeeId}`, response);
         this.closeDialog();
