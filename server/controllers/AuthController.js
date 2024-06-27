@@ -12,6 +12,7 @@ const { transporter } = require("../config/nodemailer.js");
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
 const Onboarding = require("../models/Onboarding.js");
+const House = require("../models/House.js");
 const File = require("../models/File.js");
 
 const login = async (req, res) => {
@@ -66,10 +67,7 @@ const register = async (req, res) => {
       isHR: false,
     });
 
-    // let pictureFileID = null;
     // Create new default profile pic, upload it as a file
-    // const data = await fs.readFile("../config/default.jpg");
-    // pictureFileID = await processFile(newEmployee._id, data, "picture", false);
     const filePath = path.resolve(__dirname, "../assets/default.jpg");
     const fileBuffer = await fs.readFile(filePath);
     const file = {
@@ -128,6 +126,16 @@ const register = async (req, res) => {
       feedback: "",
     });
 
+    // Add user to Random House
+    const count = await House.countDocuments().exec();
+    if (count === 0)
+      return res.status(400).json({ message: "No houses found" });
+
+    const random = Math.floor(Math.random() * count);
+    const myHouse = await House.findOne().skip(random).exec();
+    myHouse.members.push(newEmployee._id);
+    console.log("New employee added to a Random House");
+
     // Stores ID, email, Employeename
     const jwttoken = generateToken(
       newEmployee._id,
@@ -137,6 +145,7 @@ const register = async (req, res) => {
 
     await newEmployee.save();
     await newOnboarding.save();
+    await myHouse.save();
     await Registration.updateOne({ email }, { $set: { status: true } });
 
     // Generate + Return { token: {data}, employee: {data} }

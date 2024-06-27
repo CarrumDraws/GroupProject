@@ -24,7 +24,6 @@ const jwtValidation = (req, res, next) => {
         message: "Invalid token",
       });
     }
-
     req.body.ID = decoded.ID; // Assign ID to req.body
     req.body.EMAIL = decoded.EMAIL; // Assign EMAIL to req.body
     req.body.ISHR = decoded.ISHR; // Assign ISHR to req.body
@@ -121,8 +120,6 @@ const RegisterValidation = (req, res, next) => {
         "Password must be 6-10 characters long and include uppercase, lowercase, number, and special character.",
     });
   }
-
-  console.log(req.body.email);
   next();
 };
 
