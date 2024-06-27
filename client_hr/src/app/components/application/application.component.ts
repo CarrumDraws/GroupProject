@@ -128,7 +128,7 @@ export class ApplicationComponent implements OnInit {
     });
     
     // Make API call using HttpClient
-    this.http.put(`${environment.serverUrl}/onboarding/${this.employeeId}`, { feedback: "", action: "Accept"}, { headers })
+    this.http.put(`${environment.serverUrl}/onboarding/${this.employeeId}`, { feedback: "", action: "Approved"}, { headers })
       .subscribe( ( _ : any) => { this.flashMessageService.info('Application has been approved!'); });
   }
 
