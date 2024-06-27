@@ -1,0 +1,62 @@
+[
+  {
+    "address": {
+      "buildaptnum": 123,
+      "street": "Main Street",
+      "city": "Cityville",
+      "state": "Stateville",
+      "zip": "12345"
+    },
+    "landlord": {
+      "firstname": "John",
+      "lastname": "Doe",
+      "phone": 1234567890,
+      "email": "john.doe@example.com"
+    },
+    "members": [],
+    "beds": 3,
+    "mattresses": 3,
+    "tables": 1,
+    "chairs": 6
+  },
+  {
+    "address": {
+      "buildaptnum": 456,
+      "street": "Second Street",
+      "city": "Townsville",
+      "state": "Stateville",
+      "zip": "67890"
+    },
+    "landlord": {
+      "firstname": "Jane",
+      "lastname": "Smith",
+      "phone": 9876543210,
+      "email": "jane.smith@example.com"
+    },
+    "members": [],
+    "beds": 4,
+    "mattresses": 4,
+    "tables": 2,
+    "chairs": 8
+  },
+  {
+    "address": {
+      "buildaptnum": 456,
+      "street": "Third Street",
+      "city": "San Jpse",
+      "state": "Statename",
+      "zip": "67544"
+    },
+    "landlord": {
+      "firstname": "Sam",
+      "lastname": "Cooper",
+      "phone": 1324354657,
+      "email": "sam.cooper@example.com"
+    },
+    "members": [],
+    "beds": 5,
+    "mattresses": 4,
+    "tables": 3,
+    "chairs": 7
+  }
+]
