@@ -17,10 +17,12 @@ const OptSchema = new Schema({
     type: refType,
     ref: "File",
   },
-  i983: {
-    type: refType,
-    ref: "File",
-  },
+  i983: [
+    {
+      type: refType,
+      ref: "File",
+    },
+  ],
   i20: {
     type: refType,
     ref: "File",

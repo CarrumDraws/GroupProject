@@ -4,20 +4,30 @@ import axios from 'axios';
 import { Box, TextField, Button, Container, Typography } from '@mui/material';
 
 import { validateEmail, validatePassword } from '../utils/AuthValidator.tsx';
+import { useOnboarding } from '../context/OnboardingContext.tsx';
 
-function Login() {
+interface LoginProps {
+    onboardingStatus: string | undefined;
+}
+
+const Login: React.FC<LoginProps> = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errs, setErrs] = useState<string[]>([]);
     
+    const { onboardingData, setIsLoggedIn } = useOnboarding();
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token) {
-            navigate('/profile');
+            if(onboardingData?.status === 'Accept') {
+                navigate('/profile');
+            }else {
+                navigate('/onboarding');
+            }
         }
-    }, [navigate]);
+    }, [navigate, onboardingData]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -40,10 +50,16 @@ function Login() {
 
             if(response.data) {
                 localStorage.setItem('token', response.data.token);
-                window.location.href='/profile'
+                setIsLoggedIn(true);
+
+                if(onboardingData?.status !== 'Accept') {
+                    navigate('/onboarding');
+                }else {
+                    navigate('profile');
+                }
             }
         }catch(e) {
-            alert('Error during login.');
+            alert(e);
         }
     }
 

@@ -10,14 +10,18 @@ const {
   retrieveFile,
 } = require("../controllers/OnboardingController.js");
 
-const { jwtValidation, isHR } = require("../middlewares/AuthMiddleware.js");
+const {
+  jwtValidation,
+  isHR,
+  isntHR,
+} = require("../middlewares/AuthMiddleware.js");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const onboardingRouter = Router();
 
-onboardingRouter.get("/", jwtValidation, getOnboarding);
+onboardingRouter.get("/", jwtValidation, isntHR, getOnboarding);
 onboardingRouter.post(
   "/",
   upload.fields([
@@ -26,6 +30,7 @@ onboardingRouter.post(
     { name: "optreciept", maxCount: 1 },
   ]),
   jwtValidation,
+  isntHR,
   submitOnboarding
 );
 onboardingRouter.get("/all", jwtValidation, isHR, reviewOnboardingApps);

@@ -1,14 +1,18 @@
-// Main DB Connection Logic Happens Here!
 const generateToken = require("../utils/generateToken.js");
+const processFile = require("../utils/processFile.js");
 
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const fs = require("fs").promises;
+
+const path = require("path");
 
 const { transporter } = require("../config/nodemailer.js");
 
 const Registration = require("../models/Registration.js");
 const Employee = require("../models/Employee.js");
 const Onboarding = require("../models/Onboarding.js");
+const File = require("../models/File.js");
 
 const login = async (req, res) => {
   try {
@@ -62,6 +66,19 @@ const register = async (req, res) => {
       isHR: false,
     });
 
+    // let pictureFileID = null;
+    // Create new default profile pic, upload it as a file
+    // const data = await fs.readFile("../config/default.jpg");
+    // pictureFileID = await processFile(newEmployee._id, data, "picture", false);
+    const filePath = path.resolve(__dirname, "../assets/default.jpg");
+    const fileBuffer = await fs.readFile(filePath);
+    const file = {
+      buffer: fileBuffer,
+      mimetype: "image/jpeg", // Set the correct MIME type
+      originalname: path.basename(filePath),
+    };
+    const pictureFileID = await processFile(newEmployee._id, file, "picture");
+
     // Create new Empty Onboarding
     const newOnboarding = new Onboarding({
       employee_id: newEmployee._id,
@@ -71,7 +88,7 @@ const register = async (req, res) => {
         lastname: "",
         preferredname: "",
       },
-      picture: null, // Picture will be null- in this case, it will have to be supplied by the frontend.
+      picture: pictureFileID, // Picture will be null
       address: {
         buildaptnum: null,
         street: "",

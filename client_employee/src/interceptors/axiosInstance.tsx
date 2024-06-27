@@ -12,6 +12,8 @@ axiosInstance.interceptors.request.use(
         if(token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        
+        delete config.headers['Content-Type'];
         return config;
     },
     (error) => {

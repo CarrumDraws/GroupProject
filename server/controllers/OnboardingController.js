@@ -2,6 +2,7 @@ const express = require("express");
 
 const { uploadFileToS3, getFileUrl } = require("../config/s3.js");
 const processFile = require("../utils/processFile.js");
+const idToFileLink = require("../utils/idToFileLink.js");
 
 const Onboarding = require("../models/Onboarding.js");
 const Opt = require("../models/Opt.js");
@@ -28,7 +29,6 @@ const getOnboarding = async (req, res) => {
 const submitOnboarding = async (req, res) => {
   try {
     const { ID, EMAIL, ISHR } = req.body;
-    console.log(ID);
     let {
       firstname,
       middlename,
@@ -60,8 +60,18 @@ const submitOnboarding = async (req, res) => {
     const picture = req.files["picture"]?.[0];
     const optreciept = req.files["optreciept"]?.[0];
     const license = req.files["license"]?.[0];
-    const references = JSON.parse(req.body.references);
-    const contacts = JSON.parse(req.body.contacts);
+    let references;
+    let contacts;
+
+    try {
+      references = JSON.parse(req.body.references);
+      contacts = JSON.parse(req.body.contacts);
+    } catch (error) {
+      return res.status(400).json({
+        error:
+          "Invalid JSON format in references or contacts. If there are no references or contacts, pass in an empty array.",
+      });
+    }
 
     if (!firstname || !lastname)
       return res.status(400).send("Missing Name Fields");
@@ -140,7 +150,7 @@ const submitOnboarding = async (req, res) => {
     // Add necessary files to files
     const pictureFileID = await processFile(ID, picture, "picture");
     const optFileID = await processFile(ID, optreciept, "optreciept");
-    if (optFileID) handleOptDocument(ID, optFileID, "optFileID");
+    if (optFileID) initializeOpt(ID, optFileID, "optFileID");
     const licenseFileID = await processFile(ID, license, "license");
 
     // Create new/update onboarding
@@ -197,12 +207,12 @@ const submitOnboarding = async (req, res) => {
     );
     console.log(updatedOnboarding);
     await updatedOnboarding.save();
-    res.status(200).json({
+    return res.status(200).json({
       message: "Onboarding submitted successfully",
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -215,22 +225,30 @@ const reviewOnboardingApps = async (req, res) => {
       return res.status(400).send("Invalid type Query");
 
     // Get first name, preferredname, lastname, email, link to their profile pic
-    const data = await Onboarding.find(
+    let onboardings = await Onboarding.find(
       { status: type },
       "name picture employee_id -_id"
     )
-      .populate("employee_id", "email") // Populate employee_id with email
+      .populate("employee_id", "email isHR") // Populate employee_id with email
       .exec();
 
-    // Remove _id from the nested name field in each document
-    const result = data.map((doc) => {
-      const plainDoc = doc.toObject(); // Converts mongo doc to plain object
-      const { _id, ...nameWithoutId } = plainDoc.name; // Remove _id from name
-      return {
-        ...plainDoc,
-        name: nameWithoutId,
-      };
-    });
+    // Filter out onboardings where the populated employee_id.isHR is true
+    onboardings = onboardings.filter((profile) => !profile.employee_id.isHR);
+
+    // Process Data
+    const result = await Promise.all(
+      onboardings.map(async (profile) => {
+        console.log(profile);
+        profile = profile.toObject(); // Converts mongo profile to plain object
+        const { _id, ...nameWithoutId } = profile.name; // Remove _id from name
+        const pictureUrl = await idToFileLink(profile.picture);
+        return {
+          ...profile,
+          picture: pictureUrl,
+          name: nameWithoutId,
+        };
+      })
+    );
 
     res.status(200).json(result);
   } catch (error) {
@@ -267,15 +285,29 @@ const handleEmployeeOnboarding = async (req, res) => {
     const employeeid = req.params.employeeid;
     if (!employeeid) return res.status(400).send("Missing employeeid Param");
     if (!action) return res.status(400).send("Missing action in body");
-    if (action != "Accept" && action != "Reject")
-      return res.status(400).send("Invalid Action: must be Accept or Reject");
+    if (action != "Approved" && action != "Rejected")
+      return res
+        .status(400)
+        .send("Invalid Action: must be Approved or Rejected");
 
-    if (action == "Reject" && !feedback)
+    if (action == "Rejected" && !feedback)
       return res.status(400).send("Missing feedback in body");
+
+    // Check if Onboarding is found or not
+    const onboard = await Onboarding.findOne({ employee_id: employeeid });
+    if (!onboard) return res.status(400).send("Onboarding not found");
+
+    // Check if onboarding is already approved/rejected
+    if (onboard.status === "Rejected" || onboard.status === "Approved")
+      return res
+        .status(400)
+        .send(
+          "Can't Reject/Approve an onboarding that's already Approved or Rejected"
+        );
 
     const data = await Onboarding.findOneAndUpdate(
       { employee_id: employeeid },
-      { status: action, feedback: action == "Reject" ? feedback : null },
+      { status: action, feedback: action == "Rejected" ? feedback : null },
       { new: true }
     );
     if (!data)
@@ -338,7 +370,7 @@ function validateContact(contact) {
   return true;
 }
 
-async function handleOptDocument(employeeId, optFileID) {
+async function initializeOpt(employeeId, optFileID) {
   try {
     // Upsert operation with findOneAndUpdate
     const updatedOpt = await Opt.findOneAndUpdate(
@@ -346,6 +378,9 @@ async function handleOptDocument(employeeId, optFileID) {
       {
         employee_id: employeeId,
         optreciept: optFileID,
+        optead: null,
+        i983: null,
+        i20: null,
         status: "OPT Receipt",
       },
       {
