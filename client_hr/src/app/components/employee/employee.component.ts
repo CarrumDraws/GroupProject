@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { EmployeeService } from 'src/app/services/employee.service';
 import { Router } from '@angular/router';
 import { Employee } from 'src/app/interface/employee';
-import { map } from 'rxjs';
+import { map, tap } from 'rxjs';
 
 
 @Component({
@@ -12,8 +12,8 @@ import { map } from 'rxjs';
 })
 export class EmployeeComponent implements OnInit {
 
-  employees: Employee[] | null = null;
-  searchResults: any[] = [];
+  employees: Employee[] = [];
+  searchResults: Employee[] = [];
   searchText: string = '';
 
   constructor(private employeeService: EmployeeService, private router: Router) { }
@@ -23,7 +23,8 @@ export class EmployeeComponent implements OnInit {
       map((response: Employee[]) => {
         // Sort employees by last name
         return response.sort((a: Employee, b: Employee) => a.name.lastname.localeCompare(b.name.lastname));
-      })
+      }),
+      tap((_) => {this.employeeService.loadEmployees();})
     ).subscribe((sortedEmployees: Employee[]) => {
       this.employees = sortedEmployees;
     });
