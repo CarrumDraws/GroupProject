@@ -9,6 +9,10 @@ const Opt = require("../models/Opt.js");
 const Registration = require("../models/Registration.js");
 const Report = require("../models/Report.js");
 
+const employeesData = require("./seeddata/employees.json");
+const housesData = require("./seeddata/houses.json");
+const registrationData = require("./seeddata/houses.json");
+
 (async () => {
   try {
     await Promise.all([
@@ -22,7 +26,7 @@ const Report = require("../models/Report.js");
       Report.deleteMany(),
     ]);
 
-    let HRPass = "Abc123@";
+    let HRPass = "Abc123!";
     HRPass = await bcrypt.hash(HRPass, Number(process.env.SALT));
     const HRPerson = new Employee({
       email: "HREmployee@gmail.com",
@@ -31,6 +35,13 @@ const Report = require("../models/Report.js");
     });
     await HRPerson.save();
 
+    // let employees = await Employee.insertMany(employeesData);
+    // let registration = await Registration.insertMany(registrationData);
+    // employees.forEach((employee, index) => {
+    //   // Fill Houses with employee id's
+    //   housesData[index % 3].members.push(employee._id);
+    // });
+    // let houses = await House.insertMany(housesData);
     console.log("DB initialized");
   } catch (error) {
     console.error(error);

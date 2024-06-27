@@ -325,6 +325,7 @@ const handleEmployeeOnboarding = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const file = req.file;
+    console.log(req.body);
     if (!file) {
       return res.status(400).send("No file uploaded.");
     }

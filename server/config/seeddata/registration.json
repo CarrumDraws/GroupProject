@@ -1,0 +1,56 @@
+[
+  {
+    "email": "alice@example.com",
+    "name": "Alice",
+    "status": true,
+    "link": "http://localhost:5173/register/1a2b3c4d5e6f7g8h"
+  },
+  {
+    "email": "bob@example.com",
+    "name": "Bob",
+    "status": true,
+    "link": "http://localhost:5173/register/9i0j1k2l3m4n5o6p"
+  },
+  {
+    "email": "charlie@example.com",
+    "name": "Charlie",
+    "status": true,
+    "link": "http://localhost:5173/register/7q8r9s0t1u2v3w4x"
+  },
+  {
+    "email": "david@example.com",
+    "name": "David",
+    "status": true,
+    "link": "http://localhost:5173/register/5y6z7a8b9c0d1e2f"
+  },
+  {
+    "email": "emma@example.com",
+    "name": "Emma",
+    "status": true,
+    "link": "http://localhost:5173/register/3g4h5i6j7k8l9m0n"
+  },
+  {
+    "email": "frank@example.com",
+    "name": "Frank",
+    "status": true,
+    "link": "http://localhost:5173/register/1o2p3q4r5s6t7u8v"
+  },
+  {
+    "email": "grace@example.com",
+    "name": "Grace",
+    "status": true,
+    "link": "http://localhost:5173/register/9w0x1y2z3a4b5c6d"
+  },
+  {
+    "email": "henry@example.com",
+    "name": "Henry",
+    "status": true,
+    "link": "http://localhost:5173/register/7e8f9g0h1i2j3k4l"
+  },
+  {
+    "email": "irene@example.com",
+    "name": "Irene",
+    "status": false,
+    "link": "http://localhost:5173/register/5m6n7o8p9q0r1s2t"
+  }
+]
