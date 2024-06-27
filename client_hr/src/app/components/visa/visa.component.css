@@ -1,0 +1,13 @@
+
+img{
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+mat-card{
+    display: flex;
+    align-items: center;
+}

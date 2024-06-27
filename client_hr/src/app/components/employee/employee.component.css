@@ -62,3 +62,11 @@ button{
     height: 2.5rem;
     border-radius: 50px;
 }
+
+img{
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    object-fit: cover;
+    border-radius: 50%;
+}
