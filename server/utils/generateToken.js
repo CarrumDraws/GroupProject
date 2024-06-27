@@ -4,10 +4,10 @@ const jwt = require("jsonwebtoken");
 const generateToken = (id, email, isHR) => {
   const token = jwt.sign(
     { ID: id, EMAIL: email, ISHR: isHR },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "6h",
-    }
+    process.env.ACCESS_TOKEN_SECRET
+    // {
+    //   expiresIn: "6h",
+    // }
   );
   return token;
 };
