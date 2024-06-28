@@ -75,10 +75,9 @@ export class HiringComponent implements OnInit{
     }
   }
 
-
-  changeFilter():void{
-    this.getApplicationByStatus(this.currentFilter)
-    console.log(this.currentFilter);
+  onFilterChange(filter: string): void {
+    this.getApplicationByStatus(filter);
+    this.currentFilter = filter;
   }
 
   viewApplication(employee_id: number){

@@ -1,0 +1,15 @@
+<div mat-dialog-content>
+    <div id="icon-wrapper">
+        <mat-icon (click)="downloadFile()" *ngIf="data.download">download</mat-icon>
+    </div>
+    <ng-container *ngIf="data.file.status === 'Pending'; else showStatus">
+        <div>
+            <button mat-button (click)="approve()">Approve</button>
+            <button mat-button (click)="openFeedbackDialog()">Reject</button>   
+        </div>
+    </ng-container>
+    <ng-template #showStatus>
+        <p>File Status: {{data.file.status}}</p>
+    </ng-template>
+    <img [src]="data.file.url" alt="" style="width: 100%; height: auto;">
+</div>

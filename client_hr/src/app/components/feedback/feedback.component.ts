@@ -1,7 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
+import { FlashMessageService } from 'src/app/services/flash-message.service';
 
 @Component({
   selector: 'app-feedback',
@@ -15,7 +16,8 @@ export class FeedbackComponent{
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { employeeId: number },
     public dialogRef: MatDialogRef<FeedbackComponent>,
-    private http: HttpClient
+    private http: HttpClient,
+    private flashMessageSerivce: FlashMessageService
   ) {}
 
   closeDialog(): void {
@@ -32,6 +34,7 @@ export class FeedbackComponent{
     this.http.put(`${environment.serverUrl}/onboarding/${this.data.employeeId}`, { feedback: this.feedbackText, action: "Rejected"}, { headers })
       .subscribe(response => {
         console.log(`Feedback submitted successfully: ${this.data.employeeId}`, response);
+        this.flashMessageSerivce.info("Feedback submitted successfully");
         this.closeDialog();
       }, error => {
         console.error('Error submitting feedback:', error);

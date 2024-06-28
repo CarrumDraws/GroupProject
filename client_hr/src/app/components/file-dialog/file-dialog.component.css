@@ -1,0 +1,14 @@
+mat-icon:hover{
+    cursor: pointer;
+    text-align: left;
+}
+
+#icon-wrapper{
+    display: flex;
+    justify-content: right;
+}
+
+button{
+    background-color: rgb(240, 242, 245);
+    margin: 0 1rem;
+}

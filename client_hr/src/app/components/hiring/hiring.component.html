@@ -35,7 +35,7 @@
                         <span [ngStyle]="{'color': 'lightskyblue'}">Registered</span>
                       </ng-container>
                       <ng-template #notRegistered>
-                        <span [ngStyle]="{'color': 'var(--accent-color)'}">On Progress</span>
+                        <span [ngStyle]="{'color': 'var(--accent-color)'}">In Progress</span>
                     </ng-template>
                 </div>
               </mat-card-content>
@@ -44,14 +44,8 @@
     </mat-tab>
 
     <mat-tab label="Onboarding Page" id="onboarding-body">
-        <mat-form-field id="filter">
-            <mat-label>Filter</mat-label>
-            <mat-select [(value)]="currentFilter" (selectionChange)="changeFilter()">
-                <mat-option value="Pending">Pending</mat-option>
-                <mat-option value="Rejected">Rejected</mat-option>
-                <mat-option value="Approved">Approved</mat-option>
-            </mat-select>
-        </mat-form-field>
+        
+        <app-filter (filterChange)="onFilterChange($event)" [values]="['Pending', 'Rejected', 'Approved']"></app-filter>
 
         <h2 id="application-title">Applications</h2>
         <div *ngFor="let application of (applications$ | async)">
