@@ -36,6 +36,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import {MatSelectModule} from '@angular/material/select';
 import { FileComponent } from './components/file/file.component';
 import { ImageDialogComponent } from './components/image-dialog/image-dialog.component';
+import { FilterComponent } from './components/filter/filter.component';
+import { FileDialogComponent } from './components/file-dialog/file-dialog.component';
+import { FileFeedbackDialogComponent } from './components/file-feedback-dialog/file-feedback-dialog.component';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @NgModule({
@@ -56,6 +60,7 @@ import { ImageDialogComponent } from './components/image-dialog/image-dialog.com
     FormsModule,
     HttpClientModule,
     MatCardModule,
+    MatIconModule,
     StoreModule.forRoot({ auth: AuthReducer}),
     EffectsModule.forRoot([AuthEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
@@ -72,7 +77,10 @@ import { ImageDialogComponent } from './components/image-dialog/image-dialog.com
     FeedbackComponent,
     ProfileComponent,
     FileComponent,
-    ImageDialogComponent
+    ImageDialogComponent,
+    FilterComponent,
+    FileDialogComponent,
+    FileFeedbackDialogComponent
   ],
 
   providers: [],
