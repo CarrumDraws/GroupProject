@@ -301,29 +301,10 @@ const getVisaEmployees = async (req, res) => {
           employee_id: profile.employee_id,
         });
         if (optDocument) {
-          //   // Convert optDocument IDs to URLs
-          //   const optrecieptUrl = await idToFileLink(optDocument.optreciept);
-          //   const opteadUrl = await idToFileLink(optDocument.optead);
-          //   const i20Url = await idToFileLink(optDocument.i20);
-
-          //   // Convert i983 array IDs to URLs
-          //   const i983Urls = optDocument.i983
-          //     ? await Promise.all(
-          //         optDocument.i983.map(async (id) => await idToFileLink(id))
-          //       )
-          //     : null;
-
           return {
             ...profile.toObject(),
             picture: pictureUrl,
             opt: optDocument,
-            // opt: {
-            //   ...optDocument.toObject(),
-            //   optreciept: optrecieptUrl,
-            //   optead: opteadUrl,
-            //   i20: i20Url,
-            //   i983: i983Urls,
-            // },
           };
         } else {
           return {
@@ -386,39 +367,27 @@ const sendNotification = async (req, res) => {
         fileid = opt.optead;
         break;
       case "I-983":
-        fileid = opt.i983[0];
-        fileidtwo = opt.i983[1];
+        fileid = opt.i983?.[0];
+        fileidtwo = opt.i983?.[1];
         break;
-      default:
+      case "I-20":
         fileid = opt.i20;
+        break;
+      case "Approved":
+        return res
+          .status(404)
+          .json({ error: "All employee files have already been approved" });
+      default:
+        return res.status(404).json({ error: "Invalid opt.status" });
     }
 
-    // Check First File
     let fileA = await File.findById(fileid);
-    if (!fileA)
-      return res.status(404).json({ error: "Previous OPT File Not Found" });
-    if (fileA.status === "Approved" || fileA.status === "Pending") {
-      if (opt.status === "I-983") {
-        // Check Second File
-        if (fileidtwo) {
-          let fileB = await File.findById(fileidtwo);
-          if (!fileB)
-            return res
-              .status(404)
-              .json({ error: "Previous OPT File Not Found" });
-          if (fileB.status === "Approved" || fileB.status === "Pending") {
-            return res.status(400).json({
-              error:
-                "No need for Notification: both I-983 files are either waiting for your approval (Pending) or Approved",
-            });
-          }
-        }
-      } else {
-        return res.status(400).json({
-          error:
-            "No need for Notification: File is waiting for your approval (Pending) or Approved",
-        });
-      }
+    let fileB = await File.findById(fileidtwo);
+
+    if (fileA?.status === "Pending" || fileB?.status === "Pending") {
+      return res.status(400).json({
+        error: "No Email Sent: One or more files are Pending for HR's approval",
+      });
     }
 
     // Send Email

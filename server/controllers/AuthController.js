@@ -109,7 +109,7 @@ const register = async (req, res) => {
       citizenship: null,
       citizenshiptype: "Citizen",
       workauth: {
-        workauth: "",
+        workauth: null,
         title: "",
         startdate: null,
         enddate: null,
@@ -180,14 +180,14 @@ const sendRegistrationToken = async (req, res) => {
       status: false,
     });
 
-    // Send Email
-    // let mailOptions = {
-    //   from: process.env.EMAIL,
-    //   to: email,
-    //   subject: "Register for Calum's Illustration Workshop",
-    //   text: `Congratulations, ${name}!\n\nYou've been selected to register for an upcoming Illustration Workshop.\nRegister with this link: ${link}\n\n Note: This link expires in 3 Hours.\n\nHope to see you soon!`,
-    // };
+    let mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Register for Calum's Illustration Workshop",
+      text: `Congratulations, ${name}!\n\nYou've been selected to register for an upcoming Illustration Workshop.\nRegister with this link: ${link}\n\n Note: This link expires in 3 Hours.\n\nHope to see you soon!`,
+    };
 
+    // Send Email
     // transporter.sendMail(mailOptions, (error) => {
     //   if (error) {
     //     console.log(error);
