@@ -38,10 +38,5 @@
     "email": "henry@example.com",
     "password": "Abc123!",
     "isHR": false
-  },
-  {
-    "email": "irene@example.com",
-    "password": "Abc123!",
-    "isHR": false
   }
 ]
