@@ -109,7 +109,7 @@ const register = async (req, res) => {
       citizenship: null,
       citizenshiptype: "Citizen",
       workauth: {
-        workauth: "",
+        workauth: null,
         title: "",
         startdate: null,
         enddate: null,

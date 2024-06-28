@@ -11,7 +11,16 @@ const Report = require("../models/Report.js");
 
 const employeesData = require("./seeddata/employees.json");
 const housesData = require("./seeddata/houses.json");
-const registrationData = require("./seeddata/houses.json");
+const registrationData = require("./seeddata/registration.json");
+const onboardingData = require("./seeddata/onboarding.json");
+const optData = require("./seeddata/opt.json");
+
+const licenseData = require("./seeddata/licenses.json");
+const optreceiptData = require("./seeddata/optreceipt.json");
+const opteadData = require("./seeddata/optead.json");
+const i987AData = require("./seeddata/i987A.json");
+const i987BData = require("./seeddata/i987B.json");
+const i20Data = require("./seeddata/i20.json");
 
 (async () => {
   try {
@@ -35,13 +44,56 @@ const registrationData = require("./seeddata/houses.json");
     });
     await HRPerson.save();
 
-    // let employees = await Employee.insertMany(employeesData);
-    // let registration = await Registration.insertMany(registrationData);
-    // employees.forEach((employee, index) => {
-    //   // Fill Houses with employee id's
-    //   housesData[index % 3].members.push(employee._id);
-    // });
-    // let houses = await House.insertMany(housesData);
+    let employees = await Employee.insertMany(employeesData);
+    let registrations = await Registration.insertMany(registrationData);
+
+    // First Pass: Add everything that JUST needs employees._id
+    // Houses, All Files (Licenses)
+    employees.forEach((employee, index) => {
+      housesData[index % 3].members.push(employee._id); // Fill Houses w/id's
+
+      // Attach id to Files
+      if (licenseData[index]) licenseData[index].employee_id = employee._id;
+      if (optreceiptData[index])
+        optreceiptData[index].employee_id = employee._id;
+      if (opteadData[index]) opteadData[index].employee_id = employee._id;
+      if (i987AData[index]) i987AData[index].employee_id = employee._id;
+      if (i987BData[index]) i987BData[index].employee_id = employee._id;
+      if (i20Data[index]) i20Data[index].employee_id = employee._id;
+    });
+
+    let houses = await House.insertMany(housesData);
+
+    let licenses = await File.insertMany(licenseData);
+    let optreceipts = await File.insertMany(optreceiptData);
+    let opteads = await File.insertMany(opteadData);
+    let i987As = await File.insertMany(i987AData);
+    let i987Bs = await File.insertMany(i987BData);
+    let i20s = await File.insertMany(i20Data);
+
+    // Second Pass: Add everything that relies on a fileid
+    // Onboarding, OPT
+    employees.forEach((employee, index) => {
+      if (onboardingData[index]) {
+        onboardingData[index].employee_id = employee._id; // Attach id
+        // Attach license
+        if (licenses[index])
+          onboardingData[index].license.licensefile = licenses[index]._id;
+      }
+      if (optData[index]) {
+        optData[index].employee_id = employee._id; // Attach id
+        // Attach Files
+        if (optreceipts[index])
+          optData[index].optreciept = optreceipts[index]._id;
+        if (opteads[index]) optData[index].optead = opteads[index]._id;
+        if (i987As[index] && i987Bs[index])
+          optData[index].i983 = [i987As[index]._id, i987Bs[index]._id];
+        if (i20s[index]) optData[index].i20 = i20s[index]._id;
+      }
+    });
+
+    let onboarding = await Onboarding.insertMany(onboardingData);
+    let opt = await Opt.insertMany(optData);
     console.log("DB initialized");
   } catch (error) {
     console.error(error);
