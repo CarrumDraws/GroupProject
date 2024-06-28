@@ -16,6 +16,7 @@ const onboardingData = require("./seeddata/onboarding.json");
 const optData = require("./seeddata/opt.json");
 
 const licenseData = require("./seeddata/licenses.json");
+const licenseData = require("./seeddata/licenses.json"); //
 const optreceiptData = require("./seeddata/optreceipt.json");
 const opteadData = require("./seeddata/optead.json");
 const i983AData = require("./seeddata/i983A.json");
