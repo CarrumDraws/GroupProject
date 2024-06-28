@@ -10,7 +10,7 @@ import OnboardingPersonInput from '../components/OnboardingPersonInput.tsx';
 import EmployeeInfo from '../types/EmployeeInfo.tsx';
 import { Person, PersonKeys } from '../types/Person.tsx';
 import axiosInstance from '../interceptors/axiosInstance.tsx';
-import { formatDateWithDash } from '../utils/utilMethos.tsx';
+import { formatDate, handleLogout } from '../utils/utilMethods.tsx';
 import { useOnboarding } from '../context/OnboardingContext.tsx';
 
 interface FormData {
@@ -18,7 +18,7 @@ interface FormData {
     middlename: string;
     lastname: string;
     preferredname: string;
-    picture: File | null;
+    picture: File | null | string;
     buildaptnum: string;
     street: string;
     city: string;
@@ -42,7 +42,7 @@ interface FormData {
     haslicense: string;
     licensenumber: string;
     expdate: string;
-    license: File | null;
+    license: File | null | string;
     references: Person[];
     contacts: Person[];
 }
@@ -149,7 +149,7 @@ const Onboarding = () => {
         model: initialData.car.model,
         color: initialData.car.color,
         ssn: initialData.ssn ? initialData.ssn : '',
-        dob: initialData.dob ? formatDateWithDash(initialData.dob) : '',
+        dob: initialData.dob ? formatDate(initialData.dob, '-') : '',
         gender: initialData.gender,
         citizenship: initialData.citizenship ? initialData.citizenship : 'false',
         citizenshiptype: initialData.citizenshiptype,
@@ -160,7 +160,7 @@ const Onboarding = () => {
         enddate: initialData.workauth.enddate ? initialData.workauth.enddate : '',
         haslicense: initialData.license.haslicense === 'true' ? 'true' : 'false',
         licensenumber: initialData.license.licensenumber,
-        expdate: initialData.license.expdate ? formatDateWithDash(initialData.license.expdate) : '',
+        expdate: initialData.license.expdate ? formatDate(initialData.license.expdate, '-') : '',
         license: initialData.license.licensefile,
         references: initialData.references,
         contacts: initialData.contacts
@@ -170,12 +170,11 @@ const Onboarding = () => {
     console.log(onboardingData?.status);
 
     let isDisabled = false;
-    if(onboardingData && (onboardingData?.status === 'Pending' || onboardingData?.status === 'Accept')) {
+    if(onboardingData && (onboardingData?.status === 'Pending' || onboardingData?.status === 'Approved')) {
         isDisabled = true;
     }
 
-    const feedback = initialData ? initialData.feedback : '';
-    console.log(feedback);
+    const feedback = initialData ? `Rejected - ${initialData.feedback}` : '';
 
     const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
         const { name, value } = e.target;
@@ -280,7 +279,7 @@ const Onboarding = () => {
             'haslicense'
         ];
 
-        if (formData.citizenship === 'Not Citizen') {
+        if (formData.citizenship === 'false') {
             requiredFields.push('workauth', 'startdate', 'enddate');
             if(formData.workauth === 'F1(CPT/OPT)') {
                 requiredFields.push('optreciept');
@@ -296,11 +295,6 @@ const Onboarding = () => {
 
         return requiredFields;
     };
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -579,7 +573,7 @@ const Onboarding = () => {
                                     </Select>
                                 </Box>
                             );
-                        case 'Not Citizen':
+                        case 'false':
                             return (
                                 (<Box>
                                     <Box sx={centerRowBoxStyle}>

@@ -1,6 +1,5 @@
 import { Box, Typography, TextField } from '@mui/material';
-
-import { formatDateWithSlash } from '../utils/utilMethos.tsx';
+import { formatDate } from '../utils/utilMethods.tsx';
 
 interface ProfileFieldProps {
     label: string;
@@ -11,9 +10,8 @@ interface ProfileFieldProps {
     editMode: boolean;
 }
 
-
 const textFieldStyle = {
-    sx:{
+    sx: {
         height: '1.5rem',
         ml: '0.5rem',
         '& input': {
@@ -28,15 +26,15 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, type, name, value, o
     return (
         <Box paddingBottom='0.5rem' sx={{ display: 'flex', flexDirection: 'row' }}>
             <Typography>{label}: </Typography>
-            {editMode ?
-                <TextField type={type} name={name} value={value} onChange={onChange} InputProps={textFieldStyle} /> :
-                (type == 'date'?
-                    <Typography paddingLeft='0.5rem'>{formatDateWithSlash(value)}</Typography> :
-                    <Typography paddingLeft='0.5rem'>{value}</Typography>
-                )
-            }
+            {editMode ? (
+                <TextField type={type} name={name} value={value} onChange={onChange} InputProps={textFieldStyle} />
+            ) : (
+                <Typography paddingLeft='0.5rem'>
+                    {type === 'date' ? formatDate(value, '/') : value}
+                </Typography>
+            )}
         </Box>
     );
-}
+};
 
 export default ProfileField;
