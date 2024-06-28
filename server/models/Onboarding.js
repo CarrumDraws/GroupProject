@@ -73,6 +73,7 @@ const CarSchema = new Schema({
 const WorkAuthSchema = new Schema({
   workauth: {
     type: String,
+    enum: ["H1-B", "L2", "F1(CPT/OPT)", "H4", "Other"],
   },
   title: {
     type: String,
