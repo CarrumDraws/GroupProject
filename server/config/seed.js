@@ -58,12 +58,6 @@ const i20Data = require("./seeddata/i20.json");
         );
       }
     }
-    // employeesData.forEach(async (employee, index) => {
-    //   employee.password = await bcrypt.hash(
-    //     employee.password,
-    //     Number(process.env.SALT)
-    //   );
-    // });
 
     let employees = await Employee.insertMany(employeesData);
     let registrations = await Registration.insertMany(registrationData);

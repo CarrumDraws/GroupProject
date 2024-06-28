@@ -219,7 +219,6 @@ const submitOnboarding = async (req, res) => {
       },
       { new: true, upsert: true, setDefaultsOnInsert: true } // Options
     );
-    console.log(updatedOnboarding);
     await updatedOnboarding.save();
     return res.status(200).json({
       message: "Onboarding submitted successfully",
@@ -252,7 +251,6 @@ const reviewOnboardingApps = async (req, res) => {
     // Process Data
     const result = await Promise.all(
       onboardings.map(async (profile) => {
-        console.log(profile);
         profile = profile.toObject(); // Converts mongo profile to plain object
         const { _id, ...nameWithoutId } = profile.name; // Remove _id from name
         const pictureUrl = await idToFileLink(profile.picture);
@@ -339,7 +337,6 @@ const handleEmployeeOnboarding = async (req, res) => {
 const uploadFile = async (req, res) => {
   try {
     const file = req.file;
-    console.log(req.body);
     if (!file) {
       return res.status(400).send("No file uploaded.");
     }
