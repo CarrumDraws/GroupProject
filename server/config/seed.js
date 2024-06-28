@@ -18,8 +18,8 @@ const optData = require("./seeddata/opt.json");
 const licenseData = require("./seeddata/licenses.json");
 const optreceiptData = require("./seeddata/optreceipt.json");
 const opteadData = require("./seeddata/optead.json");
-const i987AData = require("./seeddata/i987A.json");
-const i987BData = require("./seeddata/i987B.json");
+const i983AData = require("./seeddata/i983A.json");
+const i983BData = require("./seeddata/i983B.json");
 const i20Data = require("./seeddata/i20.json");
 
 (async () => {
@@ -44,6 +44,27 @@ const i20Data = require("./seeddata/i20.json");
     });
     await HRPerson.save();
 
+    // Hash all Employee Passwords
+    for (const employee of employeesData) {
+      try {
+        employee.password = await bcrypt.hash(
+          employee.password,
+          Number(process.env.SALT)
+        );
+      } catch (error) {
+        console.error(
+          `Error hashing password for employee ${employee.id}:`,
+          error
+        );
+      }
+    }
+    // employeesData.forEach(async (employee, index) => {
+    //   employee.password = await bcrypt.hash(
+    //     employee.password,
+    //     Number(process.env.SALT)
+    //   );
+    // });
+
     let employees = await Employee.insertMany(employeesData);
     let registrations = await Registration.insertMany(registrationData);
 
@@ -57,8 +78,8 @@ const i20Data = require("./seeddata/i20.json");
       if (optreceiptData[index])
         optreceiptData[index].employee_id = employee._id;
       if (opteadData[index]) opteadData[index].employee_id = employee._id;
-      if (i987AData[index]) i987AData[index].employee_id = employee._id;
-      if (i987BData[index]) i987BData[index].employee_id = employee._id;
+      if (i983AData[index]) i983AData[index].employee_id = employee._id;
+      if (i983BData[index]) i983BData[index].employee_id = employee._id;
       if (i20Data[index]) i20Data[index].employee_id = employee._id;
     });
 
@@ -67,8 +88,8 @@ const i20Data = require("./seeddata/i20.json");
     let licenses = await File.insertMany(licenseData);
     let optreceipts = await File.insertMany(optreceiptData);
     let opteads = await File.insertMany(opteadData);
-    let i987As = await File.insertMany(i987AData);
-    let i987Bs = await File.insertMany(i987BData);
+    let i983As = await File.insertMany(i983AData);
+    let i983Bs = await File.insertMany(i983BData);
     let i20s = await File.insertMany(i20Data);
 
     // Second Pass: Add everything that relies on a fileid
@@ -86,8 +107,8 @@ const i20Data = require("./seeddata/i20.json");
         if (optreceipts[index])
           optData[index].optreciept = optreceipts[index]._id;
         if (opteads[index]) optData[index].optead = opteads[index]._id;
-        if (i987As[index] && i987Bs[index])
-          optData[index].i983 = [i987As[index]._id, i987Bs[index]._id];
+        if (i983As[index] && i983Bs[index])
+          optData[index].i983 = [i983As[index]._id, i983Bs[index]._id];
         if (i20s[index]) optData[index].i20 = i20s[index]._id;
       }
     });
