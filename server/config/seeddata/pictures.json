@@ -1,1 +1,58 @@
-// Seed data with the same image 40815ffc00a0525c6e5697961255f55f
+[
+  {
+    "employee_id": null,
+    "filename": "Default.png",
+    "filekey": "Default.png",
+    "status": "Pending",
+    "notification_sent": null,
+    "feedback": null
+  },
+  {
+    "employee_id": null,
+    "filename": "Default.png",
+    "filekey": "Default.png",
+    "status": "Pending",
+    "notification_sent": null,
+    "feedback": null
+  },
+  {
+    "employee_id": null,
+    "filename": "Default.png",
+    "filekey": "Default.png",
+    "status": "Pending",
+    "notification_sent": null,
+    "feedback": null
+  },
+  {
+    "employee_id": null,
+    "filename": "Default.png",
+    "filekey": "Default.png",
+    "status": "Pending",
+    "notification_sent": null,
+    "feedback": null
+  },
+  {
+    "employee_id": null,
+    "filename": "Default.png",
+    "filekey": "Default.png",
+    "status": "Pending",
+    "notification_sent": null,
+    "feedback": null
+  },
+  {
+    "employee_id": null,
+    "filename": "Default.png",
+    "filekey": "Default.png",
+    "status": "Pending",
+    "notification_sent": null,
+    "feedback": null
+  },
+  {
+    "employee_id": null,
+    "filename": "Default.png",
+    "filekey": "Default.png",
+    "status": "Pending",
+    "notification_sent": null,
+    "feedback": null
+  }
+]

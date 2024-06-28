@@ -32,8 +32,6 @@ const getHouse = async (req, res) => {
 const addHouse = async (req, res) => {
   try {
     const { ID, EMAIL, ISHR } = req.body;
-    console.log("Add House");
-    console.log(req.body);
     let {
       firstname,
       middlename,
