@@ -384,9 +384,7 @@ const Onboarding = () => {
                 }
             } else if (Array.isArray(value)) {
                 data.append(key, JSON.stringify(value));
-            } else if(value && (key === 'dob' || key === 'startdate' || key === 'enddate' || key === 'expdate')) {
-                data.append(key, value);
-            }else{
+            } else{
                 data.append(key, value !== null ? value.toString() : '');
             }
         });

@@ -86,7 +86,7 @@ const ProfilePage = () => {
     };
 
     const cancelChanges = (field: keyof EditModeState | 'emergencies') => {
-        if (window.confirm("Do you want to discard the changes?")) {
+        if (window.confirm("Do you want to discard the changes in the section?")) {
             if (field === 'emergencies') {
                 const filteredEmergencies = removeEmptyEmergencyContacts(initialState.emergencies);
                 setInitialState(prevState => ({
