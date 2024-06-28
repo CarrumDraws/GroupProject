@@ -41,9 +41,12 @@ function Registration() {
                 alert('Registration successful!');
                 navigate('/login');
             }
-        } catch (e) {
-            console.log(e);
-            alert('Error during registration.');
+        } catch (e : any) {
+            if (e.response && e.response.data && e.response.data.message) {
+                const errorMessage = e.response.data.message;
+                alert('Error during registration: ' + errorMessage);
+            }
+            
         }
     }
 

@@ -1,469 +1,453 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from 'react';
 
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from '@mui/material';
 
-import { useProfile } from '../context/ProfileContext.tsx';
-import { profileForms }  from '../components/ProfileForms.tsx';
 import ProfileField from '../components/ProfileField.tsx';
+import Documents from '../components/Documents.tsx';
+import axiosInstance from '../interceptors/axiosInstance';
+import { useProfile, EmergencyForm } from '../context/ProfileContext.tsx';
+import { v4 as uuidv4 } from 'uuid';
+import { formatDate, handleLogout } from '../utils/utilMethods.tsx';
 
-function Profile() {
+type EditModeState = {
+    name: boolean;
+    address: boolean;
+    contact: boolean;
+    employment: boolean;
+    emergencies: boolean;
+};
+
+const ProfilePage = () => {
     const {
-        name,
-        updateName,
-        address,
-        updateAddress,
-        contact,
-        updateContact,
-        employment,
-        updateEmployment,
-        emergency,
-        updateEmergency
+        name, updateName,
+        address, updateAddress,
+        contact, updateContact,
+        employment, updateEmployment,
+        emergencies, updateEmergency, addEmergency, deleteEmergency,
+        isLoading
     } = useProfile();
 
-    const [nameFormValues, setNameFormValues] = useState(name);
-    const [nameEditMode, setNameEditMode] = useState(false);
-
-    const [addressFormValues, setAddressFormValues] = useState(address);
-    const [addressEditMode, setAddressEditMode] = useState(false);
-
-    const [contactFormValues, setContactFormValues] = useState(contact);
-    const [contactEditMode, setContactEditMode] = useState(false);
-
-    const [employmentFormValues, setEmploymentFormValues] = useState(employment);
-    const [employmentEditMode, setEmploymentEditMode] = useState(false);
-
-    const [emergencyFormValues, setEmergencyFormValues] = useState(emergency);
-    const [emergencyEditMode, setEmergencyEditMode] = useState(false);
-
-    const nameForm = profileForms(nameFormValues);
-    const addressForm = profileForms(addressFormValues);
-    const contactForm = profileForms(contactFormValues);
-    const employmentForm = profileForms(employmentFormValues);
-    const emergencyForm = profileForms(emergencyFormValues);
+    const [initialState, setInitialState] = useState({
+        name,
+        address,
+        contact,
+        employment,
+        emergencies
+    });
 
     useEffect(() => {
-        if(!nameEditMode) {
-            setNameFormValues(name);
+        if (!isLoading) {
+            setInitialState({
+                name,
+                address,
+                contact,
+                employment,
+                emergencies
+            });
         }
+    }, [isLoading]);
 
-        if(!addressEditMode) {
-            setAddressFormValues(address);
+    const [editMode, setEditMode] = useState<EditModeState>({
+        name: false,
+        address: false,
+        contact: false,
+        employment: false,
+        emergencies: false
+    });
+
+    const toggleEditMode = (field: keyof EditModeState) => {
+        setEditMode(prevState => ({ ...prevState, [field]: !prevState[field] }));
+    };
+
+    const removeEmptyEmergencyContacts = (contacts: EmergencyForm[]) => {
+        return contacts.filter(contact => {
+            return !(contact.emergencyFirstName === '' && contact.emergencyMiddleName === '' && contact.emergencyLastName === '' && contact.emergencyPhone === '' && contact.emergencyEmail === '' && contact.relationship === '');
+        });
+    };
+
+    const saveChanges = async (field: keyof EditModeState | 'emergencies', data: any) => {
+        if (field === 'emergencies') {
+            data = removeEmptyEmergencyContacts(data);
         }
-
-        if(!contactEditMode) {
-            setContactFormValues(contact);
-        }
-
-        if(!employmentEditMode) {
-            setEmploymentFormValues(employment);
-        }
-
-        if(!emergencyEditMode) {
-            setEmergencyFormValues(emergency);
-        }
-    },[name, nameEditMode, address, addressEditMode, contact, contactEditMode, employment, employmentEditMode, emergency, emergencyEditMode]);
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-    }
-
-    // Toggle Edit Mode for the forms
-    const toggleNameEditMode = () => {
-        setNameEditMode(!nameEditMode);
-    }
-
-    const toggleAddressEditMode = () => {
-        setAddressEditMode(!addressEditMode);
-    }
-
-    const toggleContactEditMode = () => {
-        setContactEditMode(!contactEditMode);
-    }
-
-    const toggleEmploymentEditMode = () => {
-        setEmploymentEditMode(!employmentEditMode);
-    }
-
-    const toggleEmergencyEditMode = () => {
-        setEmergencyEditMode(!emergencyEditMode);
-    }
-
-    // Handle Save function for the forms
-    const handleSaveNameEdit = () => {
-        updateName(nameFormValues);
-        toggleNameEditMode();
-    }
-
-    const handleSaveAddressEdit = () => {
-        updateAddress(addressFormValues);
-        toggleAddressEditMode();
-    }
-
-    const handleSaveContactEdit = () => {
-        updateContact(contactFormValues);
-        toggleContactEditMode();
-    }
-
-    const handleSaveEmploymentEdit = () => {
-        updateEmployment(employmentFormValues);
-        toggleEmploymentEditMode();
-    }
-
-    const handleSaveEmergencyEdit = () => {
-        updateEmergency(emergencyFormValues);
-        toggleEmergencyEditMode();
-    }
-
-    // Handle the cancel function for the forms
-    const handleNameCancel = () => {
-        const confirmDiscard = window.confirm('Do you want to discard all of your changes for the Name Form?');
-        if(confirmDiscard) {
-            nameForm.resetValues(name);
-            toggleNameEditMode();
+        try {
+            const response = await axiosInstance.post(`${import.meta.env.VITE_SERVER_URL}/employee/${field}`, data);
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            if (field === 'emergencies') {
+                setInitialState(prevState => ({
+                    ...prevState,
+                    emergencies: [...data]
+                }));
+            }
+            toggleEditMode(field as keyof EditModeState);
         }
     };
 
-    const handleAddressCancel = () => {
-        const confirmDiscard = window.confirm('Do you want to discard all of your changes for the Address Form?');
-        if(confirmDiscard) {
-            addressForm.resetValues(address);
-            toggleAddressEditMode();
+    const cancelChanges = (field: keyof EditModeState | 'emergencies') => {
+        if (window.confirm("Do you want to discard the changes in the section?")) {
+            if (field === 'emergencies') {
+                const filteredEmergencies = removeEmptyEmergencyContacts(initialState.emergencies);
+                setInitialState(prevState => ({
+                    ...prevState,
+                    emergencies: [...filteredEmergencies]
+                }));
+                while (emergencies.length > filteredEmergencies.length) {
+                    emergencies.pop();
+                }
+                emergencies.forEach((contact, index) => {
+                    updateEmergency(contact, index);
+                });
+            } else {
+                switch (field) {
+                    case 'name':
+                        updateName(initialState.name);
+                        break;
+                    case 'address':
+                        updateAddress(initialState.address);
+                        break;
+                    case 'contact':
+                        updateContact(initialState.contact);
+                        break;
+                    case 'employment':
+                        updateEmployment(initialState.employment);
+                        break;
+                }
+            }
+            setEditMode(prevState => ({ ...prevState, [field]: false }));
         }
-    }
+    };
 
-    const handleContactCancel = () => {
-        const confirmDiscard = window.confirm('Do you want to discard all of your changes for the Contact Information Form?');
-        if(confirmDiscard) {
-            contactForm.resetValues(contact);
-            toggleContactEditMode();
-        }
-    }
+    const addEmergencyContact = () => {
+        const newEmergency: EmergencyForm = {
+            id: uuidv4(),
+            emergencyFirstName: '',
+            emergencyMiddleName: '',
+            emergencyLastName: '',
+            emergencyPhone: '',
+            emergencyEmail: '',
+            relationship: ''
+        };
+        addEmergency(newEmergency);
+    };
 
-    const handleEmploymentCancel = () => {
-        const confirmDiscard = window.confirm('Do you want to discard all of your changes for the Employment Form?');
-        if(confirmDiscard) {
-            employmentForm.resetValues(employment);
-            toggleEmploymentEditMode();
+    const handleDeleteEmergency = (id: string) => {
+        if (window.confirm("Are you sure you want to delete this emergency contact?")) {
+            deleteEmergency(id);
         }
-    }
+    };
 
-    const handleEmergencyCancel = () => {
-        const confirmDiscard = window.confirm('Do you want to discard all of your changes for the Emergency Contact Form?');
-        if(confirmDiscard) {
-            emergencyForm.resetValues(emergency);
-            toggleEmergencyEditMode();
+    const handleDateChange = (e: ChangeEvent<HTMLInputElement>, field: string) => {
+        const value = e.target.value;
+        let formattedDate = value;
+
+        if (value.length === 8 && !value.includes('-')) {
+            formattedDate = formatDate(value, '-');
         }
-    }
+
+        updateName({ ...name, [field]: formattedDate });
+    };
+
+    if (isLoading) return <Typography>Loading...</Typography>;
 
     return (
         <Container>
-            <Box sx={{ display:'flex', flexDirection:'row' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                 <Box sx={{ width: '80%' }}>
                     <Typography paddingTop='1rem' fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Name</Typography>
-
                     <form>
-                        <Box sx={{ display:'flex', flexDirection:'row', justifyContent:'space-between' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Box>
                                 <ProfileField
                                     label="First Name"
                                     type='text'
                                     name='firstName'
-                                    value={nameForm.values.firstName}
-                                    onChange={nameForm.handleChange}
-                                    editMode={nameEditMode}
+                                    value={name.firstName}
+                                    onChange={(e) => updateName({ ...name, firstName: e.target.value })}
+                                    editMode={editMode.name}
                                 />
-                                    
                                 <ProfileField
                                     label="Middle Name"
-                                    type='text' name='middleName'
-                                    value={nameForm.values.middleName}
-                                    onChange={nameForm.handleChange}
-                                    editMode={nameEditMode}
+                                    type='text'
+                                    name='middleName'
+                                    value={name.middleName}
+                                    onChange={(e) => updateName({ ...name, middleName: e.target.value })}
+                                    editMode={editMode.name}
                                 />
-
                                 <ProfileField
                                     label="Last Name"
                                     type='text'
                                     name='lastName'
-                                    value={nameForm.values.lastName}
-                                    onChange={nameForm.handleChange}
-                                    editMode={nameEditMode}
+                                    value={name.lastName}
+                                    onChange={(e) => updateName({ ...name, lastName: e.target.value })}
+                                    editMode={editMode.name}
                                 />
                             </Box>
-
                             <Box>
                                 <ProfileField
                                     label="Email"
                                     type='email'
                                     name='email'
-                                    value={nameForm.values.email}
-                                    onChange={nameForm.handleChange}
-                                    editMode={nameEditMode}
+                                    value={name.email}
+                                    onChange={(e) => updateName({ ...name, email: e.target.value })}
+                                    editMode={editMode.name}
                                 />
-
                                 <ProfileField
                                     label="SSN"
                                     type='text'
                                     name='ssn'
-                                    value={nameForm.values.ssn}
-                                    onChange={nameForm.handleChange}
-                                    editMode={nameEditMode}
+                                    value={name.ssn}
+                                    onChange={(e) => updateName({ ...name, ssn: e.target.value })}
+                                    editMode={editMode.name}
                                 />
-
                                 <ProfileField
                                     label="Date of Birth"
                                     type='date'
                                     name='dob'
-                                    value={nameForm.values.dob}
-                                    onChange={nameForm.handleChange}
-                                    editMode={nameEditMode}
+                                    value={formatDate(name.dob, '-')}
+                                    onChange={(e) => handleDateChange(e, 'dob')}
+                                    editMode={editMode.name}
                                 />
-
                                 <ProfileField
                                     label="Gender"
                                     type="text"
                                     name='gender'
-                                    value={nameForm.values.gender}
-                                    onChange={nameForm.handleChange}
-                                    editMode={nameEditMode}
+                                    value={name.gender}
+                                    onChange={(e) => updateName({ ...name, gender: e.target.value })}
+                                    editMode={editMode.name}
                                 />
                             </Box>
-                            {nameEditMode ?
-                                <Box sx={{ display:'flex', displayDirection: 'column' }}>
-                                    <Button onClick={handleSaveNameEdit}>Save</Button>
-                                    <Button onClick={handleNameCancel}>Cancel</Button>
-                                </Box> :
-                                <Button onClick={toggleNameEditMode}>Edit</Button>}
+                            {editMode.name ? (
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Button onClick={() => saveChanges('name', name)}>Save</Button>
+                                    <Button onClick={() => cancelChanges('name')}>Cancel</Button>
+                                </Box>
+                            ) : (
+                                <Button onClick={() => toggleEditMode('name')}>Edit</Button>
+                            )}
                         </Box>
                     </form>
 
-                    <hr/>
+                    <hr />
 
                     <Typography fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Address</Typography>
-
                     <form>
-                        <Box sx={{ display:'flex', flexDirection:'row', justifyContent:'space-between' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Box>
                                 <ProfileField
                                     label="Building/apt #"
                                     type='text'
                                     name='apt'
-                                    value={addressForm.values.apt}
-                                    onChange={addressForm.handleChange}
-                                    editMode={addressEditMode}
+                                    value={address.apt}
+                                    onChange={(e) => updateAddress({ ...address, apt: e.target.value })}
+                                    editMode={editMode.address}
                                 />
-
                                 <ProfileField
                                     label="Street Name"
                                     type='text'
                                     name='street'
-                                    value={addressForm.values.street}
-                                    onChange={addressForm.handleChange}
-                                    editMode={addressEditMode}
+                                    value={address.street}
+                                    onChange={(e) => updateAddress({ ...address, street: e.target.value })}
+                                    editMode={editMode.address}
                                 />
                             </Box>
-
                             <Box>
                                 <ProfileField
                                     label="City"
                                     type='text'
                                     name='city'
-                                    value={addressForm.values.city}
-                                    onChange={addressForm.handleChange}
-                                    editMode={addressEditMode}
+                                    value={address.city}
+                                    onChange={(e) => updateAddress({ ...address, city: e.target.value })}
+                                    editMode={editMode.address}
                                 />
-
                                 <ProfileField
                                     label="State"
                                     type='text'
                                     name='state'
-                                    value={addressForm.values.state}
-                                    onChange={addressForm.handleChange}
-                                    editMode={addressEditMode}
+                                    value={address.state}
+                                    onChange={(e) => updateAddress({ ...address, state: e.target.value })}
+                                    editMode={editMode.address}
                                 />
-
                                 <ProfileField
                                     label="Zip"
                                     type='text'
                                     name='zip'
-                                    value={addressForm.values.zip}
-                                    onChange={addressForm.handleChange}
-                                    editMode={addressEditMode}
+                                    value={address.zip}
+                                    onChange={(e) => updateAddress({ ...address, zip: e.target.value })}
+                                    editMode={editMode.address}
                                 />
                             </Box>
-                            {addressEditMode ?
-                                    <Box sx={{ display:'flex', displayDirection: 'column' }}>
-                                        <Button onClick={handleSaveAddressEdit}>Save</Button>
-                                        <Button onClick={handleAddressCancel}>Cancel</Button>
-                                    </Box> :
-                                    <Button onClick={toggleAddressEditMode}>Edit</Button>}
+                            {editMode.address ? (
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Button onClick={() => saveChanges('address', address)}>Save</Button>
+                                    <Button onClick={() => cancelChanges('address')}>Cancel</Button>
+                                </Box>
+                            ) : (
+                                <Button onClick={() => toggleEditMode('address')}>Edit</Button>
+                            )}
                         </Box>
                     </form>
 
-                    <hr/>
+                    <hr />
 
                     <Typography fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Contact Info</Typography>
-
                     <form>
-                        <Box sx={{ display:'flex', flexDirection:'row', justifyContent:'space-between' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <ProfileField
                                 label="Cell Phone Number"
                                 type='text'
                                 name='cell'
-                                value={contactForm.values.cell}
-                                onChange={contactForm.handleChange}
-                                editMode={contactEditMode}
+                                value={contact.cell}
+                                onChange={(e) => updateContact({ ...contact, cell: e.target.value })}
+                                editMode={editMode.contact}
                             />
-
                             <ProfileField
                                 label="Work Phone Number"
                                 type='text'
                                 name='work'
-                                value={contactForm.values.work}
-                                onChange={contactForm.handleChange}
-                                editMode={contactEditMode}
+                                value={contact.work}
+                                onChange={(e) => updateContact({ ...contact, work: e.target.value })}
+                                editMode={editMode.contact}
                             />
-
-                            {contactEditMode ?
-                                <Box sx={{ display:'flex', displayDirection: 'column' }}>
-                                    <Button onClick={handleSaveContactEdit}>Save</Button>
-                                    <Button onClick={handleContactCancel}>Cancel</Button>
-                                </Box> :
-                                <Button onClick={toggleContactEditMode}>Edit</Button>}
+                            {editMode.contact ? (
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Button onClick={() => saveChanges('contact', contact)}>Save</Button>
+                                    <Button onClick={() => cancelChanges('contact')}>Cancel</Button>
+                                </Box>
+                            ) : (
+                                <Button onClick={() => toggleEditMode('contact')}>Edit</Button>
+                            )}
                         </Box>
                     </form>
 
-                    <hr/>
+                    <hr />
 
                     <Typography fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Employment</Typography>
-                    
                     <form>
-                        <Box sx={{ display:'flex', flexDirection:'row', justifyContent:'space-between' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <ProfileField
                                 label="Visa Title"
                                 type='text'
                                 name='visa'
-                                value={employmentForm.values.visa}
-                                onChange={employmentForm.handleChange}
-                                editMode={employmentEditMode}
+                                value={employment.visa}
+                                onChange={(e) => updateEmployment({ ...employment, visa: e.target.value })}
+                                editMode={editMode.employment}
                             />
-
                             <Box>
                                 <ProfileField
                                     label="Start Date"
                                     type='date'
                                     name='start'
-                                    value={employmentForm.values.start}
-                                    onChange={employmentForm.handleChange}
-                                    editMode={employmentEditMode}
+                                    value={formatDate(employment.start, '-')}
+                                    onChange={(e) => updateEmployment({ ...employment, start: e.target.value })}
+                                    editMode={editMode.employment}
                                 />
-
                                 <ProfileField
                                     label="End Date"
                                     type='date'
                                     name='end'
-                                    value={employmentForm.values.end}
-                                    onChange={employmentForm.handleChange}
-                                    editMode={employmentEditMode}
+                                    value={formatDate(employment.end, '-')}
+                                    onChange={(e) => updateEmployment({ ...employment, end: e.target.value })}
+                                    editMode={editMode.employment}
                                 />
                             </Box>
-
-                            {employmentEditMode ?
-                                <Box sx={{ display:'flex', displayDirection: 'column' }}>
-                                    <Button onClick={handleSaveEmploymentEdit}>Save</Button>
-                                    <Button onClick={handleEmploymentCancel}>Cancel</Button>
-                                </Box> :
-                                <Button onClick={toggleEmploymentEditMode}>Edit</Button>}
+                            {editMode.employment ? (
+                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                    <Button onClick={() => saveChanges('employment', employment)}>Save</Button>
+                                    <Button onClick={() => cancelChanges('employment')}>Cancel</Button>
+                                </Box>
+                            ) : (
+                                <Button onClick={() => toggleEditMode('employment')}>Edit</Button>
+                            )}
                         </Box>
                     </form>
 
-                    <hr/>
+                    <hr />
 
                     <Typography fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Emergency Contact</Typography>
-                    
                     <form>
-                        <Box sx={{ display:'flex', flexDirection:'row', justifyContent:'space-between' }}>
-                            <Box>
-                                <ProfileField
-                                    label="First Name"
-                                    type='text'
-                                    name='emergencyFirstName'
-                                    value={emergencyForm.values.emergencyFirstName}
-                                    onChange={emergencyForm.handleChange}
-                                    editMode={emergencyEditMode}
-                                />
-
-                                <ProfileField
-                                    label="Middle Name"
-                                    type='text'
-                                    name='emergencyMiddleName'
-                                    value={emergencyForm.values.emergencyMiddleName}
-                                    onChange={emergencyForm.handleChange}
-                                    editMode={emergencyEditMode}
-                                />
-
-                                <ProfileField
-                                    label="Last Name"
-                                    type='text'
-                                    name='emergencyLastName'
-                                    value={emergencyForm.values.emergencyLastName}
-                                    onChange={emergencyForm.handleChange}
-                                    editMode={emergencyEditMode}
-                                />
+                        {emergencies.map((emergency, index) => (
+                            <Box key={emergency.id} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <Box>
+                                    <ProfileField
+                                        label="First Name"
+                                        type='text'
+                                        name='emergencyFirstName'
+                                        value={emergency.emergencyFirstName}
+                                        onChange={(e) => updateEmergency({ ...emergency, emergencyFirstName: e.target.value }, index)}
+                                        editMode={editMode.emergencies}
+                                    />
+                                    <ProfileField
+                                        label="Middle Name"
+                                        type='text'
+                                        name='emergencyMiddleName'
+                                        value={emergency.emergencyMiddleName}
+                                        onChange={(e) => updateEmergency({ ...emergency, emergencyMiddleName: e.target.value }, index)}
+                                        editMode={editMode.emergencies}
+                                    />
+                                    <ProfileField
+                                        label="Last Name"
+                                        type='text'
+                                        name='emergencyLastName'
+                                        value={emergency.emergencyLastName}
+                                        onChange={(e) => updateEmergency({ ...emergency, emergencyLastName: e.target.value }, index)}
+                                        editMode={editMode.emergencies}
+                                    />
+                                </Box>
+                                <Box>
+                                    <ProfileField
+                                        label="Phone"
+                                        type='text'
+                                        name='emergencyPhone'
+                                        value={emergency.emergencyPhone}
+                                        onChange={(e) => updateEmergency({ ...emergency, emergencyPhone: e.target.value }, index)}
+                                        editMode={editMode.emergencies}
+                                    />
+                                    <ProfileField
+                                        label="Email"
+                                        type='email'
+                                        name='emergencyEmail'
+                                        value={emergency.emergencyEmail}
+                                        onChange={(e) => updateEmergency({ ...emergency, emergencyEmail: e.target.value }, index)}
+                                        editMode={editMode.emergencies}
+                                    />
+                                    <ProfileField
+                                        label="Relationship"
+                                        type='text'
+                                        name='relationship'
+                                        value={emergency.relationship}
+                                        onChange={(e) => updateEmergency({ ...emergency, relationship: e.target.value }, index)}
+                                        editMode={editMode.emergencies}
+                                    />
+                                </Box>
+                                {emergencies.length > 1 && (
+                                    <Button onClick={() => handleDeleteEmergency(emergency.id)}>Delete</Button>
+                                )}
                             </Box>
-
-                            <Box>
-                                <ProfileField
-                                    label="Phone"
-                                    type='text'
-                                    name='emergencyPhone'
-                                    value={emergencyForm.values.emergencyPhone}
-                                    onChange={emergencyForm.handleChange}
-                                    editMode={emergencyEditMode}
-                                />
-
-                                <ProfileField
-                                    label="Email"
-                                    type='email'
-                                    name='emergencyEmail'
-                                    value={emergencyForm.values.emergencyEmail}
-                                    onChange={emergencyForm.handleChange}
-                                    editMode={emergencyEditMode}
-                                />
-
-                                <ProfileField
-                                    label="Relationship"
-                                    type='text'
-                                    name='relationship'
-                                    value={emergencyForm.values.relationship}
-                                    onChange={emergencyForm.handleChange}
-                                    editMode={emergencyEditMode}
-                                />
+                        ))}
+                        {editMode.emergencies ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Button onClick={() => saveChanges('emergencies', emergencies)}>Save</Button>
+                                <Button onClick={() => cancelChanges('emergencies')}>Cancel</Button>
+                                <Button onClick={addEmergencyContact}>Add Emergency Contact</Button>
                             </Box>
-
-                            {emergencyEditMode ?
-                                <Box sx={{ display:'flex', displayDirection: 'column' }}>
-                                    <Button onClick={handleSaveEmergencyEdit}>Save</Button>
-                                    <Button onClick={handleEmergencyCancel}>Cancel</Button>
-                                </Box> :
-                                <Button onClick={toggleEmergencyEditMode}>Edit</Button>}
-                        </Box>
-
-                        <hr/>
+                        ) : (
+                            <Button onClick={() => toggleEditMode('emergencies')}>Edit</Button>
+                        )}
                     </form>
+
+                    <hr />
                 </Box>
-                <Box sx={{ display:'flex', justifyContent:'center', width: '20%' }}>
-                    <Typography paddingTop='1rem' fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Documents</Typography>
-                </Box>
+                <Documents />
             </Box>
-            <Box sx={{ display:'flex', justifyContent:'center', mt: '3rem' }}>
-                <Button onClick={handleLogout} sx={{ color:'red', borderColor:'red', fontSize: '1rem', paddingLeft: '1.5rem' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: '3rem' }}>
+                <Button onClick={handleLogout} sx={{ color: 'red', borderColor: 'red', fontSize: '1rem', paddingLeft: '1.5rem' }}>
                     Log Out
                 </Button>
             </Box>
         </Container>
     );
-}
+};
 
-export default Profile;
+export default ProfilePage;
