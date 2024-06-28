@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
+
 import { Box, Typography } from '@mui/material';
+
 import { useProfile } from '../context/ProfileContext.tsx';
+import { FileData } from '../types/FileData.tsx'
 import LoadingScreen from './LoadingScreen.tsx';
 import axiosInstance from '../interceptors/axiosInstance.tsx';
 
-interface FileData {
-    fileKey: string;
-    url: string;
-    filename: string;
-}
-
 const Documents = () => {
     const [fileArr, setFileArr] = useState<FileData[]>([]);
+    const [profilePic, setProfilePic] = useState<FileData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const { files } = useProfile();
@@ -20,10 +18,17 @@ const Documents = () => {
         const fetchFiles = async () => {
             const newFileArr: FileData[] = [];
             try {
-                await Promise.all(files.map(async (fileKey) => {
+                await Promise.all(files.map(async (fileKey, index) => {
                     const response = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${fileKey}`);
                     const data = await response.data;
-                    newFileArr.push({ fileKey, url: data.url, filename: data.filename });
+                    const fileData = { fileKey, url: data.url, filename: data.filename };
+
+                    // Assume the first file is always the profile picture
+                    if (index === 0) {
+                        setProfilePic(fileData);
+                    } else {
+                        newFileArr.push(fileData);
+                    }
                 }));
                 setFileArr(newFileArr);
             } catch (e) {
@@ -47,7 +52,7 @@ const Documents = () => {
         } else if (['mp3', 'wav', 'ogg'].includes(extension!)) {
             return <audio controls src={url} />;
         } else if (extension === 'pdf') {
-            return <iframe src={url} style={{ width: '100%', height: '500px' }} />;
+            return <iframe src={url} style={{ width: '70%', height: '172px' }} />;
         } else {
             return <Typography>Unsupported file type: {filename}</Typography>;
         }
@@ -63,22 +68,22 @@ const Documents = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '20%' }}>
-            {fileArr.length > 0 && (
+            {profilePic && (
                 <Box sx={{ marginTop: '1.5rem', textAlign: 'center' }}>
                     <img 
-                        src={fileArr[0].url} 
+                        src={profilePic.url} 
                         alt="Profile Pic" 
                         style={{ width: '100px', height: '100px', borderRadius: '50%' }} 
                     />
                 </Box>
             )}
             <Typography paddingTop='1rem' fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Documents</Typography>
-            {fileArr.slice(1).map(({ fileKey, url, filename }) => (
+            {fileArr.map(({ fileKey, url, filename }) => (
                 <Box key={fileKey} sx={{ margin: '1rem', textAlign: 'center' }}>
                     <a href={url} target="_blank" rel="noopener noreferrer">
                         {renderFilePreview({ fileKey, url, filename })}
+                        <Typography sx={{ color: 'black', textDecoration: 'none' }}>{filename}</Typography>
                     </a>
-                    <Typography>{filename}</Typography>
                 </Box>
             ))}
         </Box>

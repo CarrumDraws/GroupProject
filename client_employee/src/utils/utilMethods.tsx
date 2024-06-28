@@ -1,3 +1,5 @@
+import { FileData } from "../types/FileData";
+
 export const formatDate = (dateString: string | Date, splitter: string) => {
     let date: Date;
 
@@ -25,4 +27,8 @@ export const formatDate = (dateString: string | Date, splitter: string) => {
 export const handleLogout = () => {
     localStorage.removeItem('token');
     window.location.href = '/login';
+}
+
+export function isFileData(file: File | FileData): file is FileData {
+    return (file as FileData).fileKey !== undefined;
 }

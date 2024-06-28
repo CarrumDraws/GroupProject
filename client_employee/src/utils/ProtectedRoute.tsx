@@ -13,11 +13,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (onboardingData?.status === 'Accept' && window.location.pathname == '/onboarding') {
+  if (onboardingData?.status === 'Approved' && window.location.pathname == '/onboarding') {
     return <Navigate to="/profile" replace />;
   }
 
-  if (onboardingData?.status !== 'Accept' && window.location.pathname !== '/onboarding') {
+  if (onboardingData?.status !== 'Approved' && window.location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />;
   }
 

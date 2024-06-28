@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Box, Button, Container, Typography, Select, MenuItem, InputLabel } from '@mui/material';
@@ -7,11 +7,12 @@ import LoadingScreen from '../components/LoadingScreen.tsx';
 import OnboardingField from '../components/OnboardingField.tsx';
 import OnboardingFileInput from '../components/OnboardingFileInput.tsx';
 import OnboardingPersonInput from '../components/OnboardingPersonInput.tsx';
+import axiosInstance from '../interceptors/axiosInstance.tsx';
 import EmployeeInfo from '../types/EmployeeInfo.tsx';
 import { Person, PersonKeys } from '../types/Person.tsx';
-import axiosInstance from '../interceptors/axiosInstance.tsx';
-import { formatDate, handleLogout } from '../utils/utilMethods.tsx';
+import { formatDate, handleLogout, isFileData } from '../utils/utilMethods.tsx';
 import { useOnboarding } from '../context/OnboardingContext.tsx';
+import { FileData } from '../types/FileData.tsx';
 
 interface FormData {
     firstname: string;
@@ -35,7 +36,7 @@ interface FormData {
     citizenship: string;
     citizenshiptype: string;
     workauth: string;
-    optreciept: File | null; // not in the GET Onboarding data
+    optreciept: File | null | string; // not in the GET Onboarding data
     title: string;
     startdate: string;
     enddate: string;
@@ -50,6 +51,8 @@ interface FormData {
 type FormDataKeys = keyof FormData;
 
 const Onboarding = () => {
+    const navigate = useNavigate();
+
     const initialPerson = {
         firstname: '',
         middlename: '',
@@ -120,14 +123,12 @@ const Onboarding = () => {
         __v: -1
     }
 
-    const { onboardingData, isLoading } = useOnboarding();
-    if(isLoading) {
-        return <LoadingScreen />;
-    }
+    // getting the initial onboarding data from server with loading
+    const { onboardingData, optReciept, files, isLoading } = useOnboarding();
 
     const initialData = onboardingData ? onboardingData : emptyEmployeeInfo;
 
-    const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File }>({});
+    const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | FileData }>(files ? files : {});
     const [refErrors, setRefErrors] = useState<string[]>([]);
     const [ecErrors, setEcErrors] = useState<string[]>([]);
     const [currentReference, setCurrentReference] = useState<Person>(initialPerson);
@@ -154,10 +155,10 @@ const Onboarding = () => {
         citizenship: initialData.citizenship ? initialData.citizenship : 'false',
         citizenshiptype: initialData.citizenshiptype,
         workauth: initialData.workauth.workauth,
-        optreciept: null,
+        optreciept: optReciept,
         title: initialData.workauth.title,
-        startdate: initialData.workauth.startdate ? initialData.workauth.startdate : '',
-        enddate: initialData.workauth.enddate ? initialData.workauth.enddate : '',
+        startdate: initialData.workauth.startdate ? formatDate(initialData.workauth.startdate, '-') : '',
+        enddate: initialData.workauth.enddate ? formatDate(initialData.workauth.enddate, '-') : '',
         haslicense: initialData.license.haslicense === 'true' ? 'true' : 'false',
         licensenumber: initialData.license.licensenumber,
         expdate: initialData.license.expdate ? formatDate(initialData.license.expdate, '-') : '',
@@ -165,16 +166,63 @@ const Onboarding = () => {
         references: initialData.references,
         contacts: initialData.contacts
     });
-    
-    const navigate = useNavigate();
-    console.log(onboardingData?.status);
 
+    // setting whether the form is disabled according to the status
     let isDisabled = false;
     if(onboardingData && (onboardingData?.status === 'Pending' || onboardingData?.status === 'Approved')) {
         isDisabled = true;
     }
 
-    const feedback = initialData ? `Rejected - ${initialData.feedback}` : '';
+    let feedback = onboardingData && onboardingData.feedback ? `${onboardingData.feedback}` : '';
+    if(feedback && feedback !== '') {
+        feedback = 'Rejected - ' + feedback;
+    }
+    if(onboardingData && onboardingData?.status === 'Approved') {
+        feedback = 'Approved - You can view and edit your information in the profile(home) page.';
+    }
+
+    useEffect(() => {
+        if (onboardingData) {
+            setFormData(prevFormData => ({
+                ...prevFormData,
+                firstname: onboardingData.name.firstname,
+                middlename: onboardingData.name.middlename,
+                lastname: onboardingData.name.lastname,
+                preferredname: onboardingData.name.preferredname,
+                picture: onboardingData.picture ? onboardingData.picture : null,
+                buildaptnum: onboardingData.address.buildaptnum ? onboardingData.address.buildaptnum : '',
+                street: onboardingData.address.street,
+                city: onboardingData.address.city,
+                state: onboardingData.address.state,
+                zip: onboardingData.address.zip,
+                cell: onboardingData.phone.cell ? onboardingData.phone.cell : '',
+                work: onboardingData.phone.work ? onboardingData.phone.work : '',
+                make: onboardingData.car.make,
+                model: onboardingData.car.model,
+                color: onboardingData.car.color,
+                ssn: onboardingData.ssn ? onboardingData.ssn : '',
+                dob: onboardingData.dob ? formatDate(onboardingData.dob, '-') : '',
+                gender: onboardingData.gender,
+                citizenship: onboardingData.citizenship ? onboardingData.citizenship : 'false',
+                citizenshiptype: onboardingData.citizenshiptype,
+                workauth: onboardingData.workauth.workauth,
+                optreciept: optReciept ? optReciept : null,
+                title: onboardingData.workauth.title,
+                startdate: onboardingData.workauth.startdate ? formatDate(onboardingData.workauth.startdate, '-') : '',
+                enddate: onboardingData.workauth.enddate ? formatDate(onboardingData.workauth.enddate, '-') : '',
+                haslicense: onboardingData.license.haslicense ? 'true' : 'false',
+                licensenumber: onboardingData.license.licensenumber,
+                expdate: onboardingData.license.expdate ? formatDate(onboardingData.license.expdate, '-') : '',
+                license: onboardingData.license.licensefile,
+                references: onboardingData.references,
+                contacts: onboardingData.contacts
+            }));
+
+            if(onboardingData.status === 'Pending' || onboardingData.status === "Approved") {
+                setUploadedFiles(files);
+            }
+        }
+    }, [onboardingData, optReciept, files]);
 
     const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
         const { name, value } = e.target;
@@ -189,7 +237,6 @@ const Onboarding = () => {
         const files = event.target.files;
         if (files && files.length > 0) {
             const file = files[0];
-            console.log(file);
             setFormData({
                 ...formData,
                 [name]: file
@@ -249,6 +296,7 @@ const Onboarding = () => {
         }));
     };
 
+    // not important
     const generateNameLabel = (field: string) => {
         switch (field.toLowerCase()) {
           case 'firstname':
@@ -332,13 +380,14 @@ const Onboarding = () => {
             
             if (value instanceof File) {
                 if (value !== null) {
-                    console.log(`Appending file - ${key}:`, value);
                     data.append(key, value);
                 }
             } else if (Array.isArray(value)) {
                 data.append(key, JSON.stringify(value));
-            } else {
-                data.append(key, value !== null ? value : '');
+            } else if(value && (key === 'dob' || key === 'startdate' || key === 'enddate' || key === 'expdate')) {
+                data.append(key, value);
+            }else{
+                data.append(key, value !== null ? value.toString() : '');
             }
         });
 
@@ -358,7 +407,10 @@ const Onboarding = () => {
                 navigate('/profile');
             }
         } catch (error: any) {
-            alert('Error submitting form:' + error.message);
+            if (error.response && error.response.data && error.response.data.message) {
+                const errorMessage = error.response.data.message;
+                alert('Error submitting form: ' + errorMessage);
+            }
         }
     };
 
@@ -387,7 +439,9 @@ const Onboarding = () => {
         border: '0.5px solid #9EAABA'
     };
 
-
+    if(isLoading) {
+        return <LoadingScreen />;
+    }
 
     return (
         <Container sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems:'center', paddingTop: '1rem' }}>
@@ -514,7 +568,7 @@ const Onboarding = () => {
                         label=''
                         type='date'
                         name='dob'
-                        value={formData.dob}
+                        value={formData.dob.toString()}
                         onChange={handleInputChange}
                         isDisabled={isDisabled}
                     />
@@ -633,7 +687,7 @@ const Onboarding = () => {
                                             label=''
                                             type='date'
                                             name='startdate'
-                                            value={formData.startdate}
+                                            value={formData.startdate.toString()}
                                             onChange={handleInputChange}
                                             isDisabled={isDisabled}
                                         />
@@ -644,7 +698,7 @@ const Onboarding = () => {
                                             label=''
                                             type='date'
                                             name='enddate'
-                                            value={formData.enddate}
+                                            value={formData.enddate.toString()}
                                             onChange={handleInputChange}
                                             isDisabled={isDisabled}
                                         />
@@ -691,7 +745,7 @@ const Onboarding = () => {
                                 label=''
                                 type='date'
                                 name='expdate'
-                                value={formData.expdate}
+                                value={formData.expdate.toString()}
                                 onChange={handleInputChange}
                                 isDisabled={isDisabled}
                             />
@@ -749,21 +803,39 @@ const Onboarding = () => {
                                 Uploaded Documents
                             </Typography>
 
-                            {Object.keys(uploadedFiles).map((key) => (
-                                <Box key={key} sx={centerColumnBoxStyle}>
-                                    <Button>{key == 'optreciept' ? 'OPT Reciept' : key} : {uploadedFiles[key].name}</Button>
-                                </Box>
-                            ))}
+                            {Object.keys(uploadedFiles).map((key) => {
+                                const file = uploadedFiles[key];
+
+                                return (
+                                    <Box key={key} sx={centerColumnBoxStyle}>
+                                        {isFileData(file) ?
+                                            (
+                                                <Box sx={centerRowBoxStyle}>
+                                                    <Typography paddingRight='0.5rem'>{key == 'optreciept' ? 'OPT reciept' : key}:</Typography>
+                                                    <a href={file.url} target="_blank" rel="noopener noreferrer">
+                                                        <Typography>{file.filename}</Typography>
+                                                    </a>
+                                                </Box>
+                                            ) :
+                                            (
+                                                <Typography>
+                                                    {key == 'optreciept' ? 'OPT Reciept' : key} : {file.name}
+                                                </Typography>
+                                            )
+                                        }
+                                    </Box>
+                                );
+                            })}
                         </Box>
                     ) : (
                         <></>
                     )}
                 </Box>
 
-                <Box sx={centerColumnBoxStyle}>
+                <Box sx={centerColumnBoxStyle} paddingTop='1rem'>
                     <Typography id='requiredError' color='red'></Typography>
                     <Box sx={centerRowBoxStyle}>
-                        <Button type='submit' sx={{ fontSize:'1rem', paddingRight: '1.5rem' }}>Submit</Button>
+                        <Button type='submit' sx={{ fontSize:'1rem', paddingRight: '1.5rem' }} disabled={isDisabled}>Submit</Button>
                         <Button onClick={handleLogout} sx={{ color:'red', borderColor:'red', fontSize: '1rem', paddingLeft: '1.5rem' }}>Log Out</Button>
                     </Box>
                 </Box>

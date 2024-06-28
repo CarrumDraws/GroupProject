@@ -21,7 +21,7 @@ const Login: React.FC<LoginProps> = () => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token) {
-            if(onboardingData?.status === 'Accept') {
+            if(onboardingData?.status === 'Approved') {
                 navigate('/profile');
             }else {
                 navigate('/onboarding');
@@ -52,14 +52,17 @@ const Login: React.FC<LoginProps> = () => {
                 localStorage.setItem('token', response.data.token);
                 setIsLoggedIn(true);
 
-                if(onboardingData?.status !== 'Accept') {
+                if(onboardingData?.status !== 'Approved') {
                     navigate('/onboarding');
                 }else {
                     navigate('profile');
                 }
             }
-        }catch(e) {
-            alert(e);
+        }catch(e: any) {
+            if (e.response && e.response.data && e.response.data.message) {
+                const errorMessage = e.response.data.message;
+                alert('Error logging in: ' + errorMessage);
+            }
         }
     }
 
