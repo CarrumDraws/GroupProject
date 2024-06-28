@@ -1,13 +1,68 @@
 
-img{
+.icon{
     width: 100px;
     height: 100px;
     overflow: hidden;
     object-fit: cover;
     border-radius: 50%;
 }
+mat-card-title{
+    color: var(--primary-color);
+}
 
 mat-card{
     display: flex;
     align-items: center;
+    width: 55vw;
+    margin-left: 15vw;
+
+    justify-content: space-evenly;
+    margin-bottom: 1rem;
+}
+
+app-filter{
+    margin-left: 30vw;
+}
+mat-form-field{
+    margin-left: -30vw;
+    width: 30vw;
+}
+
+mat-card-content{
+    margin: 1rem;
+    color: rgb(0, 0, 0, 0.54);
+}
+
+button{
+    color: lightskyblue;
+}
+
+#content-wrapper{
+    display: flex;
+}
+
+.file{
+    margin: 0 0 1rem 5vw;
+    width: 200px;
+    height: 250px;
+    object-fit: cover;
+}
+
+.file:hover{
+    cursor: pointer;
+}
+
+#file-container{
+    display: flex;
+    flex-direction: column;
+    overflow:auto;
+    height: 90vh;
+}
+h1{
+    text-align: left;
+    margin-left: 15vw;
+    margin-bottom: 0px;
+    width: 57vw;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--accent-color);
 }

@@ -19,8 +19,9 @@ export class ImageDialogComponent {
   }
 
   openFeedbackDialog(): void {
+
     const feedbackDialogRef = this.dialog.open(FeedbackComponent, {
-      width: '400px'
+      width: '400px',
     });
 
     feedbackDialogRef.afterClosed().subscribe(result => {

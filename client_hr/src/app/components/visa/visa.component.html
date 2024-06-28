@@ -1,23 +1,37 @@
-<div *ngFor="let visa of (visaList$ |async); let i = index;">
-    <mat-card (click)="updateSelected(i)" [ngStyle]="{ 'background-color': (currentSelected === i) ? 'rgb(240,242,245)' : '' }">
-        <img src="{{ visa. picture}}" alt="">
-        <mat-card-header>
-            <mat-card-title>
-                {{ visa.name.firstname}} ({{ visa.name.preferredname}}), {{ visa.name.lastname}}
-            </mat-card-title>
-            <mat-card-subtitle>
-                Work Auth: {{ visa.workauth.workauth }} <br>
-                Title: {{ visa.workauth.title || "N/A"}} <br>
-                Start Date: {{ visa.workauth.startdate | date }} <br>
-                End Date: {{ visa.workauth.enddate | date}} <br>
-            </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-            <p *ngIf="visa.workauth.dayRemains !== null">Work Auth Day Remains: {{ (visa.workauth.dayRemains >= 0) ? visa.workauth.dayRemains : 0 }}</p>
-            <p>- Action Placeholder - </p>
-        </mat-card-content>
-        <mat-card-actions>
-            <button mat-button>Send notification</button>
-        </mat-card-actions>
-    </mat-card>
+<app-filter (filterChange)="onFilterChange($event)" [values]="['In Progress', 'All']"></app-filter><br>
+<mat-form-field>
+    <mat-label>Search By Name</mat-label>
+    <input matInput [(ngModel)]="searchText" (input)="searchVisa()" placeholder="Name">
+</mat-form-field>
+<h1>Visa</h1>
+<div id="content-wrapper">
+    <div>
+        <div *ngFor="let visa of visaResult, let i = index">
+            <mat-card (click)="updateSelected(visa.employee_id._id, visa)" [ngStyle]="{ 'background-color': (currentSelectedUser === visa.employee_id._id) ? 'rgb(240,242,245)' : '' }">
+                <img class='icon' src="{{ visa. picture}}" alt="">
+                <mat-card-header>
+                    <mat-card-title>
+                        {{ visa.name.lastname}}, {{ visa.name.firstname}} ({{ visa.name.preferredname}})
+                    </mat-card-title>
+                    <mat-card-subtitle>
+                        <p style="color: var(--accent-color);">Work Auth: {{ visa.workauth.workauth }}</p>
+                        <p>Title: {{ visa.workauth.title || "N/A"}}</p>
+                        <p>Start Date: {{ visa.workauth.startdate | date }}</p>
+                        <p>End Date: {{ visa.workauth.enddate | date}}</p>
+                    </mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <p style="color: var(--accent-color);">Status: {{ visa.opt.status}}</p>
+                    <p *ngIf="visa.workauth.dayRemains !== null">Work Auth Day Remains: {{ (visa.workauth.dayRemains >= 0) ? visa.workauth.dayRemains : 0 }}</p>
+                    <p *ngIf="filterOut != ''">{{ visa.action }}</p>
+                </mat-card-content>
+                <mat-card-actions [ngStyle] = "{'visibility' : (visa.action === 'Waiting for Approval') || (filterOut == '') ? 'hidden' : 'inherit'}">
+                    <button mat-button (click)="onSendNotification(visa.name.firstname)">Send notification</button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+    <div id="file-container">
+        <img class='file' src="{{ file.url }}" *ngFor="let file of fileList" (click)="openFileDialog(file, download)">
+    </div>
 </div>
