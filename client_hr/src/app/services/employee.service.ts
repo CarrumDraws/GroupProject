@@ -26,7 +26,7 @@ export class EmployeeService {
     if(this.employees.length == 0){
       this.loadEmployees();
     }
-   console.log(this.employees);
+
     if (!searchText.trim()) { 
       return [];
     }

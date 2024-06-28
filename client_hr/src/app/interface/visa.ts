@@ -1,3 +1,4 @@
+import { File } from "./file";
 export interface Visa {
     employee_id: {
       _id: string;
@@ -31,5 +32,7 @@ export interface Visa {
         optead: null,
         optreciept: string | null;
         status: string;
+        files: File[] | null;
     };
+    action: string | null;
   }
