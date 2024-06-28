@@ -31,8 +31,6 @@ const getOpt = async (req, res) => {
 const postOpt = async (req, res) => {
   try {
     const { ID, EMAIL, ISHR } = req.body;
-    console.log(ID);
-    console.log(EMAIL);
     const type = req.params.type;
     if (!type) return res.status(400).send("Missing type Param");
     if (
@@ -257,7 +255,6 @@ const handleOpt = async (req, res) => {
           .status(404)
           .json({ error: "Opt which I-983 Document belongs to Not Found" });
       let otherid = myopt.i983[0] == fileid ? myopt.i983[1] : myopt.i983[0];
-      console.log(otherid); // Found otherid
 
       let otheridfile = await File.findById(otherid);
       if (!otheridfile)
