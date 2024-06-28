@@ -1,13 +1,13 @@
 [
   {
-    "employee_id": "62b5a5b1c9d2f4a4e5b7c1d9", // Example ObjectId for Employee
+    "employee_id": null,
     "name": {
       "firstname": "Alice",
       "middlename": "Marie",
       "lastname": "Johnson",
       "preferredname": "Ali"
     },
-    "picture": "62b5a5b1c9d2f4a4e5b7c1d8", // Example ObjectId for File
+    "picture": null,
     "address": {
       "buildaptnum": 102,
       "street": "123 Main St",
@@ -27,11 +27,11 @@
     "ssn": 123456789,
     "dob": "1990-05-15T00:00:00.000Z",
     "gender": "Female",
-    "citizenship": true,
-    "citizenshiptype": "Citizen",
+    "citizenship": false,
+    "citizenshiptype": null,
     "workauth": {
-      "workauth": "H1B",
-      "title": "Software Engineer",
+      "workauth": "F1(CPT/OPT)",
+      "title": "",
       "startdate": "2023-01-01T00:00:00.000Z",
       "enddate": "2026-01-01T00:00:00.000Z"
     },
@@ -39,7 +39,7 @@
       "haslicense": true,
       "licensenumber": "D1234567",
       "expdate": "2025-12-31T00:00:00.000Z",
-      "licensefile": "62b5a5b1c9d2f4a4e5b7c1d7" // Example ObjectId for File
+      "licensefile": null
     },
     "references": [
       {
@@ -58,21 +58,21 @@
         "lastname": "Smith",
         "phone": 5559876543,
         "email": "janesmith@example.com",
-        "relationship": "Emergency Contact"
+        "relationship": "Father"
       }
     ],
     "status": "Approved",
     "feedback": ""
   },
   {
-    "employee_id": "62c6b6d2e4f5a7b8c9d1e2f3", // Example ObjectId for Employee
+    "employee_id": null,
     "name": {
       "firstname": "Bob",
       "middlename": "Thomas",
       "lastname": "Smith",
       "preferredname": "Bobby"
     },
-    "picture": "62c6b6d2e4f5a7b8c9d1e2f4", // Example ObjectId for File
+    "picture": null,
     "address": {
       "buildaptnum": 304,
       "street": "456 Elm St",
@@ -92,19 +92,19 @@
     "ssn": 987654321,
     "dob": "1985-08-20T00:00:00.000Z",
     "gender": "Male",
-    "citizenship": true,
-    "citizenshiptype": "Citizen",
+    "citizenship": false,
+    "citizenshiptype": null,
     "workauth": {
-      "workauth": "Green Card",
-      "title": "Project Manager",
-      "startdate": "2022-03-01T00:00:00.000Z",
-      "enddate": "2025-03-01T00:00:00.000Z"
+      "workauth": "F1(CPT/OPT)",
+      "title": "",
+      "startdate": "2023-01-01T00:00:00.000Z",
+      "enddate": "2026-01-01T00:00:00.000Z"
     },
     "license": {
       "haslicense": true,
       "licensenumber": "D7654321",
       "expdate": "2024-11-30T00:00:00.000Z",
-      "licensefile": "62c6b6d2e4f5a7b8c9d1e2f5" // Example ObjectId for File
+      "licensefile": null
     },
     "references": [
       {
@@ -130,14 +130,14 @@
     "feedback": "Excited to be part of the team!"
   },
   {
-    "employee_id": "62d7e8f3a5b6c7d8e9f0g1h2", // Example ObjectId for Employee
+    "employee_id": null,
     "name": {
       "firstname": "Charlie",
       "middlename": "Edward",
       "lastname": "Williams",
       "preferredname": "Chuck"
     },
-    "picture": "62d7e8f3a5b6c7d8e9f0g1h3", // Example ObjectId for File
+    "picture": null,
     "address": {
       "buildaptnum": 205,
       "street": "789 Oak St",
@@ -157,19 +157,19 @@
     "ssn": 112233445,
     "dob": "1992-11-10T00:00:00.000Z",
     "gender": "Male",
-    "citizenship": true,
-    "citizenshiptype": "Citizen",
+    "citizenship": false,
+    "citizenshiptype": null,
     "workauth": {
-      "workauth": "EAD",
-      "title": "Data Analyst",
-      "startdate": "2023-05-15T00:00:00.000Z",
-      "enddate": "2024-05-15T00:00:00.000Z"
+      "workauth": "F1(CPT/OPT)",
+      "title": "",
+      "startdate": "2023-01-01T00:00:00.000Z",
+      "enddate": "2026-01-01T00:00:00.000Z"
     },
     "license": {
       "haslicense": true,
       "licensenumber": "C3344556",
       "expdate": "2026-06-30T00:00:00.000Z",
-      "licensefile": "62d7e8f3a5b6c7d8e9f0g1h4" // Example ObjectId for File
+      "licensefile": null
     },
     "references": [
       {
@@ -195,14 +195,14 @@
     "feedback": "Eager to contribute to the team's success!"
   },
   {
-    "employee_id": "62e8f9g4a5b6c7d8e9f0g1h2", // Example ObjectId for Employee
+    "employee_id": null,
     "name": {
       "firstname": "David",
       "middlename": "John",
       "lastname": "Harris",
       "preferredname": "Dave"
     },
-    "picture": "62e8f9g4a5b6c7d8e9f0g1h3", // Example ObjectId for File
+    "picture": null,
     "address": {
       "buildaptnum": 401,
       "street": "123 Birch St",
@@ -212,7 +212,7 @@
     },
     "phone": {
       "cell": 4567890123,
-      "work": 6543210987
+      "work": null
     },
     "car": {
       "make": "Chevrolet",
@@ -222,19 +222,19 @@
     "ssn": 223344556,
     "dob": "1988-03-22T00:00:00.000Z",
     "gender": "Male",
-    "citizenship": true,
-    "citizenshiptype": "Citizen",
+    "citizenship": false,
+    "citizenshiptype": null,
     "workauth": {
-      "workauth": "L1",
-      "title": "Systems Engineer",
-      "startdate": "2022-08-01T00:00:00.000Z",
-      "enddate": "2025-08-01T00:00:00.000Z"
+      "workauth": "F1(CPT/OPT)",
+      "title": "",
+      "startdate": "2023-01-01T00:00:00.000Z",
+      "enddate": "2026-01-01T00:00:00.000Z"
     },
     "license": {
       "haslicense": true,
       "licensenumber": "L1122334",
       "expdate": "2023-12-31T00:00:00.000Z",
-      "licensefile": "62e8f9g4a5b6c7d8e9f0g1h4" // Example ObjectId for File
+      "licensefile": null
     },
     "references": [
       {
@@ -287,18 +287,18 @@
     "ssn": 334455667,
     "dob": "1995-07-18T00:00:00.000Z",
     "gender": "Female",
-    "citizenship": true,
-    "citizenshiptype": "Citizen",
+    "citizenship": false,
+    "citizenshiptype": null,
     "workauth": {
-      "workauth": "",
+      "workauth": "F1(CPT/OPT)",
       "title": "",
-      "startdate": null,
-      "enddate": null
+      "startdate": "2023-01-01T00:00:00.000Z",
+      "enddate": "2026-01-01T00:00:00.000Z"
     },
     "license": {
-      "haslicense": false,
-      "licensenumber": "",
-      "expdate": null,
+      "haslicense": true,
+      "licensenumber": "D1234567",
+      "expdate": "2025-12-31T00:00:00.000Z",
       "licensefile": null
     },
     "references": [
@@ -321,18 +321,18 @@
         "relationship": "Emergency Contact"
       }
     ],
-    "status": "Rejected",
-    "feedback": "Your Preferred name is too short! Please make it longer!"
+    "status": "Approved",
+    "feedback": "Ready to start the new role!"
   },
   {
-    "employee_id": "62g1h2i3j4k5l6m7n8o9p0q", // Example ObjectId for Employee
+    "employee_id": null,
     "name": {
       "firstname": "Frank",
       "middlename": "Robert",
       "lastname": "Thompson",
       "preferredname": "Frankie"
     },
-    "picture": "62g1h2i3j4k5l6m7n8o9p0r", // Example ObjectId for File
+    "picture": null,
     "address": {
       "buildaptnum": 601,
       "street": "456 Maple St",
@@ -342,7 +342,7 @@
     },
     "phone": {
       "cell": 6789012345,
-      "work": 4321098765
+      "work": null
     },
     "car": {
       "make": "Ford",
@@ -352,19 +352,19 @@
     "ssn": 445566778,
     "dob": "1990-12-05T00:00:00.000Z",
     "gender": "Male",
-    "citizenship": true,
-    "citizenshiptype": "Citizen",
+    "citizenship": false,
+    "citizenshiptype": null,
     "workauth": {
-      "workauth": "CPT",
-      "title": "Marketing Specialist",
-      "startdate": "2023-04-15T00:00:00.000Z",
-      "enddate": "2024-04-15T00:00:00.000Z"
+      "workauth": "F1(CPT/OPT)",
+      "title": "",
+      "startdate": "2023-01-01T00:00:00.000Z",
+      "enddate": "2026-01-01T00:00:00.000Z"
     },
     "license": {
-      "haslicense": true,
-      "licensenumber": "F1122334",
-      "expdate": "2024-10-31T00:00:00.000Z",
-      "licensefile": "62g1h2i3j4k5l6m7n8o9p0s" // Example ObjectId for File
+      "haslicense": false,
+      "licensenumber": "",
+      "expdate": null,
+      "licensefile": null
     },
     "references": [
       {
@@ -390,14 +390,14 @@
     "feedback": null
   },
   {
-    "employee_id": "62h3i4j5k6l7m8n9o0p1q2", // Example ObjectId for Employee
+    "employee_id": null,
     "name": {
       "firstname": "Grace",
       "middlename": "Elizabeth",
       "lastname": "Moore",
       "preferredname": "Gracie"
     },
-    "picture": "62h3i4j5k6l7m8n9o0p1q3", // Example ObjectId for File
+    "picture": null,
     "address": {
       "buildaptnum": 703,
       "street": "789 Walnut St",
@@ -420,8 +420,8 @@
     "citizenship": true,
     "citizenshiptype": "Green Card",
     "workauth": {
-      "workauth": "",
-      "title": "",
+      "workauth": null,
+      "title": null,
       "startdate": null,
       "enddate": null
     },

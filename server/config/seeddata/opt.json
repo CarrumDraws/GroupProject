@@ -1,0 +1,50 @@
+[
+  {
+    "employee_id": null,
+    "optreciept": null,
+    "optead": null,
+    "i983": null,
+    "i20": null,
+    "status": "Approved"
+  },
+  {
+    "employee_id": null,
+    "optreciept": null,
+    "optead": null,
+    "i983": null,
+    "i20": null,
+    "status": "I-20"
+  },
+  {
+    "employee_id": null,
+    "optreciept": null,
+    "optead": null,
+    "i983": null,
+    "i20": null,
+    "status": "I-983"
+  },
+  {
+    "employee_id": null,
+    "optreciept": null,
+    "optead": null,
+    "i983": null,
+    "i20": null,
+    "status": "I-983"
+  },
+  {
+    "employee_id": null,
+    "optreciept": null,
+    "optead": null,
+    "i983": null,
+    "i20": null,
+    "status": "OPT EAD"
+  },
+  {
+    "employee_id": null,
+    "optreciept": null,
+    "optead": null,
+    "i983": null,
+    "i20": null,
+    "status": "OPT Receipt"
+  }
+]
