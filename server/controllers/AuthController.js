@@ -18,7 +18,6 @@ const File = require("../models/File.js");
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     let employee = await Employee.findOne({ email }).lean().exec(); // check if email exists
     if (!employee) return res.status(401).json({ message: "Invalid Email" });
 

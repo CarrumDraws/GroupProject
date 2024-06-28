@@ -25,7 +25,6 @@ const getOnboarding = async (req, res) => {
   }
 };
 
-// Submit massive chunk of data with files...?
 const submitOnboarding = async (req, res) => {
   try {
     const { ID, EMAIL, ISHR } = req.body;
@@ -83,6 +82,8 @@ const submitOnboarding = async (req, res) => {
 
     if (!ssn) return res.status(400).send("Missing SSN Field");
     if (!dob) return res.status(400).send("Missing DOB Field");
+    if (!isValidDate(dob))
+      return res.status(400).send("DOB Field is an invalidly formatted Date");
 
     if (!gender) return res.status(400).send("Missing Gender Field");
     if (gender != "Male" && gender != "Female" && gender != "Other")
@@ -109,6 +110,15 @@ const submitOnboarding = async (req, res) => {
     } else {
       if (!workauth || !startdate || !enddate)
         return res.status(400).send("Missing Work Authorization Fields");
+
+      if (!isValidDate(startdate))
+        return res
+          .status(400)
+          .send("startdate Field is an invalidly formatted Date");
+      if (!isValidDate(enddate))
+        return res
+          .status(400)
+          .send("enddate Field is an invalidly formatted Date");
       if (
         workauth != "H1-B" &&
         workauth != "L2" &&
@@ -133,6 +143,10 @@ const submitOnboarding = async (req, res) => {
     if (haslicense) {
       if (!licensenumber || !expdate || !license)
         return res.status(400).send("Missing Lisence Data");
+      if (!isValidDate(expdate))
+        return res
+          .status(400)
+          .send("expdate Field is an invalidly formatted Date");
     }
     if (contacts.length == 0) {
       return res.status(400).send("Must Have at Least One Emergency Contact");
@@ -182,20 +196,20 @@ const submitOnboarding = async (req, res) => {
           color,
         },
         ssn: Number(ssn),
-        dob: Date(dob),
+        dob: new Date(dob),
         gender,
         citizenship: citizenship,
         citizenshiptype: citizenship ? citizenshiptype : null,
         workauth: {
           workauth: citizenship ? null : workauth,
           title: citizenship ? null : workauth === "Other" ? title : null,
-          startdate: citizenship ? null : Date(startdate),
-          enddate: citizenship ? null : Date(enddate),
+          startdate: citizenship ? null : new Date(startdate),
+          enddate: citizenship ? null : new Date(enddate),
         },
         license: {
           haslicense: haslicense,
           licensenumber: haslicense ? licensenumber : null,
-          expdate: haslicense ? Date(expdate) : null,
+          expdate: haslicense ? new Date(expdate) : null,
           licensefile: haslicense ? licenseFileID : null,
         },
         references,
@@ -357,6 +371,12 @@ const retrieveFile = async (req, res) => {
     res.status(500).send("Error generating pre-signed URL.");
   }
 };
+
+function isValidDate(dateString) {
+  const date = new Date(dateString); // Try to create a new Date object
+
+  return !isNaN(date.getTime()); // Check if the date is valid
+}
 
 function validateContact(contact) {
   contact.phone = Number(contact.phone);
