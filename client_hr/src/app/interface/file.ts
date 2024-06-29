@@ -8,4 +8,5 @@ export interface File {
     status: string;
     notification_sent: string;
     feedback: string;
+    fileType: string | null;
 }

@@ -74,12 +74,18 @@ export class ProfileComponent implements OnInit {
 
       //get license
       if(profile.profile.license.haslicense){
-        fileObservables.push(this.fileService.getFileUrl(profile.profile.license.licensefile));
+        fileObservables.push(this.fileService.getFileUrl(profile.profile.license.licensefile).pipe(
+          map((file: File) => {
+            let license = file;
+            license.fileType = "license";
+            return license;
+          })
+        ));
       }
     
       //async operation to make sure we get the fils before udpating action for each visa
       forkJoin(fileObservables).subscribe(files => {
-        this.fileList = files.filter(file => file.status == 'Approved');
+        this.fileList = files.filter(file => file.status == 'Approved' || file.fileType == "license");
       });
   }
 
