@@ -679,7 +679,7 @@ const ProfilePage = () => {
                         </Box>
                     )}
 
-                    <Documents fileKeys={fileKeys} />
+                    <Documents fileKeysAndNames={fileKeys} />
                 </Box>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: '3rem' }}>
