@@ -32,7 +32,12 @@
         </div>
     </div>
     <div id="file-container">
-        <!-- <img class='file' src="{{ file.url }}" *ngFor="let file of fileList" (click)="openFileDialog(file, download)"> -->
-        <app-pdf-preview pdfUrl="{{ file.url }}" *ngFor="let file of fileList"></app-pdf-preview>
+        <div class="file-card" *ngFor="let file of fileList">
+            <app-pdf-viewer #pdfViewer></app-pdf-viewer>
+            <div (click)="openPdf(file)">
+                <p >{{file.filename}}</p>
+                <p class="file-status">{{ file.status }}</p>
+            </div>
+        </div>
     </div>
 </div>

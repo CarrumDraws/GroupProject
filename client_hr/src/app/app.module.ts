@@ -43,8 +43,9 @@ import { MatIconModule } from '@angular/material/icon';
 
 
 import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
-import { PdfPreviewComponent } from './components/pdf-preview/pdf-preview.component';
+import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from './services/pdf.service';
+import { SafeUrlPipe } from './pipe/safe-url.pipe';
 
 
 @NgModule({
@@ -87,7 +88,8 @@ import { PdfService } from './services/pdf.service';
     FileDialogComponent,
     FileFeedbackDialogComponent,
     PdfDialogComponent,
-    PdfPreviewComponent
+    PdfViewerComponent,
+    SafeUrlPipe
   ],
 
   providers: [PdfService],

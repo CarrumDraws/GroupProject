@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, ValidatorFn, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
 import { House } from 'src/app/interface/house';
+import { HouseDetail } from 'src/app/interface/houseDetail';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
 import { HouseService } from 'src/app/services/house.service';
 
@@ -34,9 +36,13 @@ export class HousingComponent implements OnInit {
     chairs: [null, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]]
   });
 
+  houseList$: Observable<HouseDetail[]> = new Observable<HouseDetail[]>;
+
   ngOnInit(): void {
 
+    this.houseList$ = this.houseService.getAllHouses();
   }
+
 
   onSubmit(): void {
     if (this.houseForm.valid) {
@@ -75,4 +81,5 @@ export class HousingComponent implements OnInit {
       return isValid ? null : { 'nonNegativeNumber': { value: control.value } };
     };
   }
+
 }
