@@ -190,8 +190,9 @@ const getOne = async (req, res) => {
     profile = profileWithoutId;
 
     const opt = await Opt.findOne({
-      employee_id: ID,
+      employee_id: employeeid,
     });
+
     res.status(200).json({ profile, opt });
   } catch (error) {
     console.error(error);
