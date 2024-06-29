@@ -1,30 +1,52 @@
 import { Injectable } from '@angular/core';
-import * as pdfjsLib from 'pdfjs-dist';
-
+import WebViewer from '@pdftron/webviewer';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PdfService {
 
-  constructor() {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+  private webViewerInstance: any;
+
+  constructor() {}
+
+  initializeWebViewer(viewerElement: HTMLElement): Promise<void> {
+    return WebViewer({
+      path: 'https://cdn.pdftron.com/webviewer/latest',
+    }, viewerElement).then(instance => {
+      this.webViewerInstance = instance;
+    });
   }
 
-  async getPdfPageAsImage(pdfUrl: string, pageNumber: number): Promise<string | null> {
+  async getFirstPageAsImage(url: string): Promise<string | null> {
+    if (!this.webViewerInstance) {
+      throw new Error('WebViewer is not initialized.');
+    }
+
     try {
-      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-      const page = await pdf.getPage(pageNumber);
-      const viewport = page.getViewport({ scale: 1.5 });
+      const doc = await this.webViewerInstance.loadDocument(url);
+      const pageNumber = 1;
+      const page = await doc.loadPage(pageNumber);
+
+      // Render the page to an HTML5 canvas
       const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d')!;
+      const context = canvas.getContext('2d');
+      const viewport = page.getViewport({ scale: 1.0 });
+
       canvas.height = viewport.height;
       canvas.width = viewport.width;
-      const renderContext = { canvasContext: context, viewport: viewport };
-      await page.render(renderContext).promise;
-      return canvas.toDataURL('image/jpeg');
+
+      await page.render({
+        canvasContext: context,
+        viewport: viewport
+      }).promise;
+
+      // Convert canvas to base64 image
+      const imageData = canvas.toDataURL('image/png');
+
+      return imageData;
     } catch (error) {
-      console.error('Error rendering PDF page', error);
+      console.error('Error fetching PDF or rendering page', error);
       return null;
     }
   }

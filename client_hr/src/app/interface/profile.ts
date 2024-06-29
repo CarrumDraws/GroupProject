@@ -30,13 +30,13 @@ export interface Profile {
         relationship: string;
         _id: number;
       }[];
-      dob: string; // Assuming this is a date string
+      dob: string;
       feedback: string | "";
       gender: string;
       license: {
         haslicense: boolean;
         licensenumber: string | "";
-        expdate: string | ""; // Assuming this is a date string
+        expdate: string | "";
         licensefile: string | "";
         _id: number;
       };
@@ -66,10 +66,19 @@ export interface Profile {
       workauth: {
         workauth: string;
         title: string;
-        startdate: string; // Assuming this is a date string
-        enddate: string; // Assuming this is a date string
+        startdate: string;
+        enddate: string;
         _id: number;
       };
     };
-    opt: null;
+    opt: {
+      _id: string;
+      employee_id: string;
+      optreciept: string;
+      optead: string;
+      i983: string[];
+      i20: string;
+      status: string;
+      __v: number;
+  }
   }

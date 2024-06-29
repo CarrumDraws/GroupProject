@@ -10,6 +10,8 @@ import { AuthGuard } from './store/auth/auth.guard';
 import { ApplicationComponent } from './components/application/application.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { FileComponent } from './components/file/file.component';
+import { HouseProfileComponent } from './components/house-profile/house-profile.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 const routes: Routes = [
   
@@ -21,9 +23,9 @@ const routes: Routes = [
   {path: 'application/:employeeId', component: ApplicationComponent, canActivate: [AuthGuard]},
   {path: 'profile/:employeeId', component: ProfileComponent, canActivate: [AuthGuard]},
   {path: 'file', component: FileComponent, canActivate: [AuthGuard] },
+  {path: 'housing/:houseId', component: HouseProfileComponent, canActivate: [AuthGuard]},
    // Catch-all route, redirect unmatched routes to the home page
-  { path: '**', redirectTo: '' }, // Or display a 404 component
-
+  { path: '**', component: NotFoundComponent}
 ];
 
 @NgModule({

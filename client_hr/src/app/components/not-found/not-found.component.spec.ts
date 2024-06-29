@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PdfPreviewComponent } from './pdf-preview.component';
+import { NotFoundComponent } from './not-found.component';
 
-describe('PdfPreviewComponent', () => {
-  let component: PdfPreviewComponent;
-  let fixture: ComponentFixture<PdfPreviewComponent>;
+describe('NotFoundComponent', () => {
+  let component: NotFoundComponent;
+  let fixture: ComponentFixture<NotFoundComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PdfPreviewComponent ]
+      declarations: [ NotFoundComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PdfPreviewComponent);
+    fixture = TestBed.createComponent(NotFoundComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

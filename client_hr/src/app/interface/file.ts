@@ -1,4 +1,5 @@
 export interface File {
+    open(): unknown;
     _id: string;
     employee_id: string;
     url: string;

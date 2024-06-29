@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Visa } from 'src/app/interface/visa';
 import { VisaService } from 'src/app/services/visa.service';
 import { Opt } from 'src/app/interface/opt';
@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { FileDialogComponent } from '../file-dialog/file-dialog.component';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
 import { Observable, forkJoin } from 'rxjs';
+import { PdfViewerComponent } from '../pdf-viewer/pdf-viewer.component';
 
 @Component({
   selector: 'app-visa',
@@ -15,6 +16,7 @@ import { Observable, forkJoin } from 'rxjs';
   styleUrls: ['./visa.component.css']
 })
 export class VisaComponent implements OnInit {
+  @ViewChild('pdfViewer') pdfViewer!: PdfViewerComponent;
 
   constructor(
     private visaService: VisaService,
@@ -75,8 +77,8 @@ export class VisaComponent implements OnInit {
       next => {
         if(next){
           //retrieve List of Visa
-          this.visaList = next;
-          this.visaResult = next;
+          this.visaList = next.sort((a: Visa, b: Visa) => a.name.lastname.localeCompare(b.name.lastname));
+          this.visaResult = next.sort((a: Visa, b: Visa) => a.name.lastname.localeCompare(b.name.lastname));
           this.currentSelectedUser = next[0].employee_id._id;
           //make sure filter is on pending on load
           this.onFilterChange(this.filterOut);
@@ -160,6 +162,10 @@ export class VisaComponent implements OnInit {
     this.dialog.open(FileDialogComponent, {
       data: { file, download }
     });
+  }
+  
+  openPdf(file: File): void {
+    this.pdfViewer.open(file);
   }
 
   onSendNotification(firstname: string){
