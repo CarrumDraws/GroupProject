@@ -31,6 +31,9 @@ employeeRouter.put(
 );
 
 employeeRouter.get("/all", jwtValidation, isHR, getAll);
-employeeRouter.get("/:employeeid", jwtValidation, isHR, getOne);
+
+// Employee needs to access this too
+employeeRouter.get("/:employeeid", jwtValidation, getOne);
+// employeeRouter.get("/:employeeid", jwtValidation, isHR, getOne);
 
 module.exports = employeeRouter;
