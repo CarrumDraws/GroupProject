@@ -31,45 +31,24 @@ const textFieldStyleLong = {
 
 const OnboardingField: React.FC<OnboardingFieldProps> = ({ isLong, label, type, name, value, onChange, isDisabled }) => {
     return (
-        type === 'date' ?
-        (
-            <TextField
-                type='date'
-                name={name}
-                value={value}
-                onChange={onChange}
-                InputProps={{
-                    style: isLong ? textFieldStyleLong : textFieldStyleShort,
-                    inputProps: {
-                        style: {
-                            textAlign: 'center',
-                            marginRight: '0.5rem'
-                        },
-                    }
-                }}
-                sx={{ mt: '1rem', mr: '0.5rem' }}
-                disabled={isDisabled}
-            />
-        ) : (
-            <TextField
-                type={type}
-                name={name}
-                value={value}
-                onChange={onChange}
-                placeholder={label}
-                InputProps={{
-                    style: isLong ? textFieldStyleLong : textFieldStyleShort,
-                    inputProps: {
-                        style: {
-                            textAlign: 'center',
-                            marginRight: '0.5rem'
-                        },
-                    }
-                }}
-                sx={{ mt: '1rem', mr: '0.5rem' }}
-                disabled={isDisabled}
-            />
-        )
+        <TextField
+            type={type}
+            name={name}
+            value={value}
+            onChange={onChange}
+            placeholder={label}
+            InputProps={{
+                style: isLong ? textFieldStyleLong : textFieldStyleShort,
+                inputProps: {
+                    style: {
+                        textAlign: 'center',
+                        marginRight: '0.5rem'
+                    },
+                }
+            }}
+            sx={{ mt: '1rem', mr: '0.5rem' }}
+            disabled={isDisabled}
+        />
     );
 }
 

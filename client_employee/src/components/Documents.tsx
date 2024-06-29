@@ -2,44 +2,50 @@ import { useEffect, useState } from "react";
 
 import { Box, Typography } from '@mui/material';
 
-import { useProfile } from '../context/ProfileContext.tsx';
-import { FileData } from '../types/FileData.tsx'
-import LoadingScreen from './LoadingScreen.tsx';
-import axiosInstance from '../interceptors/axiosInstance.tsx';
+import axiosInstance from "../interceptors/axiosInstance.tsx";
+import { FileData } from '../types/FileData.tsx';
+import LoadingScreen from "./LoadingScreen.tsx";
 
-const Documents = () => {
-    const [fileArr, setFileArr] = useState<FileData[]>([]);
-    const [profilePic, setProfilePic] = useState<FileData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+type DocumentsProps = {
+    fileKeysAndNames: FileData[]
+}
 
-    const { files } = useProfile();
+// NOTE: fileKeys here in the parameter is just a FileData array
+// with only fileKey and name in the FileData, which says it needs
+// to be updated with data from GET file before use
+const Documents: React.FC<DocumentsProps> = ({ fileKeysAndNames }) => {
+    const [fileData, setFileData] = useState<FileData[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchFiles = async () => {
-            const newFileArr: FileData[] = [];
+            const newFileData: FileData[] = [];
+
             try {
-                await Promise.all(files.map(async (fileKey, index) => {
-                    const response = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${fileKey}`);
-                    const data = await response.data;
-                    const fileData = { fileKey, url: data.url, filename: data.filename };
+                await Promise.all(fileKeysAndNames.map(async (fileKeyAndName) => {
+                    const fileResponse = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${fileKeyAndName.fileKey}`);
+                    const data = await fileResponse.data;
+                    const fileData: FileData = { fileKey: fileKeyAndName.fileKey, url: data.url, filename: data.filename, status: data.status, name: fileKeyAndName.name };
 
                     // Assume the first file is always the profile picture
-                    if (index === 0) {
-                        setProfilePic(fileData);
-                    } else {
-                        newFileArr.push(fileData);
+                    if(fileData.status == 'Approved' || fileData.name === 'license'){
+                        newFileData.push(fileData);
                     }
                 }));
-                setFileArr(newFileArr);
-            } catch (e) {
-                alert('Failed to fetch files');
+
+                setFileData(newFileData);
+            } catch (e : any) {
+                if (e.response && e.response.data) {
+                    const errorMessage = e.response.data;
+                    alert('Error fetching profile picture: ' + errorMessage);
+                }
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchFiles();
-    }, [files]);
+    }, [fileKeysAndNames]);
 
     const renderFilePreview = (file: FileData) => {
         const { url, filename } = file;
@@ -67,26 +73,19 @@ const Documents = () => {
     }
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '20%' }}>
-            {profilePic && (
-                <Box sx={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                    <img 
-                        src={profilePic.url} 
-                        alt="Profile Pic" 
-                        style={{ width: '100px', height: '100px', borderRadius: '50%' }} 
-                    />
-                </Box>
-            )}
+        <>
             <Typography paddingTop='1rem' fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Documents</Typography>
-            {fileArr.map(({ fileKey, url, filename }) => (
+            <Typography fontSize='0.9rem'>(The approved documents only)</Typography>
+
+            {fileData.map(({ fileKey, url, filename, status, name }) => (
                 <Box key={fileKey} sx={{ margin: '1rem', textAlign: 'center' }}>
                     <a href={url} target="_blank" rel="noopener noreferrer">
-                        {renderFilePreview({ fileKey, url, filename })}
+                        {renderFilePreview({ fileKey, url, filename, status, name })}
                         <Typography sx={{ color: 'black', textDecoration: 'none' }}>{filename}</Typography>
                     </a>
                 </Box>
             ))}
-        </Box>
+        </>
     );
 }
 

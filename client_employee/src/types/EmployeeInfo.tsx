@@ -8,7 +8,7 @@ interface Employee {
     __v: number;
 }
 
-interface Name {
+export interface Name {
     firstname: string;
     middlename: string;
     lastname: string;
@@ -16,8 +16,8 @@ interface Name {
     _id: string;
 }
 
-interface Address {
-    buildaptnum: string | null;
+export interface Address {
+    buildaptnum: string;
     street: string;
     city: string;
     state: string;
@@ -25,13 +25,13 @@ interface Address {
     _id: string;
 }
 
-interface Phone {
-    cell: string | null;
-    work: string | null;
+export interface Phone {
+    cell: string;
+    work: string;
     _id: string;
 }
 
-interface Car {
+export interface Car {
     make: string;
     model: string;
     color: string;
@@ -54,7 +54,7 @@ interface License {
     _id: string;
 }
 
-export default interface EmployeeInfo {
+export interface EmployeeInfo {
     employee_id: Employee;
     name: Name;
     picture: File | null | string;

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useLocation } from 'react-router-dom';
 
 import axiosInstance from '../interceptors/axiosInstance.tsx';
-import EmployeeInfo from '../types/EmployeeInfo.tsx';
+import { EmployeeInfo } from '../types/EmployeeInfo.tsx';
 import { FileData } from '../types/FileData.tsx';
 
 interface OnboardingContextType {
@@ -96,7 +96,9 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
                     newUploadedFiles[name] = {
                         fileKey: fileKey,
                         url: data.url,
-                        filename: data.filename
+                        filename: data.filename,
+                        status: data.status,
+                        name: name
                     };
                 }));
 
