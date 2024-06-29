@@ -8,9 +8,9 @@ import OnboardingField from '../components/OnboardingField.tsx';
 import OnboardingFileInput from '../components/OnboardingFileInput.tsx';
 import OnboardingPersonInput from '../components/OnboardingPersonInput.tsx';
 import axiosInstance from '../interceptors/axiosInstance.tsx';
-import EmployeeInfo from '../types/EmployeeInfo.tsx';
+import { Name, EmployeeInfo, Address, Phone, Car } from '../types/EmployeeInfo.tsx';
 import { Person, PersonKeys } from '../types/Person.tsx';
-import { formatDate, handleLogout, isFileData } from '../utils/utilMethods.tsx';
+import { capitalizeFirstLetter, createEmptyFormObject, formatDate, handleLogout, isFileData } from '../utils/utilMethods.tsx';
 import { useOnboarding } from '../context/OnboardingContext.tsx';
 import { FileData } from '../types/FileData.tsx';
 
@@ -62,7 +62,7 @@ const Onboarding = () => {
         relationship: ''
     }
 
-    const emptyEmployeeInfo: EmployeeInfo = {
+    const initialData: EmployeeInfo = {
         employee_id: {
             _id: '',
             email: '',
@@ -70,33 +70,11 @@ const Onboarding = () => {
             isHR: false,
             __v: -1
         },
-        name: {
-            firstname: '',
-            middlename: '',
-            lastname: '',
-            preferredname: '',
-            _id: ''
-        },
+        name: createEmptyFormObject<Name>(),
         picture: null,
-        address: {
-            buildaptnum: null,
-            street: '',
-            city: '',
-            state: '',
-            zip: '',
-            _id: ''
-        },
-        phone: {
-            cell: null,
-            work: null,
-            _id: ''
-        },
-        car: {
-            make: '',
-            model: '',
-            color: '',
-            _id: ''
-        },
+        address: createEmptyFormObject<Address>(),
+        phone: createEmptyFormObject<Phone>(),
+        car: createEmptyFormObject<Car>(),
         ssn: null,
         dob: null,
         gender: '',
@@ -126,8 +104,6 @@ const Onboarding = () => {
     // getting the initial onboarding data from server with loading
     const { onboardingData, optReciept, files, isLoading } = useOnboarding();
 
-    const initialData = onboardingData ? onboardingData : emptyEmployeeInfo;
-
     const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | FileData }>(files ? files : {});
     const [refErrors, setRefErrors] = useState<string[]>([]);
     const [ecErrors, setEcErrors] = useState<string[]>([]);
@@ -144,8 +120,8 @@ const Onboarding = () => {
         city: initialData.address.city,
         state: initialData.address.state,
         zip: initialData.address.zip,
-        cell: initialData.phone.cell ? initialData.phone.cell : '',
-        work: initialData.phone.work ? initialData.phone.work : '',
+        cell: initialData.phone.cell,
+        work: initialData.phone.work,
         make: initialData.car.make,
         model: initialData.car.model,
         color: initialData.car.color,
@@ -809,7 +785,7 @@ const Onboarding = () => {
                                         {isFileData(file) ?
                                             (
                                                 <Box sx={centerRowBoxStyle}>
-                                                    <Typography paddingRight='0.5rem'>{key == 'optreciept' ? 'OPT reciept' : key}:</Typography>
+                                                    <Typography paddingRight='0.5rem'>{key == 'optreciept' ? 'OPT Reciept' : capitalizeFirstLetter(key)}:</Typography>
                                                     <a href={file.url} target="_blank" rel="noopener noreferrer">
                                                         <Typography>{file.filename}</Typography>
                                                     </a>
@@ -817,7 +793,7 @@ const Onboarding = () => {
                                             ) :
                                             (
                                                 <Typography>
-                                                    {key == 'optreciept' ? 'OPT Reciept' : key} : {file.name}
+                                                    {key == 'optreciept' ? 'OPT Reciept' : capitalizeFirstLetter(key)} : {file.name}
                                                 </Typography>
                                             )
                                         }

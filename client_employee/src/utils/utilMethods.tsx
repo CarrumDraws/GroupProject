@@ -1,4 +1,5 @@
-import { FileData } from "../types/FileData";
+import { FileData } from "../types/FileData.tsx";
+import { EmptyFormObject } from "../types/ProfileForms.tsx";
 
 export const formatDate = (dateString: string | Date, splitter: string) => {
     let date: Date;
@@ -31,4 +32,19 @@ export const handleLogout = () => {
 
 export function isFileData(file: File | FileData): file is FileData {
     return (file as FileData).fileKey !== undefined;
+}
+
+export function createEmptyFormObject<T>(): EmptyFormObject<T> {
+    const obj = {} as EmptyFormObject<T>;
+    for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            obj[key] = '';
+        }
+    }
+    return obj;
+}
+
+export function capitalizeFirstLetter(field: string) {
+    if (!field) return field; // handle empty or null strings
+    return field.charAt(0).toUpperCase() + field.slice(1);
 }
