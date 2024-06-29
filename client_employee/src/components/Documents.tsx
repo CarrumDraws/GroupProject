@@ -7,13 +7,13 @@ import { FileData } from '../types/FileData.tsx';
 import LoadingScreen from "./LoadingScreen.tsx";
 
 type DocumentsProps = {
-    fileKeys: FileData[]
+    fileKeysAndNames: FileData[]
 }
 
 // NOTE: fileKeys here in the parameter is just a FileData array
 // with only fileKey and name in the FileData, which says it needs
 // to be updated with data from GET file before use
-const Documents: React.FC<DocumentsProps> = ({ fileKeys }) => {
+const Documents: React.FC<DocumentsProps> = ({ fileKeysAndNames }) => {
     const [fileData, setFileData] = useState<FileData[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -22,10 +22,10 @@ const Documents: React.FC<DocumentsProps> = ({ fileKeys }) => {
             const newFileData: FileData[] = [];
 
             try {
-                await Promise.all(fileKeys.map(async (fileKey) => {
-                    const fileResponse = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${fileKey.fileKey}`);
+                await Promise.all(fileKeysAndNames.map(async (fileKeyAndName) => {
+                    const fileResponse = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${fileKeyAndName.fileKey}`);
                     const data = await fileResponse.data;
-                    const fileData: FileData = { fileKey: fileKey.fileKey, url: data.url, filename: data.filename, status: data.status, name: data.name };
+                    const fileData: FileData = { fileKey: fileKeyAndName.fileKey, url: data.url, filename: data.filename, status: data.status, name: fileKeyAndName.name };
 
                     // Assume the first file is always the profile picture
                     if(fileData.status == 'Approved' || fileData.name === 'license'){
@@ -45,7 +45,7 @@ const Documents: React.FC<DocumentsProps> = ({ fileKeys }) => {
         };
 
         fetchFiles();
-    }, [fileKeys]);
+    }, [fileKeysAndNames]);
 
     const renderFilePreview = (file: FileData) => {
         const { url, filename } = file;
