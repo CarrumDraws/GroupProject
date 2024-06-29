@@ -42,6 +42,11 @@ import { FileFeedbackDialogComponent } from './components/file-feedback-dialog/f
 import { MatIconModule } from '@angular/material/icon';
 
 
+import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
+import { PdfPreviewComponent } from './components/pdf-preview/pdf-preview.component';
+import { PdfService } from './services/pdf.service';
+
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -80,10 +85,12 @@ import { MatIconModule } from '@angular/material/icon';
     ImageDialogComponent,
     FilterComponent,
     FileDialogComponent,
-    FileFeedbackDialogComponent
+    FileFeedbackDialogComponent,
+    PdfDialogComponent,
+    PdfPreviewComponent
   ],
 
-  providers: [],
+  providers: [PdfService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

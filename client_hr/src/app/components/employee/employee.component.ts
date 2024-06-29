@@ -3,6 +3,8 @@ import { EmployeeService } from 'src/app/services/employee.service';
 import { Router } from '@angular/router';
 import { Employee } from 'src/app/interface/employee';
 import { map, tap } from 'rxjs';
+import { PdfPreviewComponent } from '../pdf-preview/pdf-preview.component';
+import { PdfService } from 'src/app/services/pdf.service';
 
 
 @Component({
