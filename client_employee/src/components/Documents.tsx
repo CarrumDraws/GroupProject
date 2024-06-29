@@ -23,7 +23,7 @@ const Documents: React.FC<DocumentsProps> = ({ fileKeys }) => {
 
             try {
                 await Promise.all(fileKeys.map(async (fileKey) => {
-                    const fileResponse = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${fileKey}`);
+                    const fileResponse = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${fileKey.fileKey}`);
                     const data = await fileResponse.data;
                     const fileData: FileData = { fileKey: fileKey.fileKey, url: data.url, filename: data.filename, status: data.status, name: data.name };
 

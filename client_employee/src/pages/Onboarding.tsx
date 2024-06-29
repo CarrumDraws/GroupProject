@@ -59,7 +59,8 @@ const Onboarding = () => {
         lastname: '',
         phone: '',
         email: '',
-        relationship: ''
+        relationship: '',
+        _id: ''
     }
 
     const initialData: EmployeeInfo = {

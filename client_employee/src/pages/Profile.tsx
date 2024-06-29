@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Box, Button, Container, Typography } from '@mui/material';
@@ -9,8 +9,9 @@ import ProfileField from '../components/ProfileField.tsx';
 import EditButton from '../components/EditButton.tsx';
 import axiosInstance from '../interceptors/axiosInstance';
 import { capitalizeFirstLetter, createEmptyFormObject, formatDate, handleLogout } from '../utils/utilMethods.tsx';
-import { AddressForm, ContactForm, EditModeState, EmergencyForm, EmploymentForm, MainForm, ProfileForms } from '../types/ProfileForms.tsx';
+import { AddressForm, AddressFormKeys, ContactForm, ContactFormKeys, EditModeState, EmploymentForm, EmploymentFormKeys, MainForm, MainFormKeys, ProfileForms } from '../types/ProfileForms.tsx';
 import { FileData } from '../types/FileData.tsx';
+import { Person } from '../types/Person.tsx';
 
 const ProfilePage = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +20,7 @@ const ProfilePage = () => {
     const [addressForm, setAddressForm] = useState<AddressForm>(createEmptyFormObject<AddressForm>());
     const [contactForm, setContactForm] = useState<ContactForm>(createEmptyFormObject<ContactForm>());
     const [employmentForm, setEmploymentForm] = useState<EmploymentForm>(createEmptyFormObject<EmploymentForm>());
-    const [emergencyContactsForm, setEmergencyContactsForm] = useState<EmergencyForm[]>([createEmptyFormObject<EmergencyForm>()]);
+    const [emergencyContactsForm, setEmergencyContactsForm] = useState<Person[]>([createEmptyFormObject<Person>()]);
     const [originalValues, setOriginalValues] = useState<ProfileForms>({
         main: mainForm,
         address: addressForm,
@@ -28,6 +29,7 @@ const ProfilePage = () => {
         emergencyContacts: emergencyContactsForm,
     });
 
+    const [pictureKey, setPictureKey] = useState<string>('');
     const [profilePicURL, setProfilePicURL] = useState<string>('');
     const [fileKeys, setFileKeys] = useState<FileData[]>([]);
     const [editMode, setEditMode] = useState<EditModeState>({
@@ -54,6 +56,39 @@ const ProfilePage = () => {
                 const formData = await formResponse.data;
                 const profile = formData.profile;
 
+                setMainForm({
+                    firstname: profile.name.firstname,
+                    middlename: profile.name.middlename,
+                    lastname: profile.name.lastname,
+                    preferredname: profile.name.preferredname,
+                    email: profile.employee_id.email,
+                    ssn: profile.ssn,
+                    dob: formatDate(profile.dob, '/'),
+                    gender: profile.gender,
+                    picture: profile.picture
+                });
+
+                setAddressForm({
+                    buildaptnum: profile.address.buildaptnum,
+                    street: profile.address.street,
+                    city: profile.address.city,
+                    state: profile.address.state,
+                    zip: profile.address.zip
+                });
+
+                setContactForm({
+                    cell: profile.phone.cell,
+                    work: profile.phone.work
+                });
+
+                setEmploymentForm({
+                    title: profile.workauth.workauth === 'Other' ? profile.workauth.title : profile.workauth.workauth,
+                    startdate: formatDate(profile.workauth.startdate, '/'),
+                    enddate: formatDate(profile.workauth.enddate, '/')
+                });
+
+                setEmergencyContactsForm([...profile.contacts]);
+
                 setOriginalValues({
                     main: {
                         firstname: profile.name.firstname,
@@ -64,9 +99,9 @@ const ProfilePage = () => {
                         ssn: profile.ssn,
                         dob: formatDate(profile.dob, '/'),
                         gender: profile.gender,
-                        picture: profile.picture
+                        picture: profile.picture // DELETE?
                     },
-                    address:{
+                    address: {
                         buildaptnum: profile.address.buildaptnum,
                         street: profile.address.street,
                         city: profile.address.city,
@@ -82,8 +117,10 @@ const ProfilePage = () => {
                         startdate: formatDate(profile.workauth.startdate, '/'),
                         enddate: formatDate(profile.workauth.enddate, '/')
                     },
-                    emergencyContacts: profile.contacts
+                    emergencyContacts: [...profile.contacts]
                 });
+
+                setPictureKey(profile.picture);
 
                 const opt = formData.opt;
                 const optKeys = {
@@ -125,7 +162,7 @@ const ProfilePage = () => {
         const updateProfilePic = async () => {
             try{
                 setIsLoading(true);
-                const profilePicResponse = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${originalValues.main.picture}`);
+                const profilePicResponse = await axiosInstance.get(`${import.meta.env.VITE_SERVER_URL}/file/${pictureKey}`);
                 const profilePicData = await profilePicResponse.data;
                 setProfilePicURL(profilePicData.url);
             }catch(e : any){
@@ -138,37 +175,90 @@ const ProfilePage = () => {
             }
         }
 
-        updateProfilePic();
-    }, [originalValues.main.picture]);
+        if(pictureKey && typeof pictureKey === 'string' && pictureKey !== '') {
+            updateProfilePic();
+        } 
+    }, [pictureKey]);
+
+    useEffect(()=> {
+
+    }, [emergencyContactsForm]);
 
     const toggleEditMode = (field: keyof EditModeState) => {
         setEditMode(prevState => ({ ...prevState, [field]: !prevState[field] }));
     };
 
-    const removeEmptyEmergencyContacts = (contacts: EmergencyForm[]) => {
-        return contacts.filter(contact => {
+    const removeEmptyEmergencyContacts = (contacts: Person[]) => {
+        const filteredEcs = contacts.filter(contact => {
             return !(contact.firstname === '' && contact.middlename === '' && contact.lastname === '' && contact.phone === '' && contact.email === '' && contact.relationship === '');
         });
+        setEmergencyContactsForm(filteredEcs);
     };
 
-    const saveChanges = async (field: keyof EditModeState | 'emergencyContacts', data: unknown) => {
+
+    const saveChanges = async (field: keyof EditModeState | 'emergencyContacts', data: any) => {
+        let processedData: any = {};
+        
         // removing empty emergency contacts
         if (field === 'emergencyContacts') {
-            data = removeEmptyEmergencyContacts(data as EmergencyForm[]);
+            removeEmptyEmergencyContacts(data as Person[]);
             // handle the case when there is no non-empty emergency contact left
-            if((data as EmergencyForm[]).length < 1) {
+            if((emergencyContactsForm as Person[]).length < 1) {
                 alert('Error saving changes: You need at least one emergency contact.');
                 return;
             }
-            data = JSON.stringify(data);
+            processedData = new FormData();
+            processedData.append('contacts', JSON.stringify(emergencyContactsForm));
         }
+
+        switch(field){
+            case 'main':
+                Object.keys(mainForm).forEach(key => {
+                    const value = (mainForm as MainForm)[key as MainFormKeys];
+                    if(key == 'dob') {
+                        (processedData as MainForm)[key as MainFormKeys] = formatDate(value, '-');
+                    }else{
+                        (processedData as MainForm)[key as MainFormKeys] = value.toString();
+                    }
+                });
+                break;
+            case 'address':
+                Object.keys(addressForm).forEach(key => {
+                    const value = (addressForm as AddressForm)[key as AddressFormKeys];
+                    (processedData as AddressForm)[key as AddressFormKeys] = value.toString();
+                });
+                break;
+            case 'contact':
+                Object.keys(contactForm).forEach(key => {
+                    const value = (contactForm as ContactForm)[key as ContactFormKeys];
+                    (processedData as ContactForm)[key as ContactFormKeys] = value.toString();
+                });
+                break;
+            case 'employment':
+                Object.keys(employmentForm).forEach(key => {
+                    const value = (employmentForm as EmploymentForm)[key as EmploymentFormKeys];
+                    if(key == 'startdate' || key == 'enddate') {
+                        (processedData as EmploymentForm)[key as EmploymentFormKeys] = formatDate(value, '-');
+                    }else {
+                        (processedData as EmploymentForm)[key as EmploymentFormKeys] = value.toString();
+                    }
+                });
+                break;
+        };
 
         // post the change
         try {
-            await axiosInstance.post(`${import.meta.env.VITE_SERVER_URL}/employee/${capitalizeFirstLetter(field)}`, data);
+            await axiosInstance.put(`${import.meta.env.VITE_SERVER_URL}/employee/${capitalizeFirstLetter(field)}`, processedData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
         } catch (error : any) {
             if (error.response && error.response.data && error.response.data.error) {
                 const errorMessage = error.response.data.error;
+                alert('Error saving changes: ' + errorMessage);
+            }else if(error.response && error.response.data && error.response.data.message) {
+                const errorMessage = error.response.data.message;
                 alert('Error saving changes: ' + errorMessage);
             }
         } finally {
@@ -176,7 +266,7 @@ const ProfilePage = () => {
             if (field === 'emergencyContacts') {
                 setOriginalValues(prev => ({
                     ...prev,
-                    emergencies: [...data as EmergencyForm[]]
+                    emergencies: [...data as Person[]]
                 }));
             }else {
                 switch (field) {
@@ -201,25 +291,14 @@ const ProfilePage = () => {
 
     const cancelChanges = (field: keyof EditModeState | 'emergencyContacts') => {
         if (window.confirm("Do you want to discard the changes in the section?")) {
-            if (field === 'emergencyContacts') {
-                // // remove empty emergency contacts & update the change
-                // const filteredEmergencies = removeEmptyEmergencyContacts(originalValues.emergencyContacts);
-                // setOriginalValues(prevState => ({
-                //     ...prevState,
-                //     emergencyContacts: [...filteredEmergencies]
-                // }));
-
-                // // NOT SURE IF I NEED TO DELETE THIS THREE LINES:
-                // while (originalValues.emergencyContacts.length > filteredEmergencies.length) {
-                //     originalValues.emergencyContacts.pop();
-                // }
-                
+            if (field === 'emergencyContacts') {              
                 originalValues.emergencyContacts.forEach((originalEc, index) => {
                     setEmergencyContactsForm((prevEcs) => {
                         const newEmergencies = [...prevEcs];
                         newEmergencies[index] = originalEc;
                         return newEmergencies;
                     });
+                    removeEmptyEmergencyContacts(emergencyContactsForm);
                 });
             } else {
                 switch (field) {
@@ -244,7 +323,7 @@ const ProfilePage = () => {
     };
 
     const addEmergencyContact = () => {
-        const newEmergency: EmergencyForm = {
+        const newEmergency: Person = {
             firstname: '',
             middlename: '',
             lastname: '',
@@ -263,7 +342,7 @@ const ProfilePage = () => {
         }
     };
 
-    const updateEmergencyContact = (updatedEc: EmergencyForm, index: number) => {
+    const updateEmergencyContact = (updatedEc: Person, index: number) => {
         setEmergencyContactsForm((prevEcs) => {
             const newEcs = [...prevEcs];
             newEcs[index] = updatedEc;
@@ -338,8 +417,8 @@ const ProfilePage = () => {
                                     label="Date of Birth"
                                     type='date'
                                     name='dob'
-                                    value={formatDate(mainForm.dob, '-')}
-                                    onChange={(e) => setMainForm({...mainForm, ['dob']: formatDate(e.target.value, '-')})}
+                                    value={mainForm.dob}
+                                    onChange={(e) => setMainForm({...mainForm, ['dob']: e.target.value })}
                                     editMode={editMode.main}
                                 />
 
@@ -474,8 +553,8 @@ const ProfilePage = () => {
                                     label="Start Date"
                                     type='date'
                                     name='startdate'
-                                    value={formatDate(employmentForm.startdate, '-')}
-                                    onChange={(e) => setEmploymentForm({...employmentForm, ['startdate']: formatDate(e.target.value, '-')})}
+                                    value={employmentForm.startdate}
+                                    onChange={(e) => setEmploymentForm({...employmentForm, ['startdate']: e.target.value})}
                                     editMode={editMode.employment}
                                 />
 
@@ -483,14 +562,14 @@ const ProfilePage = () => {
                                     label="End Date"
                                     type='date'
                                     name='enddate'
-                                    value={formatDate(employmentForm.enddate, '-')}
-                                    onChange={(e) => setEmploymentForm({...employmentForm, ['enddate']: formatDate(e.target.value, '-')})}
+                                    value={employmentForm.enddate}
+                                    onChange={(e) => setEmploymentForm({...employmentForm, ['enddate']: e.target.value})}
                                     editMode={editMode.employment}
                                 />
                             </Box>
 
                             <EditButton
-                                editMode={editMode.contact}
+                                editMode={editMode.employment}
                                 saveChanges ={() => saveChanges('employment', employmentForm)}
                                 cancelChanges={() => cancelChanges('employment')}
                                 toggleEditMode={() => toggleEditMode('employment')}
@@ -502,10 +581,10 @@ const ProfilePage = () => {
 
                     <Typography fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Emergency Contact</Typography>
                     <form>
-                        {emergencyContactsForm.map((ec, index) => (
-                            <Box paddingBottom='1rem'>
-                                <Typography fontSize='1rem'>Emergency Contact {index}</Typography>
-                                <Box key={ec._id} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                        {emergencyContactsForm && emergencyContactsForm.map((ec, index) => (
+                            <Box key={ec._id + index} paddingBottom='1rem'>
+                                <Typography fontSize='1rem'>Emergency Contact {index + 1}</Typography>
+                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Box>
                                         <ProfileField
                                             label="First Name"
@@ -564,12 +643,12 @@ const ProfilePage = () => {
                                         />
                                     </Box>
 
+                                    <Box sx={{ width: '8rem' }}></Box>
+
                                     {emergencyContactsForm.length > 1 && (
                                         <Button onClick={() => handleDeleteEmergency(ec._id)}>Delete</Button>
                                     )}
                                 </Box>
-
-                                <Box sx={{ width: '8rem' }} />
                             </Box>
                         ))}
 

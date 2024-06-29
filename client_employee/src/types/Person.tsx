@@ -5,6 +5,7 @@ export interface Person {
     phone: string;
     email: string;
     relationship: string;
+    _id: string;
 };
 
 export type PersonKeys = keyof Person;
