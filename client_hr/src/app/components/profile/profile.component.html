@@ -1,6 +1,6 @@
 <div *ngIf="(profile$ | async) as profile" id="profile-body">
     <mat-card>
-        <img id="profile-img" [src]="picture$ | async" *ngIf="picture$ | async"/>
+        <img id="profile-img" [src]="profile.profile.picture || ''"/>
 
         <mat-card-title>Name</mat-card-title>
         <mat-card-content>

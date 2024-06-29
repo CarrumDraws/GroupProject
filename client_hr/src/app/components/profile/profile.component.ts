@@ -29,24 +29,13 @@ export class ProfileComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const employeeId = "667a350722a96c9de64d682c";
-    // const employeeId: string = this.route.snapshot.params['employeeId'];
+    // const employeeId = "667a350722a96c9de64d682c";
+    const employeeId: string = this.route.snapshot.params['employeeId'];
 
     //get profile and profile picture
     this.profile$ = this.profileService.getProfile(employeeId);
-    this.picture$ = this.profile$.pipe(
-      switchMap(profile => {
-        if (profile?.profile?.picture) {
-          return this.fileService.getFileUrl(profile.profile.picture).pipe(
-            map(file => file.url)
-          );
-        } else {
-          return of(null);
-        }
-      })
-    );
-    //get files
-    this.files = this.fileService.getFilesByEmployeeId(employeeId);
+
+    // this.files = this.fileService.getFilesByEmployeeId(employeeId);
   }
 
   // showFile(url: string){

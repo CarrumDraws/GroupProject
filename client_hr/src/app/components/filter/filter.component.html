@@ -1,0 +1,8 @@
+<mat-form-field id="filter">
+    <mat-label>Filter</mat-label>
+    <mat-select [(value)]="currentFilter" (selectionChange)="changeFilter()">
+       <ng-container *ngFor="let value of values">
+            <mat-option value="{{ value }}">{{ value}}</mat-option>
+       </ng-container>
+    </mat-select>
+  </mat-form-field>

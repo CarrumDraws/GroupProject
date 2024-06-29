@@ -38,8 +38,8 @@ h2{
     display: flex;
     align-items: center;
     text-align: left;
-    background-color: var(--primary-color);
-    color: white;
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--accent-color);
     height: 3rem;
     padding: 0 1rem;
     margin: 0;
@@ -61,4 +61,12 @@ button{
     color: lightskyblue;
     height: 2.5rem;
     border-radius: 50px;
+}
+
+img{
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    object-fit: cover;
+    border-radius: 50%;
 }

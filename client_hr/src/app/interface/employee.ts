@@ -20,6 +20,8 @@ export interface Employee {
         cell: string;
         work: string;
     };
+
+    picture: string;
   
     // Personal Info
     ssn: string;
@@ -27,6 +29,7 @@ export interface Employee {
     // Work Status
     workauth: {
       workauth: string;
+      title: string;
       startdate: Date;
       enddate: Date;
     };

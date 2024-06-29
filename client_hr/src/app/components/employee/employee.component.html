@@ -6,26 +6,27 @@
 
     <h2>Employees</h2>
     <ng-container *ngIf="searchText">
-        <div *ngIf="searchResults.length === 0">No records found</div>
+        <div *ngIf="searchResults.length === 0" style="padding-top: 5rem;">No records found</div>
         <div *ngFor="let employee of searchResults">
           <mat-card appearance="outlined">
+            <app-pdf-preview pdfUrl="{{ employee.picture }}"></app-pdf-preview>
             <mat-card-header>
-              <mat-card-title> {{ employee.lastName }}, {{ employee.firstName }} ({{ employee.preferredName }})</mat-card-title>
+              <mat-card-title> {{ employee.name.lastname }}, {{ employee.name.firstname }} ({{ employee.name.preferredname }})</mat-card-title>
               <mat-card-subtitle>
                 <div>
-                  <div class="email" (click)="sendEmail(employee.email)">
-                    {{ employee.email }}
+                  <div class="email" (click)="sendEmail(employee.employee_id.email)">
+                    {{ employee.employee_id.email }}
                   </div>
-                  <div>Phone: {{ employee.phoneNumber }}</div>
+                  <div>Phone: {{ employee.phone.cell }}</div>
                 </div>
               </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
               <div>SSN: {{employee.ssn}}</div>
-              <div>Work Authorization: {{employee.workAuthorizationTitle}}</div>
+              <div>Work Authorization: {{employee.workauth.title}}</div>
             </mat-card-content>
             <mat-card-actions>
-              <button mat-button (click)="viewEmployee(employee.id)">View Profile</button>
+              <button mat-button (click)="viewEmployee(employee.employee_id._id)">View Profile</button>
             </mat-card-actions>
         </mat-card>
         </div>
@@ -33,26 +34,27 @@
       <ng-container *ngIf="!searchText">
         <div *ngFor="let employee of employees">
           <mat-card appearance="outlined">
-              <mat-card-header>
-                <mat-card-title> {{ employee.name.lastname }}, {{ employee.name.firstname }} ({{ employee.name.preferredname }})</mat-card-title>
-                <mat-card-subtitle>
-                  <div>
-                    <div class="email" (click)="sendEmail(employee.employee_id.email)">
-                      {{ employee.employee_id.email }}
-                    </div>
-                    <div>Phone: {{ employee.phone.cell }}</div>
+            <img src='{{ employee.picture }}' alt="">
+            <mat-card-header>
+              <mat-card-title> {{ employee.name.lastname }}, {{ employee.name.firstname }} ({{ employee.name.preferredname }})</mat-card-title>
+              <mat-card-subtitle>
+                <div>
+                  <div class="email" (click)="sendEmail(employee.employee_id.email)">
+                    {{ employee.employee_id.email }}
                   </div>
-                </mat-card-subtitle>
-              </mat-card-header>
-              <mat-card-content>
-                <div>SSN: {{employee.ssn}}</div>
-                <div>Work Authorization: 
-                  {{ employee.workauth.workauth != null ? employee.workauth.workauth : "Authorized"}}
+                  <div>Phone: {{ employee.phone.cell }}</div>
                 </div>
-              </mat-card-content>
-              <mat-card-actions>
-                <button mat-button (click)="viewEmployee(employee.employee_id._id)">View Profile</button>
-              </mat-card-actions>
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div>SSN: {{employee.ssn}}</div>
+              <div>Work Authorization: 
+                {{ employee.workauth.workauth != null ? employee.workauth.workauth : "Authorized"}}
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-button (click)="viewEmployee(employee.employee_id._id)">View Profile</button>
+            </mat-card-actions>
           </mat-card>
         </div>
       </ng-container>

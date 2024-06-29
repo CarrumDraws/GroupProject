@@ -22,8 +22,12 @@ export class EmployeeService {
     return this.http.get<Employee[]>(`${environment.serverUrl}/employee/all`, { headers });
   }
   // this.employees.sort((a, b)=> a.name.lastname.localeCompare(b.name.lastname));
-  searchEmployees(searchText: string): any[] {
-    if (!searchText.trim()) {
+  searchEmployees(searchText: string): Employee[] {
+    if(this.employees.length == 0){
+      this.loadEmployees();
+    }
+
+    if (!searchText.trim()) { 
       return [];
     }
     const lowerCaseSearch = searchText.toLowerCase();
@@ -32,5 +36,11 @@ export class EmployeeService {
       employee.name.lastname.toLowerCase().includes(lowerCaseSearch) ||
       employee.name.preferredname.toLowerCase().includes(lowerCaseSearch)
     ).sort((a, b)=> a.name.lastname.localeCompare(b.name.lastname));
+  }
+
+  loadEmployees(): void {
+    this.getEmployees().subscribe(
+      data => this.employees = data
+    );
   }
 }
