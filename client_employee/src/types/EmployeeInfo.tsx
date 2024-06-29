@@ -50,14 +50,14 @@ interface License {
     haslicense: string | null;
     licensenumber: string;
     expdate: string | null;
-    licensefile: File | null;
+    licensefile: File | null | string;
     _id: string;
 }
 
 export default interface EmployeeInfo {
     employee_id: Employee;
     name: Name;
-    picture: File | null;
+    picture: File | null | string;
     address: Address;
     phone: Phone;
     car: Car;

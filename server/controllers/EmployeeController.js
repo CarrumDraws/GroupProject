@@ -154,7 +154,6 @@ const updateInfo = async (req, res) => {
         };
         break;
     }
-    console.log(updateObject);
     let updatedOnboarding = await Onboarding.updateOne(
       { employee_id: ID },
       { $set: updateObject }, // Use $set to update only specified fields

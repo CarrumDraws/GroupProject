@@ -15,6 +15,7 @@ const registrationData = require("./seeddata/registration.json");
 const onboardingData = require("./seeddata/onboarding.json");
 const optData = require("./seeddata/opt.json");
 
+const pictureData = require("./seeddata/pictures.json");
 const licenseData = require("./seeddata/licenses.json");
 const optreceiptData = require("./seeddata/optreceipt.json");
 const opteadData = require("./seeddata/optead.json");
@@ -58,22 +59,17 @@ const i20Data = require("./seeddata/i20.json");
         );
       }
     }
-    // employeesData.forEach(async (employee, index) => {
-    //   employee.password = await bcrypt.hash(
-    //     employee.password,
-    //     Number(process.env.SALT)
-    //   );
-    // });
 
     let employees = await Employee.insertMany(employeesData);
     let registrations = await Registration.insertMany(registrationData);
 
     // First Pass: Add everything that JUST needs employees._id
-    // Houses, All Files (Licenses)
+    // Houses, All Files (Pictures, Licenses, etc)
     employees.forEach((employee, index) => {
       housesData[index % 3].members.push(employee._id); // Fill Houses w/id's
 
       // Attach id to Files
+      if (pictureData[index]) pictureData[index].employee_id = employee._id;
       if (licenseData[index]) licenseData[index].employee_id = employee._id;
       if (optreceiptData[index])
         optreceiptData[index].employee_id = employee._id;
@@ -85,6 +81,7 @@ const i20Data = require("./seeddata/i20.json");
 
     let houses = await House.insertMany(housesData);
 
+    let pictures = await File.insertMany(pictureData);
     let licenses = await File.insertMany(licenseData);
     let optreceipts = await File.insertMany(optreceiptData);
     let opteads = await File.insertMany(opteadData);
@@ -97,6 +94,9 @@ const i20Data = require("./seeddata/i20.json");
     employees.forEach((employee, index) => {
       if (onboardingData[index]) {
         onboardingData[index].employee_id = employee._id; // Attach id
+        // Attach picture
+        if (pictures[index])
+          onboardingData[index].picture = pictures[index]._id;
         // Attach license
         if (licenses[index])
           onboardingData[index].license.licensefile = licenses[index]._id;
