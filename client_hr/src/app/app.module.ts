@@ -46,6 +46,8 @@ import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
 import { PdfService } from './services/pdf.service';
 import { SafeUrlPipe } from './pipe/safe-url.pipe';
+import { HouseProfileComponent } from './components/house-profile/house-profile.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 
 @NgModule({
@@ -89,7 +91,9 @@ import { SafeUrlPipe } from './pipe/safe-url.pipe';
     FileFeedbackDialogComponent,
     PdfDialogComponent,
     PdfViewerComponent,
-    SafeUrlPipe
+    SafeUrlPipe,
+    HouseProfileComponent,
+    NotFoundComponent
   ],
 
   providers: [PdfService],

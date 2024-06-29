@@ -22,7 +22,11 @@ const Report: React.FC<ReportProps> = ({ data }) => {
       display="flex"
       flexDirection="column"
       sx={{
+<<<<<<< HEAD
         width: "100%",
+=======
+        width: "calc(100% - 1.5rem)",
+>>>>>>> 4ac1cc3be44099e0bdd0dc68b85d009c56d2722d
         backgroundColor: "#bcddf1",
         marginBottom: "1rem",
         padding: "1rem",

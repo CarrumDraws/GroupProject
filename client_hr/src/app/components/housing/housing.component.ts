@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, ValidatorFn, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { House } from 'src/app/interface/house';
 import { HouseDetail } from 'src/app/interface/houseDetail';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
 import { HouseService } from 'src/app/services/house.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-housing',
@@ -16,31 +17,38 @@ export class HousingComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private flashMessageService: FlashMessageService,
-    private houseService:  HouseService
+    private houseService:  HouseService,
+    private router: Router
   ) {}
 
   houseForm = this.fb.group({
     firstname: ['', Validators.required],
     middlename: [''],
     lastname: ['', Validators.required],
-    phone: [null, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
+    phone: ['', [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
     email: ['', [Validators.required, Validators.email]],
     buildaptnum: [0, Validators.required],
     street: ['', Validators.required],
     city: ['', Validators.required],
     state: ['', Validators.required],
     zip: ['', Validators.required],
-    beds: [null, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
-    mattresses: [null, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
-    tables: [null, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
-    chairs: [null, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]]
+    beds: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
+    mattresses: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
+    tables: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
+    chairs: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]]
   });
 
   houseList$: Observable<HouseDetail[]> = new Observable<HouseDetail[]>;
 
   ngOnInit(): void {
 
-    this.houseList$ = this.houseService.getAllHouses();
+    this.getHouseList();
+  }
+
+  getHouseList(){
+    this.houseList$ = this.houseService.getAllHouses().pipe(
+      map(houses => houses.reverse())
+    );
   }
 
 
@@ -65,10 +73,11 @@ export class HousingComponent implements OnInit {
       };
       console.log(house);
       this.houseService.postHouse(house).subscribe(response => {
+        this.getHouseList();
         this.flashMessageService.info('House is successfully added');
       }, error => {
         console.log(error)
-        this.flashMessageService.warn(error.error.error);
+        this.flashMessageService.warn(error.error.error.error);
       });
     } else {
       this.flashMessageService.warn("House form is not valid");
@@ -80,6 +89,10 @@ export class HousingComponent implements OnInit {
       const isValid = control.value >= 0;
       return isValid ? null : { 'nonNegativeNumber': { value: control.value } };
     };
+  }
+
+  onHouseCard(houseId: string){
+    this.router.navigate(['/housing', houseId]);
   }
 
 }

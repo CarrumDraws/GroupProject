@@ -72,7 +72,7 @@
     </form>
 
     <h1 id="title">Houses</h1>
-    <mat-card *ngFor="let house of (houseList$ | async)" class="house-card">
+    <mat-card *ngFor="let house of (houseList$ | async)" class="house-card" (click)="onHouseCard(house._id)">
         <div>
             <mat-card-title>Address</mat-card-title>
             <mat-card-subtitle>
