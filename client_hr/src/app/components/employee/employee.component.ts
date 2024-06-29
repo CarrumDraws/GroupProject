@@ -24,6 +24,7 @@ export class EmployeeComponent implements OnInit {
     this.employeeService.getEmployees().pipe(
       map((response: Employee[]) => {
         // Sort employees by last name
+        console.log(response);
         return response.sort((a: Employee, b: Employee) => a.name.lastname.localeCompare(b.name.lastname));
       }),
       tap((_) => {this.employeeService.loadEmployees();})

@@ -18,7 +18,7 @@ export class HouseService {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     });
 
-    return this.http.post<House>(`${environment.serverUrl}/house`, { house },{ headers });
+    return this.http.post<House>(`${environment.serverUrl}/house`, house , { headers });
 
   }
 }
