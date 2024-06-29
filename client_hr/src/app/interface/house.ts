@@ -9,8 +9,8 @@ export interface House{
     city: string;
     state: string;
     zip: string;
-    beds: number| null;
-    mattresses: number| null;
-    tables: number| null;
-    chairs: number | null;
+    beds: number;
+    mattresses: number;
+    tables: number;
+    chairs: number;
 }

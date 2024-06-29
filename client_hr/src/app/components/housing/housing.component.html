@@ -1,30 +1,29 @@
 <mat-card> 
     <form [formGroup]="houseForm" (ngSubmit)="onSubmit()">
-        <div id="form-row">
-            <mat-card-title>House Address</mat-card-title>
-            <mat-card-content>
-                <mat-form-field appearance="fill">
-                <mat-label>Building/Apt Number</mat-label>
-                <input matInput id="buildaptnum" formControlName="buildaptnum" type="number">
-                </mat-form-field>
-                <mat-form-field appearance="fill">
-                <mat-label>Street</mat-label>
-                <input matInput id="street" formControlName="street" type="text">
-                </mat-form-field>
-                <mat-form-field appearance="fill">
-                <mat-label>City</mat-label>
-                <input matInput id="city" formControlName="city" type="text">
-                </mat-form-field>
-                <mat-form-field appearance="fill">
-                <mat-label>State</mat-label>
-                <input matInput id="state" formControlName="state" type="text">
-                </mat-form-field>
-                <mat-form-field appearance="fill">
-                <mat-label>Zip</mat-label>
-                <input matInput id="zip" formControlName="zip" type="text">
-                </mat-form-field>
-            </mat-card-content>
-        </div>
+
+        <mat-card-title>House Address</mat-card-title>
+        <mat-card-content>
+            <mat-form-field appearance="fill">
+            <mat-label>Building/Apt Number</mat-label>
+            <input matInput id="buildaptnum" formControlName="buildaptnum" type="number">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+            <mat-label>Street</mat-label>
+            <input matInput id="street" formControlName="street" type="text">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+            <mat-label>City</mat-label>
+            <input matInput id="city" formControlName="city" type="text">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+            <mat-label>State</mat-label>
+            <input matInput id="state" formControlName="state" type="text">
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+            <mat-label>Zip</mat-label>
+            <input matInput id="zip" formControlName="zip" type="text">
+            </mat-form-field>
+        </mat-card-content>
         <mat-card-title>Landlord</mat-card-title>
         <mat-card-content>
             <mat-form-field appearance="fill">
