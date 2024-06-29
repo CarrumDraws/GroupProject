@@ -9,7 +9,7 @@
         <div *ngIf="searchResults.length === 0" style="padding-top: 5rem;">No records found</div>
         <div *ngFor="let employee of searchResults">
           <mat-card appearance="outlined">
-            <img src='{{ employee.picture }}' alt="">
+            <app-pdf-preview pdfUrl="{{ employee.picture }}"></app-pdf-preview>
             <mat-card-header>
               <mat-card-title> {{ employee.name.lastname }}, {{ employee.name.firstname }} ({{ employee.name.preferredname }})</mat-card-title>
               <mat-card-subtitle>
