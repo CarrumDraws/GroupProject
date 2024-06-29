@@ -5,8 +5,6 @@ import axios from "axios";
 import Housemate from "./HousingWidgets/Housemate";
 import Report from "./HousingWidgets/Report";
 
-import "./Housing.css";
-
 interface ReportData {
   house_id: string;
   employee_id: string;
@@ -114,12 +112,7 @@ const Housing: React.FC = () => {
   }, []);
 
   return (
-    <Box
-      className="Housing"
-      display="flex"
-      flexDirection="column"
-      sx={{ margin: "3rem" }}
-    >
+    <Box display="flex" flexDirection="column" sx={{ margin: "1.5rem" }}>
       <Box sx={{ paddingBottom: "1.5rem" }}>
         {CustomTypography("Address")}
         <Box sx={{ paddingLeft: "1.5rem" }}>
@@ -136,7 +129,7 @@ const Housing: React.FC = () => {
         </Box>
       </Box>
       <Box sx={{ paddingBottom: "1.5rem" }}>
-        {CustomTypography("Housemates")}
+        {CustomTypography("House Members")}
         <Box display="flex" flexDirection="row" sx={{ paddingLeft: "1.5rem" }}>
           {houseData?.members?.map((member, index) => (
             <Housemate userid={member._id} key={member.email} />
