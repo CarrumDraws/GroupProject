@@ -18,6 +18,7 @@ export class ProfileComponent implements OnInit {
 
   profile$: Observable<Profile | null> = new Observable<Profile | null>();
   picture$: Observable<string | null> = new Observable<string | null>();
+
   //FIles are dummpy data still
   files: File[] | null = null;
 
@@ -34,6 +35,10 @@ export class ProfileComponent implements OnInit {
 
     //get profile and profile picture
     this.profile$ = this.profileService.getProfile(employeeId);
+
+    // this.picture$.subscribe(profile => {
+    //   console.log(this.profile$.)
+    // });
 
     // this.files = this.fileService.getFilesByEmployeeId(employeeId);
   }
