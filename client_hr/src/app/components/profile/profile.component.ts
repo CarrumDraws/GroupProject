@@ -47,10 +47,52 @@ export class ProfileComponent implements OnInit {
   //   this.fileService.newTapForFile(url);
   // }
 
+<<<<<<< HEAD
   openImageDialog(imageUrl: string): void {
     this.dialog.open(ImageDialogComponent, {
       data: { imageUrl }
     });
+=======
+      //get opt recipet
+      if (opt.optreciept) {
+        fileObservables.push(this.fileService.getFileUrl(opt.optreciept));
+      }
+      //get opt ead
+      if (opt.optead) {
+        fileObservables.push(this.fileService.getFileUrl(opt.optead));
+      }
+      //get I-983
+      if (opt.i983) {
+        opt.i983.forEach(file_id => {
+          fileObservables.push(this.fileService.getFileUrl(file_id));
+        });
+      }
+      //get I-20
+      if (opt.i20) {
+        fileObservables.push(this.fileService.getFileUrl(opt.i20));
+      }
+
+      //get license
+      if(profile.profile.license.haslicense){
+        fileObservables.push(this.fileService.getFileUrl(profile.profile.license.licensefile).pipe(
+          map((file: File) => {
+            let license = file;
+            license.fileType = "license";
+            return license;
+          })
+        ));
+      }
+    
+      //async operation to make sure we get the fils before udpating action for each visa
+      forkJoin(fileObservables).subscribe(files => {
+        this.fileList = files.filter(file => file.status == 'Approved' || file.fileType == "license");
+      });
+  }
+
+
+  openPdf(file: File): void {
+    this.pdfViewer.open(file);
+>>>>>>> 17fdb79 (updated page)
   }
 
 }
