@@ -58,7 +58,7 @@ const updateInfo = async (req, res) => {
     } = req.body;
 
     const picture = req.files["picture"]?.[0];
-    contacts = JSON.parse(req.body.contacts);
+
     if (!field) return res.status(400).json({ error: "Missing Field Param" });
     if (
       field != "Main" &&
@@ -94,6 +94,7 @@ const updateInfo = async (req, res) => {
         return res.status(400).send("Missing Work Authorization Fields");
     } else if (field === "EmergencyContacts") {
       if (!contacts) res.status(400).send("Missing Emergency Contacts");
+      contacts = JSON.parse(req.body.contacts);
       if (contacts.length == 0) {
         return res.status(400).send("Must Have at Least One Emergency Contact");
       } else {

@@ -100,7 +100,7 @@ const VisaStatusManagement: React.FC = () => {
     })();
   }, []);
 
-  // Get File Data from OPT
+  // Get File Data
   useEffect(() => {
     if (!optData) return;
 
@@ -344,8 +344,8 @@ function approvedFiles(data) {
   if (!data) return arr;
   if (data.optreciept) arr.push([data.optreciept, "OPT Reciept"]);
   if (data.optead) arr.push([data.optead, "OPT EAD"]);
-  if (data.i983[0]) arr.push([data.i983[0], "I-983 One"]);
-  if (data.i983[1]) arr.push([data.i983[1], "I-983 Two"]);
+  if (data.i983?.[0]) arr.push([data.i983[0], "I-983 One"]);
+  if (data.i983?.[1]) arr.push([data.i983[1], "I-983 Two"]);
   if (data.i20) arr.push([data.i20, "I-20"]);
   return arr;
 }
