@@ -1,0 +1,38 @@
+[
+  {
+    "report_id": null,
+    "employee_id": null,
+    "description": "We have received your report about the water leakage in the basement. Can you provide more details about the extent of the damage?",
+    "timestamp": "2024-06-29T10:05:00Z"
+  },
+  {
+    "report_id": null,
+    "employee_id": null,
+    "description": "The water is pooling near the furnace and has soaked the carpet. It seems to be coming from a crack in the foundation wall.",
+    "timestamp": "2024-06-29T10:10:00Z"
+  },
+  {
+    "report_id": null,
+    "employee_id": null,
+    "description": "Thank you for the information. We will send maintenance to assess the situation. Are there any electrical appliances affected by the water?",
+    "timestamp": "2024-06-29T10:15:00Z"
+  },
+  {
+    "report_id": null,
+    "employee_id": null,
+    "description": "Yes, the dehumidifier and a couple of power outlets are affected. We have unplugged the dehumidifier for safety.",
+    "timestamp": "2024-06-29T10:20:00Z"
+  },
+  {
+    "report_id": null,
+    "employee_id": null,
+    "description": "Understood. Please avoid using the affected outlets. Maintenance will be there within the hour. We will follow up once the initial assessment is done.",
+    "timestamp": "2024-06-29T10:25:00Z"
+  },
+  {
+    "report_id": null,
+    "employee_id": null,
+    "description": "Thank you for the prompt response. We will be waiting for the maintenance team.",
+    "timestamp": "2024-06-29T10:30:00Z"
+  }
+]

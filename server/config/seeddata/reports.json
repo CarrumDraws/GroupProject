@@ -1,0 +1,42 @@
+[
+  {
+    "house_id": null,
+    "employee_id": null,
+    "title": "Water Leakage",
+    "description": "There is a water leakage in the basement.",
+    "timestamp": "2024-06-29T10:00:00Z",
+    "status": "Open"
+  },
+  {
+    "house_id": null,
+    "employee_id": null,
+    "title": "Broken Window",
+    "description": "The kitchen window is broken.",
+    "timestamp": "2024-06-28T15:30:00Z",
+    "status": "In Progress"
+  },
+  {
+    "house_id": null,
+    "employee_id": null,
+    "title": "Pest Infestation",
+    "description": "There is a pest infestation in the attic.",
+    "timestamp": "2024-06-27T08:45:00Z",
+    "status": "Closed"
+  },
+  {
+    "house_id": null,
+    "employee_id": null,
+    "title": "Electricity Outage",
+    "description": "The electricity is out in the living room.",
+    "timestamp": "2024-06-26T12:00:00Z",
+    "status": "Open"
+  },
+  {
+    "house_id": null,
+    "employee_id": null,
+    "title": "Heating System Malfunction",
+    "description": "The heating system is not working properly.",
+    "timestamp": "2024-06-25T09:15:00Z",
+    "status": "In Progress"
+  }
+]
