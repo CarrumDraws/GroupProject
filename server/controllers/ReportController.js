@@ -144,10 +144,11 @@ const addReport = async (req, res) => {
     if (!description || description.length == 0)
       return res.status(400).send("Missing Description");
 
-    const house = await House.findOne({ members: ID })
-      .populate("members")
-      .exec();
+    const house = await House.findOne({ members: "6681734e119945586f2815eb" });
     if (!house) return res.status(400).send("House Not Found");
+
+    const onboarding = await Onboarding.findOne({ employee_id: ID });
+    if (!onboarding) return res.status(400).send("Onboarding Not Found");
 
     const report = new Report({
       house_id: house._id,
@@ -157,8 +158,13 @@ const addReport = async (req, res) => {
       status: "Open",
     });
 
+    let returnData = {
+      ...report.toObject(),
+      name: onboarding.name,
+    };
+
     await report.save();
-    res.status(200).json(report);
+    res.status(200).json(returnData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -167,6 +173,8 @@ const addReport = async (req, res) => {
 
 const addComment = async (req, res) => {
   try {
+    console.log(req.body);
+    console.log(req.params);
     const { ID, EMAIL, ISHR } = req.body;
     const { reportid } = req.params;
     if (!reportid)
@@ -176,13 +184,17 @@ const addComment = async (req, res) => {
     if (!description || description.length == 0)
       return res.status(400).send("Missing Description");
 
-    const house = await House.findOne({ members: ID })
-      .populate("members")
-      .exec();
+    const house = await House.findOne({ members: ID });
     if (!house) return res.status(400).send("House Not Found");
 
     const report = await Report.findById(reportid);
     if (!report) return res.status(400).send("Report Not Found");
+
+    const employee = await Employee.findById(ID);
+    if (!employee) return res.status(400).send("Employee Not Found");
+
+    const onboarding = await Onboarding.findOne({ employee_id: ID });
+    if (!onboarding) return res.status(400).send("Onboarding Not Found");
 
     if (report.status === "Closed")
       return res.status(400).send("Can't add Comment to Closed Report");
@@ -193,8 +205,16 @@ const addComment = async (req, res) => {
       description: description,
     });
 
-    await comment.save();
-    res.status(200).json(comment);
+    const pictureUrl = await idToFileLink(onboarding.picture);
+    let returnData = {
+      ...comment.toObject(),
+      name: onboarding.name,
+      employee_id: employee,
+      picture: pictureUrl,
+    };
+
+    // await comment.save();
+    res.status(200).json(returnData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

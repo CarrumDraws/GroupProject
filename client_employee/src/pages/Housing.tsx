@@ -3,7 +3,7 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import axios from "axios";
 
 import Housemate from "./HousingWidgets/Housemate";
-import Report from "./HousingWidgets/Report";
+import ReportWidget from "./HousingWidgets/ReportWidget";
 
 interface ReportData {
   house_id: string;
@@ -38,51 +38,38 @@ interface Props {
 
 const Housing: React.FC = () => {
   const [houseData, setHouseData] = useState<HouseData | null>(null);
-  const [formData, setFormData] = useState({
-    title: "",
-    email: "",
-    password: "",
-  });
-
-  const reports: ReportData[] = [
-    {
-      house_id: "60d21b4667d0d8992e610c85",
-      employee_id: "60d21b4967d0d8992e610c88",
-      title: "Broken Window",
-      description:
-        "A window in the living room is broken and needs immediate repair.",
-      timestamp: "2024-06-28T12:00:00Z",
-      status: "Open",
-    },
-    {
-      house_id: "60d21b4667d0d8992e610c85",
-      employee_id: "60d21b4967d0d8992e610c89",
-      title: "Plumbing Issue",
-      description: "There is a plumbing issue in the kitchen causing a leak.",
-      timestamp: "2024-06-28T13:00:00Z",
-      status: "In Progress",
-    },
-    {
-      house_id: "60d21b4667d0d8992e610c86",
-      employee_id: "60d21b4967d0d8992e610c90",
-      title: "Electrical Fault",
-      description:
-        "An electrical fault in the bedroom is causing the lights to flicker.",
-      timestamp: "2024-06-28T14:00:00Z",
-      status: "Closed",
-    },
-  ];
+  const [reports, setReports] = useState([]);
 
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
+
+  const token = localStorage.getItem("token");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = {
       title: titleRef?.current?.value,
-      email: descriptionRef?.current?.value,
+      description: descriptionRef?.current?.value,
     };
-    // Handle form submission, e.g., send data to an API
+
+    // Submit New Report
+    (async () => {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_SERVER_URL}/report`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data);
+        setReports((prev) => [...prev, response.data]);
+      } catch (err) {
+        console.log("Failed to get House Data");
+      }
+    })();
     console.log("Form data submitted:", formData);
 
     if (titleRef.current) titleRef.current.value = "";
@@ -90,8 +77,6 @@ const Housing: React.FC = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     // Call Get House
     (async () => {
       try {
@@ -104,7 +89,24 @@ const Housing: React.FC = () => {
           }
         );
         setHouseData(response.data);
+      } catch (err) {
+        console.log("Failed to get House Data");
+      }
+    })();
+
+    // Call Get Your Reports
+    (async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_SERVER_URL}/report`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log(response.data);
+        setReports(response.data);
       } catch (err) {
         console.log("Failed to get House Data");
       }
@@ -119,7 +121,7 @@ const Housing: React.FC = () => {
           <Typography variant="h6" sx={{}}>
             {houseData?.address?.buildaptnum + " " + houseData?.address?.street}
           </Typography>
-          <Typography sx={{}}>
+          <Typography>
             {houseData?.address?.city +
               " " +
               houseData?.address?.state +
@@ -144,7 +146,7 @@ const Housing: React.FC = () => {
           sx={{ paddingLeft: "1.5rem" }}
         >
           {reports.map((report, index) => (
-            <Report data={report} key={report.title} />
+            <ReportWidget data={report} key={report._id} />
           ))}
         </Box>
       </Box>
