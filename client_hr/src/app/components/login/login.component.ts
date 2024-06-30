@@ -39,6 +39,7 @@ export class LoginComponent implements OnInit {
     localStorage.removeItem('token');
     this.store.dispatch(AuthActions.logout());
     console.log("Token is removed");
+    window.location.reload();
   }
 
 }

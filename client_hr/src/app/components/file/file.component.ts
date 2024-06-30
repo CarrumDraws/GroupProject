@@ -12,33 +12,11 @@ export class FileComponent implements OnInit {
 
   constructor(private route: ActivatedRoute) { }
 
-  // imageUrl: string | null = null;
-
 
   ngOnInit(): void {
 
-    // let encodeFileUrl = localStorage.getItem(encodedFileUrl);
-
-    // if(encodeFileUrl != null){
-    //   this.imageUrl = CryptoJS.AES.decrypt(encodeFileUrl, environment.myEncodeKey).toString(CryptoJS.enc.Utf8);
-    // }
     
   }
-
-  // @HostListener('window:beforeunload', ['$event'])
-  // beforeUnloadHandler(event: Event) {
-  //   // Remove local storage item before leaving the page
-  //   localStorage.removeItem('encodedFileUrl');
-  // }
-
-  // @HostListener('window:visibilitychange', ['$event'])
-  // visibilityChangeHandler(event: Event) {
-  //   // Check if the tab/window is hidden (user switched tabs)
-  //   if (document.visibilityState === 'hidden') {
-  //     // Remove local storage item when the tab/window is hidden
-  //     localStorage.removeItem('encodedFileUrl');
-  //   }
-  // }
 
 
 

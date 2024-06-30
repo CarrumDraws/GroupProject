@@ -1,6 +1,6 @@
 export interface House{
     firstname: string;
-    middlename: string;
+    middlename: string | null;
     lastname: string;
     phone: string| null;
     email: string;
@@ -9,8 +9,8 @@ export interface House{
     city: string;
     state: string;
     zip: string;
-    beds: number;
-    mattresses: number;
-    tables: number;
-    chairs: number;
+    beds: number | 0;
+    mattresses: number| 0;
+    tables: number | 0;
+    chairs: number | 0;
 }

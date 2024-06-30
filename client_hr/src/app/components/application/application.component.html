@@ -133,6 +133,8 @@
                 <input matInput disabled value="{{application.license.expdate | date}}">
               </mat-form-field>
             </mat-card-content>
+            <app-pdf-viewer #pdfViewer></app-pdf-viewer>
+            <button mat-button *ngIf="application.license.haslicense" style="color: lightskyblue;" (click)="viewLicense(application.license.licensefile)">View License</button>
         </mat-card>
         <mat-card appearance="outlined">
             <mat-card-header>

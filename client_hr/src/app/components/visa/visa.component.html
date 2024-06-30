@@ -15,18 +15,17 @@
                     </mat-card-title>
                     <mat-card-subtitle>
                         <p style="color: var(--accent-color);">Work Auth: {{ visa.workauth.workauth }}</p>
-                        <p>Title: {{ visa.workauth.title || "N/A"}}</p>
+                        <p>Title: {{ visa.workauth.title }}</p>
                         <p>Start Date: {{ visa.workauth.startdate | date }}</p>
                         <p>End Date: {{ visa.workauth.enddate | date}}</p>
                     </mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
                     <p style="color: var(--accent-color);">Status: {{ visa.opt.status}}</p>
-                    <!-- <p *ngIf="visa.workauth.dayRemains !== null">Work Auth Day Remains: {{ visa.workauth.dayRemains }}</p> -->
                     <p *ngIf="filterOut != ''">{{ visa.action }}</p>
                 </mat-card-content>
                 <mat-card-actions [ngStyle] = "{'visibility' : (visa.action === 'Waiting for Approval') || (filterOut == '') ? 'hidden' : 'inherit'}">
-                    <button mat-button (click)="onSendNotification(visa.name.firstname)">Send notification</button>
+                    <button mat-button (click)="onSendNotification(visa)">Send notification</button>
                 </mat-card-actions>
             </mat-card>
         </div>

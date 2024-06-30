@@ -7,6 +7,10 @@
     align-items: start;
 }
 
+.house-card:hover{
+    cursor: pointer;
+}
+
 #title{
     color: var(--primary-color);
     border-bottom: 3px solid var(--accent-color);

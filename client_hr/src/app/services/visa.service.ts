@@ -19,4 +19,13 @@ export class VisaService {
 
     return this.http.get<Visa[]>(`${environment.serverUrl}/opt/visaholders`, { headers });
   }
+
+  sendNotification(visa: Visa){
+    
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    });
+
+    return this.http.get<string>(`${environment.serverUrl}/opt/visaholders/${visa.employee_id._id}`, { headers });
+  }
 }

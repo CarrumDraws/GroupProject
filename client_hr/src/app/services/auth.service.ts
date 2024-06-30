@@ -31,7 +31,9 @@ export class AuthService {
 
     //after a successful login, redirect user to Employee page
     console.log('token is set');
-    this.router.navigate(['/employee']);
+    this.router.navigate(['/employee']).then(() => {
+      window.location.reload();
+    });
   }
 }
     

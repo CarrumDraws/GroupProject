@@ -90,13 +90,4 @@ export class HiringComponent implements OnInit{
     window.location.href = mailtoLink;
   }
 
-  // employees_data = [
-  //   { id: 1, name: "firstname last", email: "employeeOne@email.com", status: "pending"},
-  //   { id: 2, name: "Youfirst yourlast", email: "employeeTwo@email.com", status: "pending"},
-  //   { id: 3, name: "myfirstname mylast", email: "employeeThree@email.com", status: "approved"},
-  //   { id: 4, name: "fake name", email: "employee4@email.com", status: "rejected"},
-  //   { id: 5, name: "invisible", email: "employee5@email.com", status: "approved"},
-  //   { id: 6, name: "invalid name", email: "employee6@email.com", status: "approved"},
-  // ]
-
 }

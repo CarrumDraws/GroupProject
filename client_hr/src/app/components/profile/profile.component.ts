@@ -30,7 +30,6 @@ export class ProfileComponent implements OnInit {
     private route: ActivatedRoute, 
     private profileService: ProfileService,
     private fileService: FileService,
-    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {

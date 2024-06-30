@@ -1,8 +1,9 @@
 <mat-toolbar id="material-nav" color="primary">
-  <span routerLink="/" class="home" color="basic">Human Resources</span>
+  <span routerLink="/employee" class="home" color="basic">Human Resources</span>
   <button mat-button routerLink="/employee" color="primary">Employees</button>
   <button mat-button routerLink="/visa" color="primary">Visa Status</button>
   <button mat-button routerLink="/hiring" color="primary">Hiring</button>
   <button mat-button routerLink="/housing" color="primary">Housing</button>
+  <button mat-button color="primary" routerLink="/">{{ token ? 'Logout' : 'Login'}}</button>
 </mat-toolbar>
 <router-outlet></router-outlet>
