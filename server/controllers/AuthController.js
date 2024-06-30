@@ -67,7 +67,7 @@ const register = async (req, res) => {
     });
 
     // Create new default profile pic, upload it as a file
-    const filePath = path.resolve(__dirname, "../assets/default.jpg");
+    const filePath = path.resolve(__dirname, "../assets/Default.png");
     const fileBuffer = await fs.readFile(filePath);
     const file = {
       buffer: fileBuffer,
@@ -187,13 +187,13 @@ const sendRegistrationToken = async (req, res) => {
     };
 
     // Send Email
-    // transporter.sendMail(mailOptions, (error) => {
-    //   if (error) {
-    //     console.log(error);
-    //     res.status(500).send("Failed to send email");
-    //   }
-    //   console.log("Email Sent");
-    // });
+    transporter.sendMail(mailOptions, (error) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send("Failed to send email");
+      }
+      console.log("Email Sent");
+    });
 
     await newRegistration.save();
     res.status(201).json(newRegistration);

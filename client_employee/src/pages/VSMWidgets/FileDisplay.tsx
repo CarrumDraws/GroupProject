@@ -28,18 +28,12 @@ function FileDisplay({ id, type }) {
             },
           }
         );
-        console.log(response.data);
         setFile(response.data);
       } catch (err) {
         console.log("Failed to get File");
       }
     })();
   }, []);
-
-  useEffect(() => {
-    if (!file) return;
-    console.log(file.status);
-  }, [file]);
 
   return (
     <>

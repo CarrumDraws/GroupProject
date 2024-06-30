@@ -62,9 +62,11 @@ const submitOnboarding = async (req, res) => {
     let references;
     let contacts;
 
+    console.log(req.body.contacts);
     try {
       references = JSON.parse(req.body.references);
       contacts = JSON.parse(req.body.contacts);
+      contacts = contacts.map(({ _id, ...rest }) => rest);
     } catch (error) {
       return res.status(400).json({
         error:
@@ -151,6 +153,7 @@ const submitOnboarding = async (req, res) => {
     if (contacts.length == 0) {
       return res.status(400).send("Must Have at Least One Emergency Contact");
     } else {
+      // console.log(contacts);
       for (let i = 0; i < contacts.length; i++) {
         if (!validateContact(contacts[i]))
           return res.status(400).send("Invalid Emergency Contact");
@@ -188,7 +191,7 @@ const submitOnboarding = async (req, res) => {
         },
         phone: {
           cell: Number(cell),
-          work: Number(work),
+          work: work ? Number(work) : null,
         },
         car: {
           make,

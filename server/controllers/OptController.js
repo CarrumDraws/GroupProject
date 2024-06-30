@@ -395,13 +395,13 @@ const sendNotification = async (req, res) => {
       text: `Hello, ${employee.name}!\n\nRemember to send/update your ${opt.status} File.\nWe cannot continue to process you until this file has been sent/updated.`,
     };
 
-    // transporter.sendMail(mailOptions, (error) => {
-    //   if (error) {
-    //     console.log(error);
-    //     res.status(500).send("Failed to send email");
-    //   }
-    //   console.log("Email Sent");
-    // });
+    transporter.sendMail(mailOptions, (error) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send("Failed to send email");
+      }
+      console.log("Email Sent");
+    });
 
     return res.status(200).json({
       message: `Successfully Sent Notification to ${employee.email} about their ${opt.status} file.`,
