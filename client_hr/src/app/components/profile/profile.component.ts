@@ -53,15 +53,6 @@ export class ProfileComponent implements OnInit {
     let fileObservables = [];
     let opt: Opt = profile.opt;
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-  openImageDialog(imageUrl: string): void {
-    this.dialog.open(ImageDialogComponent, {
-      data: { imageUrl }
-    });
-=======
->>>>>>> 67f51b8 (updated page)
       //get opt recipet
       if (opt.optreciept) {
         fileObservables.push(this.fileService.getFileUrl(opt.optreciept));
@@ -101,10 +92,6 @@ export class ProfileComponent implements OnInit {
 
   openPdf(file: File): void {
     this.pdfViewer.open(file);
-<<<<<<< HEAD
-=======
->>>>>>> 17fdb79 (updated page)
->>>>>>> 67f51b8 (updated page)
   }
 
 }
