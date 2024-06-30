@@ -87,6 +87,8 @@ td{
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
+    background-color: white;
+    border-radius: 10px;
 }
 
 .file-card:hover{
