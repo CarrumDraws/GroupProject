@@ -130,6 +130,7 @@ const commentsData = require("./seeddata/comments.json");
     });
     let comments = await Comment.insertMany(commentsData);
 
+    let onboardings = await Onboarding.insertMany(onboardingData);
     let opts = await Opt.insertMany(optData);
     console.log("DB initialized");
   } catch (error) {
