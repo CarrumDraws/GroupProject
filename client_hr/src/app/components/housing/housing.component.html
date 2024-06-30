@@ -1,4 +1,4 @@
-<mat-card> 
+<mat-card id="form-wrapper">
     <form [formGroup]="houseForm" (ngSubmit)="onSubmit()">
 
         <mat-card-title>House Address</mat-card-title>
@@ -70,60 +70,60 @@
             <button mat-raised-button color="primary" type="submit">Add House</button>
         </mat-card-actions>      
     </form>
+</mat-card>
 
-    <h1 id="title">Houses</h1>
-    <mat-card *ngFor="let house of (houseList$ | async)" class="house-card" (click)="onHouseCard(house._id)">
-        <div>
-            <mat-card-title>Address</mat-card-title>
-            <mat-card-subtitle>
-                <table>
-                    <tr>
-                        <th>Street:</th>
-                        <td>{{house.address.street}}</td>           
-                    </tr>
-                    <tr>
-                        <th>Building/Apt:</th>
-                        <td>{{house.address.buildaptnum}}</td>           
-                    </tr>
-                    <tr>
-                        <th>City:</th>
-                        <td>{{house.address.city}}</td>           
-                    </tr>
-                    <tr>
-                        <th>State:</th>
-                        <td>{{house.address.state}}</td>           
-                    </tr>
-                    <tr>
-                        <th>Zip:</th>
-                        <td>{{house.address.zip}}</td>           
-                    </tr>
-                </table>
-            </mat-card-subtitle>
-        </div>
-        <div>
-            <mat-card-title>Landlord</mat-card-title>
-            <mat-card-subtitle>
-                <table>
-                    <tr>
-                        <th>Name:</th>
-                        <td> {{house.landlord.lastname}}, {{house.landlord.firstname}} {{house.landlord.middlename}}</td>           
-                    </tr>
-                    <tr>
-                        <th>Email:</th>
-                        <td>{{house.landlord.email}}</td>           
-                    </tr>
-                    <tr>
-                        <th>Phone:</th>
-                        <td>{{ house.landlord.phone}}</td>           
-                    </tr>
-                </table>
-            </mat-card-subtitle>
-        </div>
-        <div>
-            <mat-card-title># Residents</mat-card-title>
-            <mat-card-subtitle>
-                <h1>{{ house.members.length }}</h1>
-            </mat-card-subtitle>
-        </div>
-    </mat-card>
+<h1 id="title">Houses</h1>
+<mat-card *ngFor="let house of (houseList$ | async)" class="house-card" (click)="onHouseCard(house._id)">
+    <div>
+        <mat-card-title>Address</mat-card-title>
+        <mat-card-subtitle>
+            <table>
+                <tr>
+                    <th>Street:</th>
+                    <td>{{house.address.street}}</td>           
+                </tr>
+                <tr>
+                    <th>Building/Apt:</th>
+                    <td>{{house.address.buildaptnum}}</td>           
+                </tr>
+                <tr>
+                    <th>City:</th>
+                    <td>{{house.address.city}}</td>           
+                </tr>
+                <tr>
+                    <th>State:</th>
+                    <td>{{house.address.state}}</td>           
+                </tr>
+                <tr>
+                    <th>Zip:</th>
+                    <td>{{house.address.zip}}</td>           
+                </tr>
+            </table>
+        </mat-card-subtitle>
+    </div>
+    <div>
+        <mat-card-title>Landlord</mat-card-title>
+        <mat-card-subtitle>
+            <table>
+                <tr>
+                    <th>Name:</th>
+                    <td> {{house.landlord.lastname}}, {{house.landlord.firstname}} {{house.landlord.middlename}}</td>           
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td>{{house.landlord.email}}</td>           
+                </tr>
+                <tr>
+                    <th>Phone:</th>
+                    <td>{{ house.landlord.phone}}</td>           
+                </tr>
+            </table>
+        </mat-card-subtitle>
+    </div>
+    <div>
+        <mat-card-title># Residents</mat-card-title>
+        <mat-card-subtitle>
+            <h1>{{ house.members.length }}</h1>
+        </mat-card-subtitle>
+    </div>
 </mat-card>

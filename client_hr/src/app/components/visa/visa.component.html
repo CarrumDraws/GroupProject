@@ -7,7 +7,7 @@
 <div id="content-wrapper">
     <div>
         <div *ngFor="let visa of visaResult, let i = index">
-            <mat-card (click)="updateSelected(visa.employee_id._id, visa)" [ngStyle]="{ 'background-color': (currentSelectedUser === visa.employee_id._id) ? 'rgb(240,242,245)' : '' }">
+            <mat-card (click)="updateSelected(visa.employee_id._id, visa)" [ngStyle]="{ 'background-color': (currentSelectedUser === visa.employee_id._id) ? 'rgb(228, 230, 233)' : '' }">
                 <img class='icon' src="{{ visa. picture}}" alt="">
                 <mat-card-header>
                     <mat-card-title>
