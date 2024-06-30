@@ -10,7 +10,6 @@ const Registration = require("../models/Registration.js");
 const Report = require("../models/Report.js");
 
 const employeesData = require("./seeddata/employees.json");
-const housesData = require("./seeddata/houses.json");
 const registrationData = require("./seeddata/registration.json");
 const onboardingData = require("./seeddata/onboarding.json");
 const optData = require("./seeddata/opt.json");
@@ -22,6 +21,10 @@ const opteadData = require("./seeddata/optead.json");
 const i983AData = require("./seeddata/i983A.json");
 const i983BData = require("./seeddata/i983B.json");
 const i20Data = require("./seeddata/i20.json");
+
+const housesData = require("./seeddata/houses.json");
+const reportsData = require("./seeddata/reports.json");
+const commentsData = require("./seeddata/comments.json");
 
 (async () => {
   try {
@@ -43,7 +46,7 @@ const i20Data = require("./seeddata/i20.json");
       password: HRPass,
       isHR: true,
     });
-    await HRPerson.save();
+    let hr = await HRPerson.save();
 
     // Hash all Employee Passwords
     for (const employee of employeesData) {
@@ -89,7 +92,7 @@ const i20Data = require("./seeddata/i20.json");
     let i983Bs = await File.insertMany(i983BData);
     let i20s = await File.insertMany(i20Data);
 
-    // Second Pass: Add everything that relies on a fileid
+    // Second Pass: Add everything that relies on a fileid / Multiple ID's
     // Onboarding, OPT
     employees.forEach((employee, index) => {
       if (onboardingData[index]) {
@@ -113,8 +116,22 @@ const i20Data = require("./seeddata/i20.json");
       }
     });
 
-    let onboarding = await Onboarding.insertMany(onboardingData);
-    let opt = await Opt.insertMany(optData);
+    // Third Pass: Add all Reports to a single Employee
+    reportsData.forEach((report, index) => {
+      report.house_id = houses[0]._id;
+      report.employee_id = employees[0]._id;
+    });
+    let reports = await Report.insertMany(reportsData);
+
+    // Fourth Pass: Add Comments (All under the same report + they should alternate between HR and Employee)
+    commentsData.forEach((comment, index) => {
+      comment.report_id = reports[0]._id;
+      comment.employee_id = index % 2 === 0 ? hr._id : employees[0]._id;
+    });
+    let comments = await Comment.insertMany(commentsData);
+
+    let onboardings = await Onboarding.insertMany(onboardingData);
+    let opts = await Opt.insertMany(optData);
     console.log("DB initialized");
   } catch (error) {
     console.error(error);

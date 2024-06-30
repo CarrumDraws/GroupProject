@@ -13,18 +13,6 @@ axiosInstance.interceptors.request.use(
             config.headers.Authorization = `Bearer ${token}`;
         }
         
-        delete config.headers['Content-Type'];
-        // if (config.method === 'post') {
-        //     if (config.data instanceof FormData) {
-        //         const formDataEntries: { [x: string]: FormDataEntryValue; }[] = [];
-        //         config.data.forEach((value, key) => {
-        //             formDataEntries.push({ [key]: value });
-        //         });
-        //         console.log('FormData Contents:', formDataEntries);
-        //     } else {
-        //         console.log('Request Config Data:', config.data); // Log the payload directly if it's not FormData
-        //     }
-        // }
         return config;
     },
     (error) => {

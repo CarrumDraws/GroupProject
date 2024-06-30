@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Input,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+
 import axios from "axios";
 
-import Housemate from "./HousingWidgets/Housemate";
-import Report from "./HousingWidgets/Report";
+import FileDisplay from "./VSMWidgets/FileDisplay";
 
 const VisaStatusManagement: React.FC = () => {
   const [optData, setOptData] = useState(null);
@@ -11,11 +20,69 @@ const VisaStatusManagement: React.FC = () => {
   const [fileTwo, setFileTwo] = useState(null);
   const [fileStatus, setFileStatus] = useState<string | null>(null);
 
-  // Determine Page Status
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  const [selectedFileOne, setSelectedFileOne] = useState(null);
+  const [selectedFileTwo, setSelectedFileTwo] = useState(null);
 
-    // Call Get OPT
+  const [error, setError] = useState({ message: "", open: false });
+
+  const token = localStorage.getItem("token");
+
+  const handleFileChangeOne = (event) => {
+    const file = event.target.files[0];
+    setSelectedFileOne(file);
+  };
+  const handleFileChangeTwo = (event) => {
+    const file = event.target.files[0];
+    setSelectedFileTwo(file);
+  };
+
+  function handleSubmit() {
+    if (!selectedFileOne) {
+      setError({ message: "Missing File(s)!", open: true });
+      return;
+    } else if (optData?.status === "I-983" && !selectedFileTwo) {
+      setError({
+        message: "Missing Second File!",
+        open: true,
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    if (selectedFileOne) formData.append("fileone", selectedFileOne);
+    if (optData?.status === "I-983" && selectedFileTwo)
+      formData.append("filetwo", selectedFileTwo);
+
+    (async () => {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_SERVER_URL}/opt/${optData?.status}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        setFileStatus("Pending");
+        console.log("Files Posted");
+      } catch (err) {
+        console.log("Failed to get OPT Data");
+      }
+    })();
+  }
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setError({ ...error, open: false });
+  };
+
+  // Get OPT
+  useEffect(() => {
     (async () => {
       try {
         const response = await axios.get(
@@ -33,6 +100,7 @@ const VisaStatusManagement: React.FC = () => {
     })();
   }, []);
 
+  // Get File Data from OPT
   useEffect(() => {
     if (!optData) return;
 
@@ -46,10 +114,7 @@ const VisaStatusManagement: React.FC = () => {
       return;
     }
 
-    // Call Get OPT
     (async () => {
-      const token = localStorage.getItem("token");
-
       try {
         // Perform two file calls if file is I-983
         if (optData.status === "I-983") {
@@ -71,7 +136,6 @@ const VisaStatusManagement: React.FC = () => {
           );
 
           setFileOne(responseOne.data);
-          console.log(responseOne.data);
           setFileTwo(responseTwo.data);
           setFileStatus(
             determineTruth(responseOne.data.status, responseTwo.data.status)
@@ -112,18 +176,124 @@ const VisaStatusManagement: React.FC = () => {
       >
         {CustomTypography(
           fileStatus === "Rejected"
-            ? "Rejected: Please Review Feedback"
+            ? `${optData?.status} Rejected: Please Review Feedback`
             : fileStatus === "Pending"
-            ? "Waiting for HR to Approve your "
+            ? optData.status === "I-983"
+              ? `Waiting for HR to Approve and Sign your ${optData?.status}`
+              : `Waiting for HR to Approve your ${optData?.status}`
             : fileStatus === "Upload"
-            ? "Please Upload a copy of your"
-            : "All Files "
+            ? optData.status === "I-983"
+              ? `Please Download and Fill Out both ${optData?.status} Forms`
+              : `Please Upload a copy of your ${optData?.status}`
+            : "All Files Approved!"
         )}
-        {optData?.status}
-        <Box display="flex" flexDirection="row">
-          <PdfViewer url={fileOne?.url} />
-        </Box>
+
+        {/* Rejected Feedback Section */}
+        {fileStatus === "Rejected" && (
+          <Paper style={{ padding: "1rem", backgroundColor: "#fbe3e7" }}>
+            <Typography color="error" sx={{ fontWeight: "bold" }}>
+              Feedback from HR:
+            </Typography>
+            <Typography variant="body1">
+              {optData.status === "I-983" && fileOne.status === "Rejected" ? (
+                <span>
+                  <b>File One: </b> {fileOne.feedback}
+                </span>
+              ) : (
+                fileOne.feedback
+              )}
+            </Typography>
+            {fileTwo && (
+              <Typography variant="body1">
+                <span>
+                  <b>File Two: </b> {fileTwo.feedback}
+                </span>
+              </Typography>
+            )}
+          </Paper>
+        )}
+
+        {/* File Display */}
+        {(fileStatus === "Pending" || fileStatus === "Rejected") && (
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="space-evenly"
+            sx={{ width: "100%", marginTop: "3rem" }}
+          >
+            <PdfViewer url={fileOne?.url} />
+            {fileTwo && <PdfViewer url={fileTwo?.url} />}
+          </Box>
+        )}
+
+        {/* Download I-983 Forms */}
+        {(fileStatus === "Upload" || fileStatus === "Rejected") &&
+          optData?.status === "I-983" && (
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-evenly"
+              sx={{ width: "100%", marginTop: "3rem" }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                href="../../I-983_File_One.pdf"
+                download
+              >
+                Download Form One
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                href="../../I-983_File_Two.pdf"
+                download
+              >
+                Download Form Two
+              </Button>
+            </Box>
+          )}
+
+        {/* File Upload */}
+        {(fileStatus === "Upload" || fileStatus === "Rejected") && (
+          <>
+            <Box sx={{ marginTop: "3rem" }}>
+              <Input
+                id="file-upload"
+                type="file"
+                onChange={handleFileChangeOne}
+              />
+              {optData?.status === "I-983" && (
+                <Input
+                  id="file-upload"
+                  type="file"
+                  onChange={handleFileChangeTwo}
+                />
+              )}
+            </Box>
+
+            <Box sx={{ marginTop: "3rem" }}>
+              <Button
+                variant="contained"
+                component="span"
+                onClick={() => {
+                  handleSubmit();
+                }}
+              >
+                {`Upload File${optData?.status === "I-983" ? "s" : ""}`}
+              </Button>
+            </Box>
+          </>
+        )}
       </Box>
+
+      {/* Error Component */}
+      <Snackbar open={error.open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          {error.message}
+        </Alert>
+      </Snackbar>
+
       <Box
         display="flex"
         flexDirection="column"
@@ -133,9 +303,14 @@ const VisaStatusManagement: React.FC = () => {
           height: "100%",
           width: "max(25vw, 300px)",
           backgroundColor: "#bcddf1",
+          overflowY: "auto", // Add this line to enable vertical scrolling
+          //   maxHeight: "400px", // Adjust the maxHeight as needed
         }}
       >
         {CustomTypography("Approved Documents")}
+        {approvedFiles(optData).map((file, index) => (
+          <FileDisplay key={file[0]} id={file[0]} type={file[1]} />
+        ))}
       </Box>
     </Box>
   );
@@ -163,15 +338,46 @@ function getFileId(data) {
   }
 }
 
+// Returns Array
+function approvedFiles(data) {
+  const arr: string[][] = []; // Array of File ID's
+  if (!data) return arr;
+  if (data.optreciept) arr.push([data.optreciept, "OPT Reciept"]);
+  if (data.optead) arr.push([data.optead, "OPT EAD"]);
+  if (data.i983[0]) arr.push([data.i983[0], "I-983 One"]);
+  if (data.i983[1]) arr.push([data.i983[1], "I-983 Two"]);
+  if (data.i20) arr.push([data.i20, "I-20"]);
+  return arr;
+}
+
 function determineTruth(statusone, statustwo): string {
-  console.log(statusone + " " + statustwo);
   if (statusone === "Pending" || statustwo === "Pending") return "Pending";
   if (statusone === "Rejected" || statustwo === "Rejected") return "Rejected";
   return "Approved";
 }
 
 const PdfViewer = ({ url }) => {
-  return <iframe src={url} style={{ width: "125px", aspectRatio: "1/1.3" }} />;
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignContent="center"
+      textAlign="center" // Align text center
+    >
+      <iframe src={url} style={{ width: "125px", aspectRatio: "1/1.3" }} />
+      <Typography
+        component="a"
+        href={url}
+        style={{ marginTop: "1rem" }}
+        target="_blank"
+        rel="noopener noreferrer"
+        variant="body1"
+      >
+        View File
+      </Typography>
+    </Box>
+  );
 };
 
 const CustomTypography = (text: string) => {

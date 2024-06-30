@@ -54,9 +54,11 @@ const updateInfo = async (req, res) => {
       title,
       startdate,
       enddate,
+      contacts,
     } = req.body;
 
     const picture = req.files["picture"]?.[0];
+    contacts = JSON.parse(req.body.contacts);
     if (!field) return res.status(400).json({ error: "Missing Field Param" });
     if (
       field != "Main" &&
@@ -72,8 +74,8 @@ const updateInfo = async (req, res) => {
     if (field === "Main") {
       if (!firstname || !lastname)
         return res.status(400).send("Missing Name Fields");
-      if (!picture)
-        return res.status(400).send("Missing Profile Picture Field");
+      // if (!picture)
+      //   return res.status(400).send("Missing Profile Picture Field");
       if (!ssn) return res.status(400).send("Missing SSN Field");
       if (!dob) return res.status(400).send("Missing DOB Field");
 
@@ -106,7 +108,9 @@ const updateInfo = async (req, res) => {
     let updateObject = {};
     switch (field) {
       case "Main":
-        const pictureFileID = await processFile(ID, picture, "picture");
+        const pictureFileID = picture
+          ? await processFile(ID, picture, "picture")
+          : null;
         updateObject = {
           name: {
             firstname: firstname,
@@ -117,7 +121,7 @@ const updateInfo = async (req, res) => {
           ssn: Number(ssn),
           dob: Date(dob),
           gender: gender,
-          picture: pictureFileID,
+          ...(pictureFileID && { picture: pictureFileID }),
         };
         break;
       case "Address":
@@ -154,6 +158,7 @@ const updateInfo = async (req, res) => {
         };
         break;
     }
+
     let updatedOnboarding = await Onboarding.updateOne(
       { employee_id: ID },
       { $set: updateObject }, // Use $set to update only specified fields
@@ -236,6 +241,20 @@ const getAll = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+function validateContact(contact) {
+  contact.phone = Number(contact.phone);
+
+  if (
+    !contact.firstname ||
+    !contact.lastname ||
+    !contact.phone ||
+    !contact.email ||
+    !contact.relationship
+  )
+    return false;
+  return true;
+}
 
 module.exports = {
   getOne,

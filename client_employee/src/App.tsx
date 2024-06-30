@@ -13,7 +13,6 @@ import Housing from "./pages/Housing";
 import Registration from "./pages/Registration";
 import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
-import { ProfileProvider } from "./context/ProfileContext";
 import { OnboardingProvider, useOnboarding } from "./context/OnboardingContext";
 
 import "./App.css";
@@ -85,9 +84,7 @@ function MainRoutes() {
               path="/profile"
               element={
                 <ProtectedRoute>
-                  <ProfileProvider>
-                    <Profile />
-                  </ProfileProvider>
+                  <Profile />
                 </ProtectedRoute>
               }
             />
