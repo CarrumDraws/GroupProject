@@ -74,8 +74,9 @@ const Documents: React.FC<DocumentsProps> = ({ fileKeysAndNames }) => {
 
     return (
         <>
-            <Typography paddingTop='1rem' fontSize='1.3rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Approved Documents</Typography>
+            <Typography fontSize='1.3rem' color='#8696A7' paddingTop='1rem' paddingBottom='1rem' sx={{ textDecoration: 'underline' }}>Approved Documents</Typography>
 
+            <Box sx={{ height: '100vh', overflowY: 'auto' }}>
             {fileData.map(({ fileKey, url, filename, status, name }) => (
                 <Box key={fileKey} sx={{ margin: '1rem', textAlign: 'center' }}>
                     <a href={url} target="_blank" rel="noopener noreferrer">
@@ -84,6 +85,7 @@ const Documents: React.FC<DocumentsProps> = ({ fileKeysAndNames }) => {
                     </a>
                 </Box>
             ))}
+            </Box>
         </>
     );
 }
