@@ -225,7 +225,7 @@ const VisaStatusManagement: React.FC = () => {
                 fileOne?.feedback
               )}
             </Typography>
-            {fileTwo && (
+            {fileTwo && fileTwo?.status === "Rejected" && (
               <Typography variant="body1">
                 <span>
                   <b>File Two: </b> {fileTwo.feedback}

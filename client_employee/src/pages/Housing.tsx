@@ -76,6 +76,10 @@ const Housing: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log(reports);
+  }, [reports]);
+
+  useEffect(() => {
     // Call Get House
     (async () => {
       try {
@@ -132,7 +136,11 @@ const Housing: React.FC = () => {
         {CustomTypography("House Members")}
         <Box display="flex" flexDirection="row" sx={{ paddingLeft: "1.5rem" }}>
           {houseData?.members?.map((member, index) => (
-            <Housemate userid={member._id} key={member.email} />
+            <Housemate
+              userid={member._id}
+              key={member.email}
+              email={member.email}
+            />
           ))}
         </Box>
       </Box>

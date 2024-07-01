@@ -161,9 +161,11 @@ const addReport = async (req, res) => {
       status: "Open",
     });
 
+    const pictureUrl = await idToFileLink(onboarding.picture);
     let returnData = {
       ...report.toObject(),
       name: onboarding.name,
+      picture: pictureUrl,
     };
 
     await report.save();
