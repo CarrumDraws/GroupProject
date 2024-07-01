@@ -21,7 +21,7 @@ const upload = multer({ storage: storage });
 
 const employeeRouter = Router();
 
-employeeRouter.get("/", jwtValidation, isntHR, getInfo);
+employeeRouter.get("/", jwtValidation, getInfo);
 employeeRouter.put(
   "/:field",
   upload.fields([{ name: "picture", maxCount: 1 }]),
