@@ -20,6 +20,8 @@ const VisaStatusManagement: React.FC = () => {
   const [fileTwo, setFileTwo] = useState<Record<string, any> | null>(null);
   const [fileStatus, setFileStatus] = useState<string | null>(null);
 
+  const [submitted, setSubmitted] = useState<boolean | null>(false);
+
   const [selectedFileOne, setSelectedFileOne] = useState<Record<
     string,
     any
@@ -38,11 +40,13 @@ const VisaStatusManagement: React.FC = () => {
     setSelectedFileOne(file);
   };
   const handleFileChangeTwo = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file: File | undefined = event.target.files?.[1]; // Use undefined if not found
-    setSelectedFileTwo(file || null); // Ensure to set null if file is undefined
+    const file: File | undefined = event.target.files?.[0];
+    setSelectedFileTwo(file || null);
   };
 
   function handleSubmit() {
+    console.log("Handling Submit");
+
     if (!selectedFileOne) {
       setError({ message: "Missing File(s)!", open: true });
       return;
@@ -55,9 +59,14 @@ const VisaStatusManagement: React.FC = () => {
     }
 
     const formData = new FormData();
-    if (selectedFileOne !== null) formData.append("fileone", selectedFileOne);
-    if (optData?.status === "I-983" && selectedFileTwo)
+    if (selectedFileOne !== null) {
+      setFileOne(URL.createObjectURL(selectedFileOne));
+      formData.append("fileone", selectedFileOne);
+    }
+    if (optData?.status === "I-983" && selectedFileTwo) {
+      setFileTwo(URL.createObjectURL(selectedFileTwo));
       formData.append("filetwo", selectedFileTwo);
+    }
 
     (async () => {
       try {
@@ -73,12 +82,17 @@ const VisaStatusManagement: React.FC = () => {
         );
 
         setFileStatus("Pending");
+        setSubmitted(true);
         console.log("Files Posted");
       } catch (err) {
         console.log("Failed to get OPT Data");
       }
     })();
   }
+
+  useEffect(() => {
+    console.log(selectedFileOne);
+  }, [selectedFileOne]);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -89,6 +103,7 @@ const VisaStatusManagement: React.FC = () => {
 
   // Get OPT
   useEffect(() => {
+    console.log("Getting OPT");
     (async () => {
       try {
         const response = await axios.get(
@@ -120,6 +135,7 @@ const VisaStatusManagement: React.FC = () => {
       return;
     }
 
+    console.log("Getting File Data");
     (async () => {
       try {
         // Perform two file calls if file is I-983
@@ -220,15 +236,29 @@ const VisaStatusManagement: React.FC = () => {
         )}
 
         {/* File Display */}
-        {(fileStatus === "Pending" || fileStatus === "Rejected") && (
+        {!submitted &&
+          (fileStatus === "Pending" || fileStatus === "Rejected") && (
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-evenly"
+              sx={{ width: "100%", marginTop: "3rem" }}
+            >
+              <PdfViewer url={fileOne?.url} />
+              {fileTwo && <PdfViewer url={fileTwo?.url} />}
+            </Box>
+          )}
+
+        {/* Just Submitted File Display */}
+        {submitted && fileOne && (
           <Box
             display="flex"
             flexDirection="row"
             justifyContent="space-evenly"
             sx={{ width: "100%", marginTop: "3rem" }}
           >
-            <PdfViewer url={fileOne?.url} />
-            {fileTwo && <PdfViewer url={fileTwo?.url} />}
+            <PdfViewer url={fileOne} />
+            {fileTwo && <PdfViewer url={fileTwo} />}
           </Box>
         )}
 
