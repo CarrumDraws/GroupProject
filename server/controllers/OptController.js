@@ -392,7 +392,7 @@ const sendNotification = async (req, res) => {
       from: process.env.EMAIL,
       to: employee.email,
       subject: `Reminder: Send/Update your ${opt.status} File`,
-      text: `Hello, ${employee.name}!\n\nRemember to send/update your ${opt.status} File.\nWe cannot continue to process you until this file has been sent/updated.`,
+      text: `Hello!\n\nRemember to send/update your ${opt.status} File.\nWe cannot continue to process you until this file has been sent/updated.`,
     };
 
     transporter.sendMail(mailOptions, (error) => {
