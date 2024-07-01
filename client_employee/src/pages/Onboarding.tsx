@@ -363,7 +363,17 @@ const Onboarding = () => {
                     data.append(key, value);
                 }
             } else if (Array.isArray(value)) {
-                data.append(key, JSON.stringify(value));
+                const newArr = formData.references.map((person) => {
+                    return {
+                        firstname: person.firstname,
+                        middlename: person.middlename,
+                        lastname: person.lastname,
+                        phone: person.phone,
+                        email: person.email,
+                        relationship: person.relationship
+                    };
+                });
+                    data.append(key, JSON.stringify(newArr));
             } else{
                 data.append(key, value !== null ? value.toString() : '');
             }
