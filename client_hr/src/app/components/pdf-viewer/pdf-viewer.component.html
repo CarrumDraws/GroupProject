@@ -2,7 +2,7 @@
     <div class="pdf-container">
       <iframe [src]="pdfUrl | safeUrl" width="100%" height="100%"></iframe>
       <div id="content">
-        <div *ngIf="pdf!.status === 'Pending'" class="action-button-container">
+        <div *ngIf="pdf!.status === 'Pending' && pdf?.fileType != 'license'" class="action-button-container">
           <button mat-button (click)="approve()">Approve</button>
           <button mat-button (click)="openFeedbackDialog()">Reject</button>
         </div>

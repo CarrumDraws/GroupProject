@@ -32,10 +32,10 @@ export class HousingComponent implements OnInit {
     city: ['', Validators.required],
     state: ['', Validators.required],
     zip: ['', Validators.required],
-    beds: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
-    mattresses: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
-    tables: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
-    chairs: [0, [Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]]
+    beds: [0, [Validators.required, Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
+    mattresses: [0, [Validators.required, Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
+    tables: [0, [Validators.required, Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]],
+    chairs: [0, [Validators.required, Validators.pattern('^[0-9]+$'), this.nonNegativeNumberValidator()]]
   });
 
   houseList$: Observable<HouseDetail[]> = new Observable<HouseDetail[]>;
@@ -56,20 +56,20 @@ export class HousingComponent implements OnInit {
     if (this.houseForm.valid) {
       const formValue = this.houseForm.value;
       const house: House = {
-        firstname: formValue.firstname ?? '',
-        middlename: formValue.middlename ?? '',
-        lastname: formValue.lastname ?? '',
-        phone: formValue.phone ?? null,
-        email: formValue.email ?? '',
+        firstname: formValue.firstname!,
+        middlename: formValue.middlename || null,
+        lastname: formValue.lastname!,
+        phone: formValue.phone || null,
+        email: formValue.email!,
         buildaptnum: formValue.buildaptnum!,
-        street: formValue.street ?? '',
-        city: formValue.city ?? '',
-        state: formValue.state ?? '',
-        zip: formValue.zip ?? '',
-        beds: formValue.beds ?? 0,
-        mattresses: formValue.mattresses ?? 0,
-        tables: formValue.tables ?? 0,
-        chairs: formValue.chairs ?? 0,
+        street: formValue.street!,
+        city: formValue.city!,
+        state: formValue.state!,
+        zip: formValue.zip!,
+        beds: formValue.beds || 0,
+        mattresses: formValue.mattresses || 0,
+        tables: formValue.tables || 0,
+        chairs: formValue.chairs || 0,
       };
       console.log(house);
       this.houseService.postHouse(house).subscribe(response => {
@@ -77,7 +77,7 @@ export class HousingComponent implements OnInit {
         this.flashMessageService.info('House is successfully added');
       }, error => {
         console.log(error)
-        this.flashMessageService.warn(error.error.error.error);
+        this.flashMessageService.warn(error.error);
       });
     } else {
       this.flashMessageService.warn("House form is not valid");

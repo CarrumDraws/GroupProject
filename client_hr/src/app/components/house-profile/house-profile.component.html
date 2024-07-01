@@ -1,3 +1,87 @@
 <ng-container *ngIf="houseProfile">
-    {{houseProfile | json}}
+    <mat-card id="house-card">
+        <div id="card-content">
+            <mat-card-title>
+                <h1><i class="ri-home-8-line"></i>House</h1>
+            </mat-card-title>
+            <mat-card-subtitle>
+                <h2><i class="ri-map-2-line"></i>Address</h2>
+            </mat-card-subtitle>
+            <mat-card-content>
+                {{houseProfile.address.street}}, 
+                #{{houseProfile.address.buildaptnum}}, 
+                {{houseProfile.address.city}}, 
+                {{houseProfile.address.state}}, 
+                {{houseProfile.address.zip}}
+            </mat-card-content>
+            <mat-card-subtitle>
+                <h2><i class="ri-user-2-fill"></i>Landlord</h2>
+            </mat-card-subtitle>
+            <mat-card-content>
+                <table>
+                    <tr>
+                        <th>Name:</th>
+                        <td> {{houseProfile.landlord.lastname}}, {{houseProfile.landlord.firstname}} {{houseProfile.landlord.middlename}}</td>           
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{houseProfile.landlord.email}}</td>           
+                    </tr>
+                    <tr>
+                        <th>Phone:</th>
+                        <td>{{ houseProfile.landlord.phone}}</td>           
+                    </tr>
+                </table>
+            </mat-card-content>
+            <mat-card-subtitle>
+                <h2><i class="ri-hotel-bed-fill"></i>Accommodations</h2>
+            </mat-card-subtitle>
+            <mat-card-content>
+                <table>
+                    <tr>
+                        <th>Beds:</th>
+                        <td> {{houseProfile.beds}}</td>           
+                    </tr>
+                    <tr>
+                        <th>Tables:</th>
+                        <td>{{ houseProfile.tables}}</td>           
+                    </tr>
+                    <tr>
+                        <th>Chairs:</th>
+                        <td>{{ houseProfile.chairs}}</td>           
+                    </tr>
+                    <tr>
+                        <th>Mattresses:</th>
+                        <td>{{houseProfile.mattresses}}</td>           
+                    </tr>
+                </table>
+            </mat-card-content>
+        </div>
+        <img src="https://t3.ftcdn.net/jpg/00/62/13/24/360_F_62132429_pw8W4rc1qLlCAP9SS9pPFDZyyPJZHwpw.jpg" alt="123">
+    </mat-card>
+    <mat-card id="card-content">
+        <mat-card-title>
+            <h2><i class="ri-group-fill"></i>Members</h2>
+        </mat-card-title>
+        <div id="member-content-wrapper">
+            <mat-card-content id="member-property">
+                <div>
+                    <p>Name:</p>
+                    <p>Phone:</p>
+                    <p>Email:</p>
+                    <p>Car:</p>
+                </div>
+            </mat-card-content>
+            <mat-card-content id="card-content-member">
+                <div *ngFor="let member of members">
+                    <p>{{ member.profile.name.firstname}}, {{ member.profile.name.lastname}}</p>
+                    <p>{{member.profile.phone.cell}}</p>
+                    <p>{{ member.profile.employee_id.email }}</p>
+                    <p>{{member.profile.car.color}} {{member.profile.car.make}} {{member.profile.car.model}}</p>
+                </div>
+            </mat-card-content>
+        </div>
+    </mat-card>
+    <app-report [houseId]="houseProfile._id"></app-report>
+
 </ng-container>

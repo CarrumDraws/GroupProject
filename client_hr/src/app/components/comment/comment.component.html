@@ -1,0 +1,67 @@
+
+<h1><i class="ri-message-2-line"></i>Report</h1>
+<div *ngIf="report">
+    <ng-container>
+        <mat-card>
+            <mat-card-title>
+                <img matLine [src]="report.picture" alt="{{ report.title }}" width="100">
+                <h3 style="color: var(--accent-color);">{{ report.name.firstname }} {{ report.name.lastname }}</h3>
+                <h3 style="color: rgb(0, 0, 0, 0.54);">{{ report.timestamp | dateFormat}}</h3>
+                
+            </mat-card-title>
+            <mat-card-subtitle>
+                <h3 matLine>[{{ report.status}}] {{ report.title }}</h3>
+                <p matLine>{{ report.description }}</p>
+            </mat-card-subtitle>
+            <mat-card-actions>
+                <button mat-button (click)="toggleReport(report._id)" [ngStyle]="{'background-color': (report.status != 'Closed') ? 'var(--accent-color)' : 'lightskyblue'}">
+                    {{ (report.status != 'Closed') ? 'Close' : 'Reopen'}}
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </ng-container>
+</div>
+
+<h1>Comments</h1>
+<ng-container *ngIf="comments">
+    <ng-container  *ngFor="let comment of comments">
+        <mat-card>
+            <mat-card-title>
+                <img matLine [src]="comment.picture" alt="" width="100">
+                <h3 style="color: var(--accent-color);">{{ comment.name.firstname }} {{ comment.name.lastname }}</h3>
+                <h3 style="color: rgb(0, 0, 0, 0.54);">{{ comment.timestamp | dateFormat}}</h3>
+            </mat-card-title>
+            <mat-card-subtitle>
+                <p matLine>{{ comment.description }}</p>
+            </mat-card-subtitle>
+            <mat-card-actions>
+                <a mat-button class="edit-button" *ngIf="comment.employee_id._id == employeeId" (click)="onEdit(comment)"> 
+                    Edit
+                </a>
+            </mat-card-actions>
+        </mat-card>
+    </ng-container>
+
+<section id="add-comment">
+    <h1>{{editCommentId != null? 'Edit' : 'Add'}} Comment</h1>
+    <mat-card>
+        <mat-card-title>
+            <h3 id="description-title">Description</h3>
+        </mat-card-title>
+        <mat-card-content>
+            <textarea class="responsive-textarea" mat-input [(ngModel)]="description"></textarea>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-button id="cancel-button" (click)="cancelEdit()" *ngIf="(editCommentId != null)">Cancel</button>
+            <button mat-button id="submit-button" (click)="addComment()">Submit</button>
+        </mat-card-actions>
+    </mat-card>
+</section>
+</ng-container>
+
+
+
+
+
+  
+

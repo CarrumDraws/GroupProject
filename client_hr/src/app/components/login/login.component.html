@@ -1,28 +1,30 @@
-<ng-container *ngIf="hasToken$ | async; else loginPage">
-  <div id="logout-container">
-    <button id='logout-button'mat-flat-button (click)="onLogout()" color="primary">Logout</button>
+<div id="page-wrapper">
+  <ng-container *ngIf="hasToken$ | async; else loginPage">
+    <div id="logout-container">
+      <button id='logout-button'mat-flat-button (click)="onLogout()" color="primary">Logout</button>
+    </div>
+  </ng-container>
+  
+  
+  <ng-template #loginPage>
+  <div class="my-div">
+  <img src="assets/Document.jfif" alt="My Image"/>
+  <form class="example-form" [formGroup]="loginForm" (submit)="onSubmit()">
+      <mat-form-field class="example-full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="text" placeholder="Email" formControlName="email">
+        <mat-error>required</mat-error>
+      </mat-form-field>
+   
+      <mat-form-field class="example-full-width">
+        <mat-label >Password</mat-label>
+        <input matInput type="password" placeholder="Password" formControlName="password">
+        <mat-error>required</mat-error>
+      </mat-form-field>
+      <br>
+      <br>
+      <button mat-raised-button color="primary">Login</button>
+  </form>
   </div>
-</ng-container>
-
-
-<ng-template #loginPage>
-<div class="my-div">
-<img src="assets/Document.jfif" alt="My Image"/>
-<form class="example-form" [formGroup]="loginForm" (submit)="onSubmit()">
-    <mat-form-field class="example-full-width">
-      <mat-label>Email</mat-label>
-      <input matInput type="text" placeholder="Email" formControlName="email">
-      <mat-error>required</mat-error>
-    </mat-form-field>
- 
-    <mat-form-field class="example-full-width">
-      <mat-label >Password</mat-label>
-      <input matInput type="password" placeholder="Password" formControlName="password">
-      <mat-error>required</mat-error>
-    </mat-form-field>
-    <br>
-    <br>
-    <button mat-raised-button color="primary">Login</button>
-</form>
+  </ng-template>
 </div>
-</ng-template>

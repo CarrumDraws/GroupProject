@@ -81,7 +81,7 @@
             <app-pdf-viewer #pdfViewer></app-pdf-viewer>
             <div (click)="openPdf(file)">
                 <p >{{file.filename}}</p>
-                <p class="file-status">{{ file.status }}</p>
+                <p class="file-status" *ngIf="file?.fileType != 'license'">{{ file.status }}</p>
             </div>
         </div>
     </div>

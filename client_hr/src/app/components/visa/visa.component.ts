@@ -168,7 +168,9 @@ export class VisaComponent implements OnInit {
     this.pdfViewer.open(file);
   }
 
-  onSendNotification(firstname: string){
-    this.flashMessageService.info("Notification sent to " + firstname);
+  onSendNotification(visa: Visa){
+    this.visaService.sendNotification(visa).subscribe( _ => {
+      this.flashMessageService.info("Notification sent to " + visa.name.firstname);
+    })
   }
 } 
