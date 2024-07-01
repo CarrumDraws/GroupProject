@@ -70,6 +70,7 @@ const submitOnboarding = async (req, res) => {
       references = JSON.parse(req.body.references);
       contacts = JSON.parse(req.body.contacts);
       contacts = contacts.map(({ _id, ...rest }) => rest);
+      references = references.map(({ _id, ...rest }) => rest);
     } catch (error) {
       return res.status(400).json({
         error:
