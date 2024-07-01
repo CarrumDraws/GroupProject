@@ -10,6 +10,7 @@ import NavBar from "./components/NavBar";
 import Profile from "./pages/Profile";
 import VisaStatusManagement from "./pages/VisaStatusManagement";
 import Housing from "./pages/Housing";
+import Report from "./pages/Report";
 import Registration from "./pages/Registration";
 import Login from "./pages/Login";
 import Onboarding from "./pages/Onboarding";
@@ -101,6 +102,14 @@ function MainRoutes() {
               element={
                 <ProtectedRoute>
                   <Housing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/report/:reportid"
+              element={
+                <ProtectedRoute>
+                  <Report />
                 </ProtectedRoute>
               }
             />
