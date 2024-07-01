@@ -19,9 +19,10 @@ interface UserData {
 
 interface HousemateProps {
   userid: string;
+  email: string;
 }
 
-const Housemate: React.FC<HousemateProps> = ({ userid }) => {
+const Housemate: React.FC<HousemateProps> = ({ userid, email }) => {
   const [userData, setUserData] = useState<UserData>({});
 
   useEffect(() => {
@@ -39,7 +40,7 @@ const Housemate: React.FC<HousemateProps> = ({ userid }) => {
           }
         );
         setUserData(response.data.profile);
-        // console.log(response.data.profile);
+        console.log(response.data.profile);
       } catch (err) {
         console.log("Failed to get House Data");
       }
@@ -57,7 +58,9 @@ const Housemate: React.FC<HousemateProps> = ({ userid }) => {
       }}
     >
       <Typography sx={{ fontWeight: "bold" }}>
-        {userData.name ? userData.name?.firstname : "loading"}{" "}
+        {userData.name?.firstname && userData.name?.firstname?.length > 1
+          ? userData.name?.firstname
+          : email}{" "}
         {userData.name?.lastname}
       </Typography>
       <Typography sx={{ fontSize: "0.875rem", fontStyle: "italic" }}>

@@ -87,6 +87,7 @@ const Housing: React.FC = () => {
             },
           }
         );
+        console.log(response.data);
         setHouseData(response.data);
       } catch (err) {
         console.log("Failed to get House Data");
@@ -132,7 +133,11 @@ const Housing: React.FC = () => {
         {CustomTypography("House Members")}
         <Box display="flex" flexDirection="row" sx={{ paddingLeft: "1.5rem" }}>
           {houseData?.members?.map((member, index) => (
-            <Housemate userid={member._id} key={member.email} />
+            <Housemate
+              userid={member._id}
+              key={member.email}
+              email={member.email}
+            />
           ))}
         </Box>
       </Box>
