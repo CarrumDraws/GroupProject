@@ -47,6 +47,11 @@ const commentsData = require("./seeddata/comments.json");
       isHR: true,
     });
     let hr = await HRPerson.save();
+    const HROnboarding = new Onboarding({
+      ...onboardingData[onboardingData.length - 1],
+      employee_id: HRPerson._id,
+    });
+    let hrob = await HROnboarding.save();
 
     // Hash all Employee Passwords
     for (const employee of employeesData) {

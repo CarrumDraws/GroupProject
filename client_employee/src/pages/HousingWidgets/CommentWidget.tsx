@@ -41,6 +41,8 @@ interface ReportData {
 
 interface ReportProps {
   data: ReportData;
+  id: string;
+  isClosed: boolean;
 }
 
 const CommentWidget: React.FC<ReportProps> = ({ data, id, isClosed }) => {
@@ -82,8 +84,10 @@ const CommentWidget: React.FC<ReportProps> = ({ data, id, isClosed }) => {
     })();
   }
 
-  const handleCommentChange = (event: React.FormEvent<HTMLFormElement>) => {
-    setEditText(event.target?.value);
+  const handleCommentChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    setEditText(event.target.value);
   };
 
   return (
