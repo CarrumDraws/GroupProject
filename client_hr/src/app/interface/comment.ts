@@ -19,4 +19,5 @@ export interface Comment{
         preferredname: string;
         _id: string;
     }
+    edit: boolean | null;
 }

@@ -68,6 +68,12 @@ mat-card {
     font-size: large;
 }
   
-  
-  
-  
+.edit-button{
+  color: white;
+  background-color: var(--primary-color);
+}
+
+#cancel-button{
+  background-color: var(--accent-color);
+  color: white;
+}

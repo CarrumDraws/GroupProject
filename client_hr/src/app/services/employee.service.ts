@@ -13,6 +13,14 @@ export class EmployeeService {
 
   private employees:Employee[] = [];
 
+  getPersonalInfo(){
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    });
+    
+    return this.http.get<any>(`${environment.serverUrl}/employee`, { headers });
+  }
+
   getEmployees(): Observable<Employee[]> {
     //get data via api call
     let headers = new HttpHeaders({

@@ -44,4 +44,12 @@ export class ReportService {
 
     return this.http.post<any>(`${environment.serverUrl}/report/${reportId}`, { description }, { headers });
   }
+
+  editComment(commentId: string, description: string){
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    });
+
+    return this.http.put<any>(`${environment.serverUrl}/report/${commentId}`, { description }, { headers });
+  }
 }
