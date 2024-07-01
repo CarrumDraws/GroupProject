@@ -176,8 +176,6 @@ const addReport = async (req, res) => {
 
 const addComment = async (req, res) => {
   try {
-    console.log(req.body);
-    console.log(req.params);
     const { ID, EMAIL, ISHR } = req.body;
     const { reportid } = req.params;
     if (!reportid)
@@ -187,8 +185,8 @@ const addComment = async (req, res) => {
     if (!description || description.length == 0)
       return res.status(400).send("Missing Description");
 
-    const house = await House.findOne({ members: ID });
-    if (!house) return res.status(400).send("House Not Found");
+    // const house = await House.findOne({ members: ID });
+    // if (!house) return res.status(400).send("House Not Found");
 
     const report = await Report.findById(reportid);
     if (!report) return res.status(400).send("Report Not Found");

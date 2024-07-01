@@ -7,8 +7,8 @@ import ReportWidget from "./HousingWidgets/ReportWidget";
 import CommentWidget from "./HousingWidgets/CommentWidget";
 
 function Report() {
-  const [yourId, setYourId] = useState(null);
-  const [reportData, setReportData] = useState({});
+  const [yourId, setYourId] = useState<string | null>(null);
+  const [reportData, setReportData] = useState<Record<string, any>>({});
 
   const commentRef = useRef<HTMLInputElement>(null);
 
@@ -109,10 +109,10 @@ function Report() {
               flexDirection="column"
               sx={{ paddingLeft: "1.5rem" }}
             >
-              {reportData?.comments.map((comment, index) => (
+              {reportData?.comments.map((comment: any) => (
                 <CommentWidget
                   data={comment}
-                  id={yourId}
+                  id={yourId!}
                   isClosed={reportData.report.status === "Closed"}
                   key={comment._id}
                 />

@@ -101,7 +101,7 @@ const OnboardingPersonInput : React.FC<OnboardingPersonInputProps> = ({
                         ))}
                     </Box>
 
-                    <Button onClick={handleAdd} disabled={isDisabled}>Save</Button>
+                    <Button onClick={handleAdd} disabled={isDisabled}>Add</Button>
                 </Box>
         </>
     );

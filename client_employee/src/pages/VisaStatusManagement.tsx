@@ -15,25 +15,31 @@ import axios from "axios";
 import FileDisplay from "./VSMWidgets/FileDisplay";
 
 const VisaStatusManagement: React.FC = () => {
-  const [optData, setOptData] = useState(null);
-  const [fileOne, setFileOne] = useState(null);
-  const [fileTwo, setFileTwo] = useState(null);
+  const [optData, setOptData] = useState<Record<string, any> | null>(null);
+  const [fileOne, setFileOne] = useState<Record<string, any> | null>(null);
+  const [fileTwo, setFileTwo] = useState<Record<string, any> | null>(null);
   const [fileStatus, setFileStatus] = useState<string | null>(null);
 
-  const [selectedFileOne, setSelectedFileOne] = useState(null);
-  const [selectedFileTwo, setSelectedFileTwo] = useState(null);
+  const [selectedFileOne, setSelectedFileOne] = useState<Record<
+    string,
+    any
+  > | null>(null);
+  const [selectedFileTwo, setSelectedFileTwo] = useState<Record<
+    string,
+    any
+  > | null>(null);
 
   const [error, setError] = useState({ message: "", open: false });
 
   const token = localStorage.getItem("token");
 
-  const handleFileChangeOne = (event) => {
-    const file = event.target.files[0];
+  const handleFileChangeOne = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file: File | null = event.target.files?.[0] || null;
     setSelectedFileOne(file);
   };
-  const handleFileChangeTwo = (event) => {
-    const file = event.target.files[0];
-    setSelectedFileTwo(file);
+  const handleFileChangeTwo = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file: File | undefined = event.target.files?.[1]; // Use undefined if not found
+    setSelectedFileTwo(file || null); // Ensure to set null if file is undefined
   };
 
   function handleSubmit() {
@@ -49,7 +55,7 @@ const VisaStatusManagement: React.FC = () => {
     }
 
     const formData = new FormData();
-    if (selectedFileOne) formData.append("fileone", selectedFileOne);
+    if (selectedFileOne !== null) formData.append("fileone", selectedFileOne);
     if (optData?.status === "I-983" && selectedFileTwo)
       formData.append("filetwo", selectedFileTwo);
 
@@ -178,11 +184,11 @@ const VisaStatusManagement: React.FC = () => {
           fileStatus === "Rejected"
             ? `${optData?.status} Rejected: Please Review Feedback`
             : fileStatus === "Pending"
-            ? optData.status === "I-983"
+            ? optData?.status === "I-983"
               ? `Waiting for HR to Approve and Sign your ${optData?.status}`
               : `Waiting for HR to Approve your ${optData?.status}`
             : fileStatus === "Upload"
-            ? optData.status === "I-983"
+            ? optData?.status === "I-983"
               ? `Please Download and Fill Out both ${optData?.status} Forms`
               : `Please Upload a copy of your ${optData?.status}`
             : "All Files Approved!"
@@ -195,12 +201,12 @@ const VisaStatusManagement: React.FC = () => {
               Feedback from HR:
             </Typography>
             <Typography variant="body1">
-              {optData.status === "I-983" && fileOne.status === "Rejected" ? (
+              {optData?.status === "I-983" && fileOne?.status === "Rejected" ? (
                 <span>
-                  <b>File One: </b> {fileOne.feedback}
+                  <b>File One: </b> {fileOne?.feedback}
                 </span>
               ) : (
-                fileOne.feedback
+                fileOne?.feedback
               )}
             </Typography>
             {fileTwo && (
@@ -319,7 +325,7 @@ const VisaStatusManagement: React.FC = () => {
 export default VisaStatusManagement;
 
 // Given the data, returns the correct id / array of ID's
-function getFileId(data) {
+function getFileId(data: any) {
   if (!data || data === "") return null;
   switch (data.status) {
     case "OPT Receipt":
@@ -339,7 +345,7 @@ function getFileId(data) {
 }
 
 // Returns Array
-function approvedFiles(data) {
+function approvedFiles(data: any) {
   const arr: string[][] = []; // Array of File ID's
   if (!data) return arr;
   if (data.optreciept) arr.push([data.optreciept, "OPT Reciept"]);
@@ -350,7 +356,7 @@ function approvedFiles(data) {
   return arr;
 }
 
-function determineTruth(statusone, statustwo): string {
+function determineTruth(statusone: string, statustwo: string): string {
   if (statusone === "Pending" || statustwo === "Pending") return "Pending";
   if (statusone === "Rejected" || statustwo === "Rejected") return "Rejected";
   return "Approved";
