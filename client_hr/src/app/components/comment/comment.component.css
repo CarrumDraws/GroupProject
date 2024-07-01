@@ -44,6 +44,29 @@ mat-card {
     color: lightskyblue;
     margin-left: 4rem;
   }
+
+
+.responsive-textarea {
+    width: 50vw;  /* 50% of the viewport width */
+    height: 10vh; /* 30% of the viewport height */
+    padding: 1em;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none; /* Prevent resizing to keep the dimensions fixed */
+    text-align: left;
+}
+
+#submit-button{
+    color: white;
+    background-color: var(--primary-color);
+}
+
+#description-title{
+    margin-left: 5vw;
+    color: var(--accent-color);
+    font-size: large;
+}
   
   
   

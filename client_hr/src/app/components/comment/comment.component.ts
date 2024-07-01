@@ -17,6 +17,8 @@ export class CommentComponent implements OnInit {
   comments: Comment[] | null = null;
   status: boolean | null = null;
 
+  description: string = "";
+
   constructor(
     private route: ActivatedRoute, 
     private reportService: ReportService,
@@ -36,10 +38,20 @@ export class CommentComponent implements OnInit {
     })
   }
 
+  addComment(){
+    if(this.report){
+      this.reportService.addComment(this.report._id, this.description).subscribe(next => {
+        this.flashMessageService.info('Comment is successfully submitted!')
+        this.loadReport();
+      })
+    }
+  }
+
   loadReport(){
     this.reportService.getComments(this.reportId).subscribe(next =>{
       this.report = next.report;
       this.comments = next.comments;
+      console.log(this.comments);
     })
   }
 
