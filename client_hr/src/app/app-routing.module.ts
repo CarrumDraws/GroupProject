@@ -14,7 +14,6 @@ import { HouseProfileComponent } from './components/house-profile/house-profile.
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { CommentComponent } from './components/comment/comment.component';
 
-
 const routes: Routes = [
   
   {path: '', component: LoginComponent},

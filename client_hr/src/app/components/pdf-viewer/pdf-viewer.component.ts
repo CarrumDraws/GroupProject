@@ -4,7 +4,7 @@ import { File } from 'src/app/interface/file';
 import { environment } from 'src/environments/environment';
 import { FlashMessageService } from 'src/app/services/flash-message.service';
 import { FileFeedbackDialogComponent } from '../file-feedback-dialog/file-feedback-dialog.component';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 
 @Component({
