@@ -110,7 +110,12 @@ function Report() {
               sx={{ paddingLeft: "1.5rem" }}
             >
               {reportData?.comments.map((comment, index) => (
-                <CommentWidget data={comment} id={yourId} key={comment._id} />
+                <CommentWidget
+                  data={comment}
+                  id={yourId}
+                  isClosed={reportData.report.status === "Closed"}
+                  key={comment._id}
+                />
               ))}
             </Box>
           </Box>
@@ -144,6 +149,7 @@ function Report() {
               type="submit"
               variant="contained"
               color="primary"
+              disabled={reportData?.report?.status === "Closed"}
               sx={{ margin: "0rem 0.5rem 0rem 0.5rem" }}
             >
               Submit

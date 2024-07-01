@@ -10,6 +10,8 @@ const File = require("../models/File.js");
 const Opt = require("../models/Opt.js");
 const House = require("../models/House.js");
 
+const { getFileUrl } = require("../config/s3.js");
+
 // Gets YOUR reports
 const getReports = async (req, res) => {
   try {
@@ -90,9 +92,10 @@ const getReport = async (req, res) => {
 
         // Note: You'll have to store the image on AWS3 and generate a link to it later!
         if (comEmployee.isHR) {
+          const hrImg = await getFileUrl("HR_Profile.png");
           updatedComment = {
             ...comment.toObject(),
-            picture: null,
+            picture: hrImg,
             name: {
               firstname: "HR",
               middlename: "",
@@ -213,7 +216,7 @@ const addComment = async (req, res) => {
       picture: pictureUrl,
     };
 
-    // await comment.save();
+    await comment.save();
     res.status(200).json(returnData);
   } catch (error) {
     console.error(error);

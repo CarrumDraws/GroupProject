@@ -81,12 +81,13 @@ const ReportWidget: React.FC<ReportProps> = ({ data }) => {
       </Box>
 
       <Typography>{data.description}</Typography>
-      <Box display="flex" flexDirection="row" sx={{ width: "100%" }}>
+      {/* Don't need to edit Reports lol */}
+      {/* <Box display="flex" flexDirection="row" sx={{ width: "100%" }}>
         <Box flexGrow="99" sx={{ width: "100%" }} />
         <Button variant="contained" sx={{ width: "5rem" }}>
           Edit
         </Button>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

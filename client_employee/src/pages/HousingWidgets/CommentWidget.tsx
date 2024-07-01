@@ -1,6 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Avatar, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+} from "@mui/material";
+import axios from "axios";
 
 interface NameData {
   firstname: string;
@@ -32,11 +43,47 @@ interface ReportProps {
   data: ReportData;
 }
 
-const CommentWidget: React.FC<ReportProps> = ({ data, id }) => {
-  const navigate = useNavigate();
+const CommentWidget: React.FC<ReportProps> = ({ data, id, isClosed }) => {
+  const [open, setOpen] = useState(false);
+  const [currText, setCurrText] = useState(data.description);
+  const [editText, setEditText] = useState(data.description);
 
-  const handleClick = () => {
-    navigate(`/report/${data._id}`); // Navigate to the About page
+  const token = localStorage.getItem("token");
+
+  const revertChanges = () => {
+    setEditText(currText);
+    setOpen(false);
+  };
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = {
+      description: editText,
+    };
+
+    // Call Edit Comment
+    (async () => {
+      try {
+        const response = await axios.put(
+          `${import.meta.env.VITE_SERVER_URL}/report/${data._id}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCurrText(response.data.description);
+        setOpen(false);
+      } catch (err) {
+        console.log("Failed to get House Data");
+      }
+    })();
+  }
+
+  const handleCommentChange = (event: React.FormEvent<HTMLFormElement>) => {
+    setEditText(event.target?.value);
   };
 
   return (
@@ -49,9 +96,6 @@ const CommentWidget: React.FC<ReportProps> = ({ data, id }) => {
         marginBottom: "1rem",
         padding: "1rem",
         borderRadius: "0.5rem",
-      }}
-      onClick={() => {
-        handleClick();
       }}
     >
       <Box display="flex" flexDirection="row">
@@ -79,16 +123,65 @@ const CommentWidget: React.FC<ReportProps> = ({ data, id }) => {
         </Box>
       </Box>
 
-      <Typography>{data.description}</Typography>
+      <Typography>{currText}</Typography>
 
-      {data.employee_id._id === id && (
+      {data.employee_id._id === id && !isClosed && (
         <Box display="flex" flexDirection="row" sx={{ width: "100%" }}>
           <Box flexGrow="99" sx={{ width: "100%" }} />
-          <Button variant="contained" sx={{ width: "5rem" }}>
+          <Button
+            variant="contained"
+            sx={{ width: "5rem" }}
+            onClick={() => {
+              setOpen((prev) => !prev);
+            }}
+          >
             Edit
           </Button>
         </Box>
       )}
+
+      <Dialog open={open} fullWidth>
+        <DialogTitle>Edit Comment</DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            <Box display="flex" flexDirection="column">
+              <TextField
+                id="description"
+                label="New Comment"
+                value={editText}
+                onChange={handleCommentChange}
+                variant="outlined"
+              />
+
+              <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="space-between"
+              >
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  sx={{ margin: "0.5rem 0.5rem 0rem 0.5rem" }}
+                  onClick={() => {
+                    revertChanges();
+                  }}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  sx={{ margin: "0.5rem 0.5rem 0rem 0.5rem" }}
+                >
+                  Submit
+                </Button>
+              </Box>
+            </Box>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
