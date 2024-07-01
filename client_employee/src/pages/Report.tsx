@@ -58,12 +58,6 @@ function Report() {
     })();
   }, [reportid]);
 
-  useEffect(() => {
-    if (!reportData) return;
-
-    console.log(reportData);
-  }, [reportData]);
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = {
@@ -84,7 +78,6 @@ function Report() {
             },
           }
         );
-        console.log(response.data);
         setReportData((prev) => ({
           ...prev,
           comments: [...prev.comments, response.data],

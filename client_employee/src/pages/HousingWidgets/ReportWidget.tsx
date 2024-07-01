@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, Avatar, Button } from "@mui/material";
 
-import defaultImg from "../HousingWidgets/Default.png";
+// import defaultImg from "../HousingWidgets/Default.png";
 
 interface NameData {
   firstname: string;
@@ -51,8 +51,8 @@ const ReportWidget: React.FC<ReportProps> = ({ data }) => {
     >
       <Box display="flex" flexDirection="row">
         <Avatar
-          alt="Remy Sharp"
-          src={defaultImg}
+          alt={`${data.name.firstname} ${data.name.lastname}`}
+          src={data.picture}
           sx={{
             marginRight: "1rem",
           }}
