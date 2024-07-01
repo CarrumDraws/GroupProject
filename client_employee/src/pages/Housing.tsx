@@ -76,6 +76,10 @@ const Housing: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log(reports);
+  }, [reports]);
+
+  useEffect(() => {
     // Call Get House
     (async () => {
       try {
@@ -87,7 +91,6 @@ const Housing: React.FC = () => {
             },
           }
         );
-        console.log(response.data);
         setHouseData(response.data);
       } catch (err) {
         console.log("Failed to get House Data");

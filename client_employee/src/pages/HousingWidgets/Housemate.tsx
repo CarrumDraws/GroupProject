@@ -40,7 +40,6 @@ const Housemate: React.FC<HousemateProps> = ({ userid, email }) => {
           }
         );
         setUserData(response.data.profile);
-        console.log(response.data.profile);
       } catch (err) {
         console.log("Failed to get House Data");
       }
