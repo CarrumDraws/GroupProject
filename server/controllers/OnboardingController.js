@@ -4,6 +4,9 @@ const { uploadFileToS3, getFileUrl } = require("../config/s3.js");
 const processFile = require("../utils/processFile.js");
 const idToFileLink = require("../utils/idToFileLink.js");
 
+const fs = require("fs").promises;
+const path = require("path");
+
 const Onboarding = require("../models/Onboarding.js");
 const Opt = require("../models/Opt.js");
 
@@ -56,15 +59,17 @@ const submitOnboarding = async (req, res) => {
       licensenumber,
       expdate,
     } = req.body;
-    const picture = req.files["picture"]?.[0];
+    let picture = req.files["picture"]?.[0];
     const optreciept = req.files["optreciept"]?.[0];
     const license = req.files["license"]?.[0];
     let references;
     let contacts;
 
+    console.log(req.body.contacts);
     try {
       references = JSON.parse(req.body.references);
       contacts = JSON.parse(req.body.contacts);
+      contacts = contacts.map(({ _id, ...rest }) => rest);
     } catch (error) {
       return res.status(400).json({
         error:
@@ -74,7 +79,7 @@ const submitOnboarding = async (req, res) => {
 
     if (!firstname || !lastname)
       return res.status(400).send("Missing Name Fields");
-    if (!picture) return res.status(400).send("Missing Profile Picture Field");
+    // if (!picture) return res.status(400).send("Missing Profile Picture Field");
 
     if (!buildaptnum || !street || !city || !state || !zip)
       return res.status(400).send("Missing Address Fields");
@@ -151,6 +156,7 @@ const submitOnboarding = async (req, res) => {
     if (contacts.length == 0) {
       return res.status(400).send("Must Have at Least One Emergency Contact");
     } else {
+      // console.log(contacts);
       for (let i = 0; i < contacts.length; i++) {
         if (!validateContact(contacts[i]))
           return res.status(400).send("Invalid Emergency Contact");
@@ -161,8 +167,19 @@ const submitOnboarding = async (req, res) => {
         return res.status(400).send("Invalid Reference");
     }
 
-    // Add necessary files to files
+    // Create new default profile pic if none provided
+    if (!picture) {
+      const filePath = path.resolve(__dirname, "../assets/Default.png");
+      const fileBuffer = await fs.readFile(filePath);
+      picture = {
+        buffer: fileBuffer,
+        mimetype: "image/jpeg", // Set the correct MIME type
+        originalname: path.basename(filePath),
+      };
+    }
+
     const pictureFileID = await processFile(ID, picture, "picture");
+
     const optFileID = await processFile(ID, optreciept, "optreciept");
     if (optFileID) initializeOpt(ID, optFileID, "optFileID");
     const licenseFileID = await processFile(ID, license, "license");
@@ -188,7 +205,7 @@ const submitOnboarding = async (req, res) => {
         },
         phone: {
           cell: Number(cell),
-          work: Number(work),
+          work: work ? Number(work) : null,
         },
         car: {
           make,

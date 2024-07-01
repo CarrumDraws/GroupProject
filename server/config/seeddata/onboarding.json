@@ -453,5 +453,52 @@
     ],
     "status": "Rejected",
     "feedback": "Sorry, just not what we're looking for!"
+  },
+  {
+    "employee_id": null,
+    "name": {
+      "firstname": "",
+      "middlename": "",
+      "lastname": "",
+      "preferredname": ""
+    },
+    "picture": null,
+    "address": {
+      "buildaptnum": null,
+      "street": "",
+      "city": "",
+      "state": "",
+      "zip": ""
+    },
+    "phone": {
+      "cell": null,
+      "work": null
+    },
+    "car": {
+      "make": "",
+      "model": "",
+      "color": ""
+    },
+    "ssn": null,
+    "dob": null,
+    "gender": "Male",
+    "citizenship": null,
+    "citizenshiptype": "Citizen",
+    "workauth": {
+      "workauth": null,
+      "title": "",
+      "startdate": null,
+      "enddate": null
+    },
+    "license": {
+      "haslicense": null,
+      "licensenumber": "",
+      "expdate": null,
+      "licensefile": null
+    },
+    "references": [],
+    "contacts": [],
+    "status": "Not Started",
+    "feedback": ""
   }
 ]
