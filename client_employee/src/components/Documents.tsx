@@ -74,8 +74,7 @@ const Documents: React.FC<DocumentsProps> = ({ fileKeysAndNames }) => {
 
     return (
         <>
-            <Typography paddingTop='1rem' fontSize='1.5rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Documents</Typography>
-            <Typography fontSize='0.9rem'>(The approved documents only)</Typography>
+            <Typography paddingTop='1rem' fontSize='1.3rem' color='#8696A7' sx={{ textDecoration: 'underline' }}>Approved Documents</Typography>
 
             {fileData.map(({ fileKey, url, filename, status, name }) => (
                 <Box key={fileKey} sx={{ margin: '1rem', textAlign: 'center' }}>
