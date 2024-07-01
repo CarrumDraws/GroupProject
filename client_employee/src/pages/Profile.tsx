@@ -99,7 +99,7 @@ const ProfilePage = () => {
                         ssn: profile.ssn,
                         dob: formatDate(profile.dob, '/'),
                         gender: profile.gender,
-                        picture: profile.picture // DELETE?
+                        picture: profile.picture
                     },
                     address: {
                         buildaptnum: profile.address.buildaptnum,
@@ -188,27 +188,153 @@ const ProfilePage = () => {
         setEditMode(prevState => ({ ...prevState, [field]: !prevState[field] }));
     };
 
+    const handleImageClicik = () => {
+        document.getElementById('profilePicFile')?.click();
+    }
+
+    const handleUploadProfile = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if(files) {
+            const file = files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const res = reader.result;
+                    if(res) {
+                        setProfilePicURL(res.toString());
+
+                        const data: MainForm = {
+                            firstname: '',
+                            middlename: '',
+                            lastname: '',
+                            preferredname: '',
+                            email: '',
+                            ssn: '',
+                            dob: '',
+                            gender: '',
+                            picture: ''
+                        };
+                        Object.keys(mainForm).forEach(key => {
+                            const value = (mainForm as MainForm)[key as MainFormKeys];
+                            if(value && key == 'dob') {
+                                (data as MainForm)[key as MainFormKeys] = formatDate(value.toString(), '-');
+                            }else if(value){
+                                (data as MainForm)[key as MainFormKeys] = value.toString();
+                            }
+                        });
+                        data['picture'] = file;
+
+                        //upload file to server
+                        try {
+                            await axiosInstance.put(`${import.meta.env.VITE_SERVER_URL}/employee/Main`, data, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            });
+                        } catch (error : any) {
+                            if (error.response && error.response.data && error.response.data.error) {
+                                const errorMessage = error.response.data.error;
+                                alert('Error saving changes: ' + errorMessage);
+                            }else if(error.response && error.response.data && error.response.data.message) {
+                                const errorMessage = error.response.data.message;
+                                alert('Error saving changes: ' + errorMessage);
+                            }
+                        }
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
     const removeEmptyEmergencyContacts = (contacts: Person[]) => {
-        const filteredEcs = contacts.filter(contact => {
+        return contacts.filter(contact => {
             return !(contact.firstname === '' && contact.middlename === '' && contact.lastname === '' && contact.phone === '' && contact.email === '' && contact.relationship === '');
         });
-        setEmergencyContactsForm(filteredEcs);
     };
 
+    const cancelEcChanges = () => {
+        originalValues.emergencyContacts.forEach((originalEc, index) => {
+            setEmergencyContactsForm((prevEcs) => {
+                const newEmergencies = [...prevEcs];
+                newEmergencies[index] = originalEc;
+                return newEmergencies;
+            });
+        });
+    }
 
-    const saveChanges = async (field: keyof EditModeState | 'emergencyContacts', data: any) => {
+    const cancelChanges = (field: keyof EditModeState | 'emergencyContacts') => {
+        if (window.confirm("Do you want to discard the changes in the section?")) {
+            if (field === 'emergencyContacts') {              
+                cancelEcChanges();
+            } else {
+                switch (field) {
+                    case 'main':
+                        setMainForm(originalValues.main);
+                        break;
+                    case 'address':
+                        setAddressForm(originalValues.address);
+                        break;
+                    case 'contact':
+                        setContactForm(originalValues.contact);
+                        break;
+                    case 'employment':
+                        setEmploymentForm(originalValues.employment);
+                        break;
+                }
+            }
+
+            // toggle the edit mode back
+            setEditMode(prevState => ({ ...prevState, [field]: false }));
+        }
+    };
+
+    const ecAllEmpty = (ecs : Person[]) => {
+        for(let i = 0; i < ecs.length; i++) {
+            if(!(ecs.length === 1 &&
+                ecs[i].firstname === '' &&
+                ecs[i].middlename === '' &&
+                ecs[i].lastname === '' &&
+                ecs[i].phone === '' &&
+                ecs[i].email === '' &&
+                ecs[i].relationship === ''
+            )){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    const saveChanges = async (field: keyof EditModeState | 'emergencyContacts') => {
         let processedData: any = {};
         
         // removing empty emergency contacts
         if (field === 'emergencyContacts') {
-            removeEmptyEmergencyContacts(data as Person[]);
-            // handle the case when there is no non-empty emergency contact left
-            if((emergencyContactsForm as Person[]).length < 1) {
+            const filteredEcs = removeEmptyEmergencyContacts(emergencyContactsForm);
+            setEmergencyContactsForm(filteredEcs);
+
+            if(ecAllEmpty(filteredEcs)) {
                 alert('Error saving changes: You need at least one emergency contact.');
+                cancelEcChanges();
                 return;
             }
+
+            const processedEcForm = filteredEcs.map((person) => {
+                return {
+                    firstname: person.firstname,
+                    middlename: person.middlename,
+                    lastname: person.lastname,
+                    phone: person.phone,
+                    email: person.email,
+                    relationship: person.relationship
+                };
+            });
+
             processedData = new FormData();
-            processedData.append('contacts', JSON.stringify(emergencyContactsForm));
+            processedData.append('contacts', JSON.stringify(processedEcForm));
         }
 
         switch(field){
@@ -216,7 +342,7 @@ const ProfilePage = () => {
                 Object.keys(mainForm).forEach(key => {
                     const value = (mainForm as MainForm)[key as MainFormKeys];
                     if(key == 'dob') {
-                        (processedData as MainForm)[key as MainFormKeys] = formatDate(value, '-');
+                        (processedData as MainForm)[key as MainFormKeys] = formatDate(value.toString(), '-');
                     }else{
                         (processedData as MainForm)[key as MainFormKeys] = value.toString();
                     }
@@ -246,7 +372,7 @@ const ProfilePage = () => {
                 break;
         };
 
-        // post the change
+        // put the change
         try {
             await axiosInstance.put(`${import.meta.env.VITE_SERVER_URL}/employee/${capitalizeFirstLetter(field)}`, processedData, {
                 headers: {
@@ -266,7 +392,7 @@ const ProfilePage = () => {
             if (field === 'emergencyContacts') {
                 setOriginalValues(prev => ({
                     ...prev,
-                    emergencies: [...data as Person[]]
+                    emergencies: [emergencyContactsForm]
                 }));
             }else {
                 switch (field) {
@@ -286,39 +412,6 @@ const ProfilePage = () => {
             }
 
             toggleEditMode(field as keyof EditModeState);
-        }
-    };
-
-    const cancelChanges = (field: keyof EditModeState | 'emergencyContacts') => {
-        if (window.confirm("Do you want to discard the changes in the section?")) {
-            if (field === 'emergencyContacts') {              
-                originalValues.emergencyContacts.forEach((originalEc, index) => {
-                    setEmergencyContactsForm((prevEcs) => {
-                        const newEmergencies = [...prevEcs];
-                        newEmergencies[index] = originalEc;
-                        return newEmergencies;
-                    });
-                    removeEmptyEmergencyContacts(emergencyContactsForm);
-                });
-            } else {
-                switch (field) {
-                    case 'main':
-                        setMainForm(originalValues.main);
-                        break;
-                    case 'address':
-                        setAddressForm(originalValues.address);
-                        break;
-                    case 'contact':
-                        setContactForm(originalValues.contact);
-                        break;
-                    case 'employment':
-                        setEmploymentForm(originalValues.employment);
-                        break;
-                }
-            }
-
-            // toggle the edit mode back
-            setEditMode(prevState => ({ ...prevState, [field]: false }));
         }
     };
 
@@ -434,7 +527,7 @@ const ProfilePage = () => {
                             
                             <EditButton
                                 editMode={editMode.main}
-                                saveChanges ={() => saveChanges('main', mainForm)}
+                                saveChanges ={() => saveChanges('main')}
                                 cancelChanges={() => cancelChanges('main')}
                                 toggleEditMode={() => toggleEditMode('main')}
                             />
@@ -493,7 +586,7 @@ const ProfilePage = () => {
                             
                             <EditButton
                                 editMode={editMode.address}
-                                saveChanges ={() => saveChanges('address', addressForm)}
+                                saveChanges ={() => saveChanges('address')}
                                 cancelChanges={() => cancelChanges('address')}
                                 toggleEditMode={() => toggleEditMode('address')}
                             />
@@ -527,7 +620,7 @@ const ProfilePage = () => {
 
                             <EditButton
                                 editMode={editMode.contact}
-                                saveChanges ={() => saveChanges('contact', contactForm)}
+                                saveChanges ={() => saveChanges('contact')}
                                 cancelChanges={() => cancelChanges('contact')}
                                 toggleEditMode={() => toggleEditMode('contact')}
                             />
@@ -570,7 +663,7 @@ const ProfilePage = () => {
 
                             <EditButton
                                 editMode={editMode.employment}
-                                saveChanges ={() => saveChanges('employment', employmentForm)}
+                                saveChanges ={() => saveChanges('employment')}
                                 cancelChanges={() => cancelChanges('employment')}
                                 toggleEditMode={() => toggleEditMode('employment')}
                             />
@@ -655,7 +748,7 @@ const ProfilePage = () => {
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                             {editMode.emergencyContacts ? (
                                 <>
-                                    <Button onClick={() => saveChanges('emergencyContacts', emergencyContactsForm)}>Save</Button>
+                                    <Button onClick={() => saveChanges('emergencyContacts')}>Save</Button>
                                     <Button onClick={addEmergencyContact}>Add Emergency Contact</Button>
                                     <Button onClick={() => cancelChanges('emergencyContacts')} sx={{ color: 'red', borderColor: 'red'}} >Cancel</Button>
                                 </>
@@ -666,6 +759,12 @@ const ProfilePage = () => {
                     </form>
 
                     <hr />
+
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: '3rem' }}>
+                        <Button onClick={handleLogout} sx={{ color: 'red', borderColor: 'red', fontSize: '1rem', paddingLeft: '1.5rem' }}>
+                            Log Out
+                        </Button>
+                    </Box>
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '20%' }}>
@@ -673,19 +772,16 @@ const ProfilePage = () => {
                         <Box sx={{ marginTop: '1.5rem', textAlign: 'center' }}>
                             <img 
                                 src={profilePicURL}
-                                alt="Profile Pic" 
-                                style={{ width: '100px', height: '100px', borderRadius: '50%' }} 
+                                alt="Profile Pic"
+                                onClick={handleImageClicik}
+                                style={{ width: '100px', height: '100px', borderRadius: '50%', cursor: 'pointer' }} 
                             />
+                            <input type='file' id='profilePicFile' onChange={handleUploadProfile} style={{ display: 'none' }} />
                         </Box>
                     )}
 
                     <Documents fileKeysAndNames={fileKeys} />
                 </Box>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: '3rem' }}>
-                <Button onClick={handleLogout} sx={{ color: 'red', borderColor: 'red', fontSize: '1rem', paddingLeft: '1.5rem' }}>
-                    Log Out
-                </Button>
             </Box>
         </Container>
     );

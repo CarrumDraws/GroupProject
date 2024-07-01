@@ -143,6 +143,7 @@ const Onboarding = () => {
         references: initialData.references,
         contacts: initialData.contacts
     });
+    const [email, setEmail] = useState('Email');
 
     // setting whether the form is disabled according to the status
     let isDisabled = false;
@@ -198,6 +199,8 @@ const Onboarding = () => {
             if(onboardingData.status === 'Pending' || onboardingData.status === "Approved") {
                 setUploadedFiles(files);
             }
+
+            setEmail(onboardingData.employee_id.email);
         }
     }, [onboardingData, optReciept, files]);
 
@@ -520,7 +523,7 @@ const Onboarding = () => {
                         label='Email'
                         type='text'
                         name=''
-                        value={initialData.employee_id.email}
+                        value={email}
                         onChange={()=>{}}
                         isDisabled={true}
                     />

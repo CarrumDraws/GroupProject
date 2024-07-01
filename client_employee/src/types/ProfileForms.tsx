@@ -9,7 +9,7 @@ export interface MainForm {
     ssn: string;
     dob: string;
     gender: string;
-    picture: string;
+    picture: string | File;
 }
 
 export type MainFormKeys = keyof MainForm;
