@@ -38,7 +38,7 @@ interface Props {
 
 const Housing: React.FC = () => {
   const [houseData, setHouseData] = useState<HouseData | null>(null);
-  const [reports, setReports] = useState([]);
+  const [reports, setReports] = useState<any[]>([]);
 
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
