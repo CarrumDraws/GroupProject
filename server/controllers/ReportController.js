@@ -147,7 +147,7 @@ const addReport = async (req, res) => {
     if (!description || description.length == 0)
       return res.status(400).send("Missing Description");
 
-    const house = await House.findOne({ members: "6681734e119945586f2815eb" });
+    const house = await House.findOne({ members: ID });
     if (!house) return res.status(400).send("House Not Found");
 
     const onboarding = await Onboarding.findOne({ employee_id: ID });

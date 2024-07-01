@@ -64,7 +64,6 @@ const Housing: React.FC = () => {
             },
           }
         );
-        console.log(response.data);
         setReports((prev) => [...prev, response.data]);
       } catch (err) {
         console.log("Failed to get House Data");
@@ -105,7 +104,6 @@ const Housing: React.FC = () => {
             },
           }
         );
-        console.log(response.data);
         setReports(response.data);
       } catch (err) {
         console.log("Failed to get House Data");
