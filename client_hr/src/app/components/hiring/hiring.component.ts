@@ -82,7 +82,7 @@ export class HiringComponent implements OnInit{
 
   viewApplication(employee_id: number){
 
-    window.open(`/application/${employee_id}`, environment.myUrl);
+    window.open(`${environment.myUrl}/application/${employee_id}`, '_blank');
   }
 
   sendEmail(email: string) {

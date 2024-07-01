@@ -1,6 +1,6 @@
-mat-card{
+mat-card, mat-paginator{
 
-    width: 60vw;
+    width: 60%;
     margin: 3vh 20vw 0;
 }
 #house-card{

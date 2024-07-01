@@ -1,0 +1,49 @@
+mat-card {
+  margin: 0 20px 1rem;
+  width: 60vw;
+  margin-left: 20vw;
+}
+
+h1{
+  text-align: left;
+  color: var(--primary-color);
+  margin: 3rem 20vw 0;
+  border-bottom: 3px solid var(--accent-color);
+}
+
+img{
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+mat-card-title{
+  display: flex;
+}
+mat-card-title > *{
+  margin: 0 0.5rem;
+}
+
+mat-card-subtitle > * {
+  text-align: left;
+  margin-left: 3.5rem;
+}
+
+mat-card-actions{
+  display: flex;
+  justify-content: space-between;
+}
+
+button{
+  color: white;
+}
+
+h5{
+  text-decoration: underline;
+  color: lightskyblue;
+  margin-left: 4rem;
+}
+
+
+

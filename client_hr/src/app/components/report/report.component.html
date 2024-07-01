@@ -1,0 +1,31 @@
+<div class="report-list">
+    <h1><i class="ri-message-2-line"></i>Report</h1>
+    <div>
+        <ng-container  *ngFor="let report of paginatedReports">
+            <mat-card>
+                <mat-card-title>
+                    <img matLine [src]="report.picture" alt="{{ report.title }}" width="100">
+                    <h3 style="color: var(--accent-color);">{{ report.name.firstname }} {{ report.name.lastname }}</h3>
+                    <h3 style="color: rgb(0, 0, 0, 0.54);">{{ report.timestamp | dateFormat}}</h3>
+                    
+                </mat-card-title>
+                <mat-card-subtitle>
+                    <h3 matLine>[{{ report.status}}] {{ report.title }}</h3>
+                    <p matLine>{{ report.description }}</p>
+                </mat-card-subtitle>
+                <mat-card-actions>
+                    <h5 (click)="viewComment(report)">View Comments</h5>
+                    <button mat-button (click)="toggleReport(report._id)" [ngStyle]="{'background-color': (report.status != 'Closed') ? 'var(--accent-color)' : 'lightskyblue'}">
+                        {{ (report.status != 'Closed') ? 'Close' : 'Reopen'}}
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </ng-container>
+    </div>
+  
+    <mat-paginator [length]="totalReports"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="pageSizeOptions"
+                   (page)="onPageChange($event)">
+    </mat-paginator>
+</div>

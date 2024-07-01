@@ -38,3 +38,7 @@ button{
     font-size: larger;
     width: 5rem;
 }
+#page-wrapper{
+    background-color: white;
+    height: 100%;
+}

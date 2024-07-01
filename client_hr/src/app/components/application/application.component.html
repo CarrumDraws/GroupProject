@@ -88,7 +88,7 @@
         </mat-card>
     </div>
       
-    <h1>Ancillary Info</h1>
+    <h1>Secondary Info</h1>
     <div class="card-row">
         <mat-card appearance="outlined">
             <mat-card-header>
@@ -126,11 +126,11 @@
             <mat-card-content>
               <mat-form-field >
                 <mat-label>License Number</mat-label>
-                <input matInput disabled value="{{application.license.licensenumber}}">
+                <input matInput disabled value="{{ (application.license.haslicense) ? application.license.licensenumber : 'N/A'}}">
               </mat-form-field>
               <mat-form-field >
                 <mat-label>Expiring Date</mat-label>
-                <input matInput disabled value="{{application.license.expdate | date}}">
+                <input matInput disabled value="{{(application.license.haslicense) ? (application.license.expdate | date)  : 'N/A'}}">
               </mat-form-field>
             </mat-card-content>
             <app-pdf-viewer #pdfViewer></app-pdf-viewer>

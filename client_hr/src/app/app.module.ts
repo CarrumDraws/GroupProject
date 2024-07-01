@@ -14,6 +14,14 @@ import { HousingComponent } from './components/housing/housing.component';
 import { LoginComponent } from './components/login/login.component';
 import { ApplicationComponent } from './components/application/application.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
+import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
+import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
+import { PdfService } from './services/pdf.service';
+import { SafeUrlPipe } from './pipe/safe-url.pipe';
+import { HouseProfileComponent } from './components/house-profile/house-profile.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import { ReportComponent } from './components/report/report.component';
+
 //NgRx
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -40,14 +48,12 @@ import { FilterComponent } from './components/filter/filter.component';
 import { FileDialogComponent } from './components/file-dialog/file-dialog.component';
 import { FileFeedbackDialogComponent } from './components/file-feedback-dialog/file-feedback-dialog.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatListModule } from '@angular/material/list';
+import { DateFormatPipe } from './pipe/date-format.pipe';
+import { CommentComponent } from './components/comment/comment.component';
 
 
-import { PdfDialogComponent } from './components/pdf-dialog/pdf-dialog.component';
-import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
-import { PdfService } from './services/pdf.service';
-import { SafeUrlPipe } from './pipe/safe-url.pipe';
-import { HouseProfileComponent } from './components/house-profile/house-profile.component';
-import { NotFoundComponent } from './components/not-found/not-found.component';
 
 
 @NgModule({
@@ -69,6 +75,8 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
     HttpClientModule,
     MatCardModule,
     MatIconModule,
+    MatPaginatorModule,
+    MatListModule,
     StoreModule.forRoot({ auth: AuthReducer}),
     EffectsModule.forRoot([AuthEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
@@ -93,7 +101,10 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
     PdfViewerComponent,
     SafeUrlPipe,
     HouseProfileComponent,
-    NotFoundComponent
+    ReportComponent,
+    NotFoundComponent,
+    DateFormatPipe,
+    CommentComponent
   ],
 
   providers: [PdfService],

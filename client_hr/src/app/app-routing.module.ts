@@ -12,6 +12,8 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { FileComponent } from './components/file/file.component';
 import { HouseProfileComponent } from './components/house-profile/house-profile.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { CommentComponent } from './components/comment/comment.component';
+
 
 const routes: Routes = [
   
@@ -24,6 +26,7 @@ const routes: Routes = [
   {path: 'profile/:employeeId', component: ProfileComponent, canActivate: [AuthGuard]},
   {path: 'file', component: FileComponent, canActivate: [AuthGuard] },
   {path: 'housing/:houseId', component: HouseProfileComponent, canActivate: [AuthGuard]},
+  {path: 'comment/:reportId', component: CommentComponent , canActivate: [AuthGuard]},
    // Catch-all route, redirect unmatched routes to the home page
   { path: '**', component: NotFoundComponent}
 ];
